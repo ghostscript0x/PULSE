@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/" class="logo">PULSE</a>
+            <nav>
+                <a href="/" class="<%= title === 'PULSE | Community Health Layer' ? 'active' : '' %>">Base</a>
+                <a href="/about" class="<%= title === 'PULSE | System Protocol' ? 'active' : '' %>">Protocol</a>
+                <a href="/dashboard" class="<%= title.includes('Dashboard') ? 'active' : '' %>">Intelligence</a>
+                <a href="/contributors" class="<%= title.includes('Contributor') ? 'active' : '' %>">Telemetry</a>
+                <a href="/bounties" class="<%= title.includes('Bounty') ? 'active' : '' %>">Production</a>
+            </nav>
+        </header>
+
+        <main>
+            <%- body %>
+        </main>
+
+        <footer style="margin-top: 8rem; padding: 4rem 0; border-top: 1px solid var(--glass-border); text-align: center;">
+            <div class="mono text-soft" style="font-size: 0.6rem; letter-spacing: 4px; margin-bottom: 1rem;">PULSE_INTELLIGENCE_OPERATING_SYSTEM_V3.3</div>
+            <div class="text-soft" style="font-size: 0.7rem; opacity: 0.5;">&copy; 2026 | COMMUNITY ICU MONITORING | DERIVED FROM ZERO AUTHORITY DATA</div>
+        </footer>
+    </div>
+    <script src="/js/main.js"></script>
+</body>
+</html>

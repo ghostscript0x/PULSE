@@ -1,0 +1,55 @@
+<section style="margin-bottom: 3rem;">
+    <div class="mono text-cyan" style="font-size: 0.7rem; margin-bottom: 1rem;">[MODULE_04]</div>
+    <h1 style="margin-bottom: 1rem; letter-spacing: 10px;">CONTRIBUTOR_ANALYTICS</h1>
+    <p class="text-soft glow-text" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">Real-time reputation telemetry and engagement tracking.</p>
+</section>
+
+<% if (contributors.length === 0) { %>
+    <section class="glass-panel" style="text-align: center; padding: 6rem 2rem; border-style: dashed;">
+        <div class="text-warning glow-text" style="font-size: 2rem; margin-bottom: 1.5rem;">[!]</div>
+        <h2 class="text-warning">ZERO_CONTRIBUTORS_DETECTED</h2>
+        <p class="text-soft">The target DAO registry contains no active contributor entries at this timestamp.</p>
+    </section>
+<% } else { %>
+    <section class="glass-panel" style="padding: 0;">
+        <div style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+            <div class="mono text-soft" style="font-size: 0.7rem;">REGISTRY_COUNT: <%= contributors.length %></div>
+            <div class="text-healthy mono" style="font-size: 0.6rem;">● LIVE_DATA_STREAM</div>
+        </div>
+        <div class="table-container" style="margin-top: 0;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>CONTRIBUTOR_ID</th>
+                        <th>REPUTATION_SCORE</th>
+                        <th>LAST_ACTIVITY_LOG</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% contributors.forEach(c => { %>
+                        <tr>
+                            <td class="mono text-cyan" style="font-size: 0.8rem; letter-spacing: 1px;">
+                                <%= c.stxAddress || c.walletId %>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span class="mono"><%= c.reputationScore || 0 %></span>
+                                    <div style="width: 60px; height: 3px; background: rgba(255,255,255,0.03);">
+                                        <div style="width: <%= Math.min(100, (c.reputationScore || 0) / 10) %>%; height: 100%; background: var(--status-healthy);"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-soft mono" style="font-size: 0.75rem;">
+                                <%= c.lastActive ? new Date(c.lastActive).toISOString().split('T')[0] : 'STALE_SIGNAL' %>
+                            </td>
+                            <td>
+                                <span class="text-healthy mono" style="font-size: 0.7rem; background: rgba(0, 255, 136, 0.05); padding: 0.3rem 0.8rem; border-radius: 2px; border: 1px solid rgba(0, 255, 136, 0.1);">ACTIVE</span>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </section>
+<% } %>

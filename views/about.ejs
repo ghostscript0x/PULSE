@@ -1,0 +1,106 @@
+<section style="margin-bottom: 4rem; text-align: center;">
+    <div class="mono text-cyan" style="font-size: 0.7rem; margin-bottom: 1.5rem;">[PROTOCOL_DOCUMENTATION_V3.3]</div>
+    <h1 style="letter-spacing: 15px; margin-bottom: 1.5rem; font-size: 3.5rem;">SYSTEM_PROTOCOL</h1>
+    <p class="text-soft glow-text" style="max-width: 800px; margin: 0 auto; line-height: 1.8;">PULSE is a high-fidelity intelligence operating system designed to monitor the vital signs of decentralized organizations. This document outlines the operational flow, metric derivation, and intelligence synthesis modules.</p>
+</section>
+
+<!-- STEP BY STEP GUIDE -->
+<section style="margin-bottom: 6rem;">
+    <h2 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem; margin-bottom: 3rem;">OPERATIONAL_FLOW</h2>
+    <div class="grid-3">
+        <div class="glass-panel" style="border-top: 2px solid var(--signal-cyan);">
+            <div style="margin-bottom: 2rem;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--signal-cyan)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7"/><path d="M16 5V3"/><path d="M8 5V3"/><path d="M3 9h18"/><path d="M15 15l2 2 4-4"/></svg>
+            </div>
+            <h4 class="text-cyan mono" style="font-size: 0.8rem;">[STEP_01]</h4>
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Target Identification</h3>
+            <p class="text-soft" style="font-size: 0.85rem;">Access the <strong>Discovery Registry</strong> on the main dashboard to view all active nodes (DAOs) on the Zero Authority network. Every node is identified by a unique cryptographic UUID.</p>
+        </div>
+        <div class="glass-panel" style="border-top: 2px solid var(--status-warning);">
+            <div style="margin-bottom: 2rem;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--status-warning)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h4 class="text-warning mono" style="font-size: 0.8rem;">[STEP_02]</h4>
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Telemetry Initialization</h3>
+            <p class="text-soft" style="font-size: 0.85rem;">Establish a <strong>Telemetry Link</strong> by entering the target UUID or selecting a node from the registry. This triggers a real-time fetch-and-compute cycle, synchronizing the system with live production data.</p>
+        </div>
+        <div class="glass-panel" style="border-top: 2px solid var(--status-healthy);">
+            <div style="margin-bottom: 2rem;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--status-healthy)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h5l2 8 5-16 2 8h5"/></svg>
+            </div>
+            <h4 class="text-healthy mono" style="font-size: 0.8rem;">[STEP_03]</h4>
+            <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Live Monitoring</h3>
+            <p class="text-soft" style="font-size: 0.85rem;">Once initialized, the <strong>Intelligence Monitor</strong> activates. The system computes a deterministic health score (0-100) based on five weighted vitality vectors derived from raw on-chain activity.</p>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURE BREAKDOWN -->
+<section style="margin-bottom: 6rem;">
+    <h2 style="border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem; margin-bottom: 3rem;">CORE_INTELLIGENCE_MODULES</h2>
+    
+    <div class="glass-panel" style="margin-bottom: 2rem; display: grid; grid-template-columns: 80px 1fr; gap: 2rem; align-items: center;">
+        <div style="display: flex; justify-content: center;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--signal-cyan)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div>
+            <h3 class="text-cyan" style="font-size: 1.2rem; margin-bottom: 0.5rem;">Deterministic Health Engine</h3>
+            <p class="text-soft" style="font-size: 0.9rem;">The heart of PULSE. It aggregates raw bounty and contributor data to calculate a normalized health score. This engine refuses to operate on simulated data, ensuring that every score represents the absolute ground truth of the community.</p>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="margin-bottom: 2rem; display: grid; grid-template-columns: 80px 1fr; gap: 2rem; align-items: center;">
+        <div style="display: flex; justify-content: center;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--status-warning)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 4.2 2.8 2.8"/><path d="M18 12h4"/><path d="m16.2 19.8 2.8-2.8"/><path d="M12 18v4"/><path d="m4.9 19.1 2.8-2.8"/><path d="M2 12h4"/><path d="m4.9 4.9 2.8 2.8"/></svg>
+        </div>
+        <div>
+            <h3 class="text-warning" style="font-size: 1.2rem; margin-bottom: 0.5rem;">Neural Insights Engine (Llama 3.3)</h3>
+            <p class="text-soft" style="font-size: 0.9rem;">Powered by Groq inference. This module performs a qualitative analysis of computed metrics. It identifies hidden risks, detects contributor burnout patterns, and synthesizes strategic growth opportunities based on the DAO's production velocity.</p>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="margin-bottom: 2rem; display: grid; grid-template-columns: 80px 1fr; gap: 2rem; align-items: center;">
+        <div style="display: flex; justify-content: center;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--status-healthy)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+            <h3 class="text-healthy" style="font-size: 1.2rem; margin-bottom: 0.5rem;">Contributor Telemetry</h3>
+            <p class="text-soft" style="font-size: 0.9rem;">A real-time ranked registry of all community contributors. It tracks reputation scores, last activity timestamps, and individual engagement intensity, allowing leaders to identify "rising stars" and retain high-value participants.</p>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="display: grid; grid-template-columns: 80px 1fr; gap: 2rem; align-items: center;">
+        <div style="display: flex; justify-content: center;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--signal-cyan)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div>
+            <h3 class="text-cyan" style="font-size: 1.2rem; margin-bottom: 0.5rem;">Production Queue Lifecycle</h3>
+            <p class="text-soft" style="font-size: 0.9rem;">A deep-dive into the community's output. This module tracks bounties from initiation to completion, analyzing engagement intensity and completion efficiency to ensure the DAO's capital is effectively converted into community value.</p>
+        </div>
+    </div>
+</section>
+
+<!-- THE MATH -->
+<section style="margin-bottom: 6rem; background: rgba(0, 212, 255, 0.02); border: 1px solid var(--glass-border); padding: 4rem 2rem; border-radius: 4px;">
+    <h2 style="text-align: center; margin-bottom: 3rem;">VITALITY_ALGORITHM_V1</h2>
+    <div class="grid-2">
+        <div>
+            <div class="mono text-soft" style="font-size: 0.7rem; margin-bottom: 1.5rem;">[SCORING_VECTORS]</div>
+            <ul class="text-soft mono" style="font-size: 0.8rem; list-style-type: none; line-height: 2.5;">
+                <li><span class="text-cyan">30%</span> | ACTIVITY_VELOCITY</li>
+                <li><span class="text-cyan">25%</span> | COMPLETION_EFFICIENCY</li>
+                <li><span class="text-cyan">20%</span> | CONTRIBUTOR_RETENTION</li>
+                <li><span class="text-cyan">15%</span> | REPUTATION_STABILITY</li>
+                <li><span class="text-cyan">10%</span> | ENGAGEMENT_DIVERSITY</li>
+            </ul>
+        </div>
+        <div style="border-left: 1px solid var(--glass-border); padding-left: 2rem;">
+            <div class="mono text-soft" style="font-size: 0.7rem; margin-bottom: 1.5rem;">[ALGORITHM_RATIONALE]</div>
+            <p class="text-soft" style="font-size: 0.9rem; line-height: 1.8;">The algorithm prioritizes <strong>Velocity</strong> and <strong>Completion</strong> as the primary indicators of community health. A DAO with high treasury but low production velocity is considered "at-risk." Conversely, high diversity in engagement signals a resilient and anti-fragile community structure.</p>
+        </div>
+    </div>
+</section>
+
+<div style="text-align: center; margin-bottom: 4rem;">
+    <a href="/dashboard" class="btn btn-primary" style="padding: 1.5rem 4rem;">Establish Telemetry Link</a>
+</div>

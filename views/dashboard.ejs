@@ -1,0 +1,203 @@
+<% if (!latest) { %>
+    <section class="glass-panel" style="text-align: center; padding: 8rem 2rem; border-style: dashed;">
+        <div class="text-warning glow-text" style="font-size: 3rem; margin-bottom: 2rem;">!</div>
+        <h2 class="text-warning">INSUFFICIENT INTELLIGENCE</h2>
+        <p class="text-soft" style="max-width: 500px; margin: 0 auto 3rem;">The real-time monitoring system has not yet captured enough telemetry. Provide a target identifier to initialize the link.</p>
+        
+        <div style="max-width: 400px; margin: 2rem auto;">
+            <form id="init-telemetry-form" style="display: flex; gap: 0.5rem; background: rgba(255,255,255,0.02); padding: 0.5rem; border: 1px solid var(--glass-border); border-radius: 4px;">
+                <input type="text" id="init-daoId" placeholder="TARGET_DAO_UUID" required 
+                    style="flex: 1; background: transparent; border: none; color: var(--signal-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; padding: 0.5rem 1rem; outline: none;">
+                <button type="submit" class="btn btn-primary">INITIALIZE</button>
+            </form>
+        </div>
+
+        <div id="discovery-registry" style="margin-top: 4rem; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+            <h4 class="text-soft mono" style="font-size: 0.7rem; margin-bottom: 1.5rem; text-align: center;">DISCOVERY_REGISTRY (ACTIVE_NODES)</h4>
+            <div id="discovery-list" class="grid-2" style="gap: 1rem;">
+                <!-- Populated by JS -->
+                <div class="text-soft mono" style="font-size: 0.6rem; grid-column: 1 / -1; text-align: center;">SCANNING_NETWORK...</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Fetch valid organizations for discovery
+        fetch('/api/discovery')
+            .then(res => res.json())
+            .then(res => {
+                const list = document.getElementById('discovery-list');
+                const data = res.data;
+                const orgs = Array.isArray(data) ? data : (data && data.organizations ? data.organizations : []);
+                
+                if (res.status === 'success' && orgs.length > 0) {
+                    list.innerHTML = orgs.map(org => `
+                        <div class="glass-panel discovery-item" style="padding: 1rem; cursor: pointer; border-color: rgba(0,212,255,0.1);" data-id="${org.id}">
+                            <div class="text-cyan mono" style="font-size: 0.7rem; font-weight: 700;">${org.name || 'UNKNOWN_NODE'}</div>
+                            <div class="text-soft mono" style="font-size: 0.5rem; opacity: 0.5; margin-top: 0.4rem;">ID: ${org.id}</div>
+                        </div>
+                    `).join('');
+
+                    // Secure Event Delegation
+                    list.addEventListener('click', (e) => {
+                        const item = e.target.closest('.discovery-item');
+                        if (item) {
+                            initializeLink(item.dataset.id);
+                        }
+                    });
+                } else {
+                    list.innerHTML = '<div class="text-soft mono" style="font-size: 0.6rem; grid-column: 1 / -1; text-align: center;">NO_ACTIVE_NODES_FOUND</div>';
+                }
+            });
+
+        function initializeLink(id) {
+            document.getElementById('init-daoId').value = id;
+            document.getElementById('init-telemetry-form').dispatchEvent(new Event('submit'));
+        }
+
+        document.getElementById('init-telemetry-form').onsubmit = function(e) {
+            e.preventDefault();
+            const daoId = document.getElementById('init-daoId').value.trim().replace(/[^a-zA-Z0-9_-]/g, '');
+            if(daoId) {
+                const btn = this.querySelector('button');
+                btn.innerText = 'SYNCING...';
+                btn.disabled = true;
+                fetch(`/api/health/${daoId}`)
+                    .then(res => res.json())
+                    .then(res => {
+                        if(res.status === 'success') window.location.reload();
+                        else alert('TELEMETRY_SYNC_FAILED: ' + (res.message || 'UNKNOWN_ERROR'));
+                    })
+                    .catch(() => alert('CONNECTION_ERROR'))
+                    .finally(() => {
+                        btn.innerText = 'INITIALIZE';
+                        btn.disabled = false;
+                    });
+            }
+        };
+    </script>
+<% } else { %>
+    <div class="grid-dashboard">
+        <!-- Health Score Module -->
+        <section class="glass-panel" style="grid-area: score; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid var(--glass-border);">
+            <h4 class="text-soft" style="font-size: 0.7rem; margin-bottom: 2.5rem;">VITAL_SIGN_MONITOR</h4>
+            
+            <div class="health-gauge" style="position: relative; width: 240px; height: 240px;">
+                <svg viewBox="0 0 100 100" style="transform: rotate(-90deg); width: 100%; height: 100%;">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="6" />
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="var(--signal-cyan)" stroke-width="6" 
+                        stroke-dasharray="283" stroke-dashoffset="<%= 283 - (283 * latest.healthScore / 100) %>" 
+                        style="transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1); filter: drop-shadow(0 0 8px var(--signal-cyan));" />
+                </svg>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                    <span class="glow-text" style="font-size: 4.5rem; font-weight: 900;"><%= latest.healthScore %></span>
+                </div>
+            </div>
+
+            <div style="margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                <div class="<%= latest.healthScore > 70 ? 'text-healthy' : 'text-warning' %>" style="font-weight: 800; letter-spacing: 4px; font-size: 0.9rem;">
+                    SYSTEM_<%= latest.healthScore > 70 ? 'STABLE' : 'WATCH' %>
+                </div>
+                <div class="text-soft mono" style="font-size: 0.6rem;">LATENCY: 42ms | TS: <%= new Date().getTime() %></div>
+            </div>
+        </section>
+
+        <!-- Health Breakdown -->
+        <section class="glass-panel" style="grid-area: breakdown;">
+            <h4 class="text-soft" style="font-size: 0.7rem; margin-bottom: 2rem;">INTELLIGENCE_METRICS</h4>
+            <div style="display: flex; flex-direction: column; gap: 1.8rem;">
+                <% const metrics = [
+                    { label: 'Activity Velocity', val: latest.metrics.velocity || 0, weight: 30 },
+                    { label: 'Bounty Completion', val: latest.metrics.completionRate || 0, weight: 25 },
+                    { label: 'Contributor Retention', val: latest.metrics.retention || 0, weight: 20 },
+                    { label: 'Reputation Growth', val: latest.metrics.reputationGrowth || 0, weight: 15 },
+                    { label: 'Engagement Diversity', val: latest.metrics.diversity || 0, weight: 10 }
+                ] %>
+                <% metrics.forEach(m => { %>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.65rem; text-transform: uppercase; margin-bottom: 0.6rem; letter-spacing: 1px;">
+                            <span class="text-soft"><%= m.label %> <span class="mono" style="opacity: 0.5;">[W:<%= m.weight %>%]</span></span>
+                            <span class="text-cyan mono"><%= Math.round(m.val) %>%</span>
+                        </div>
+                        <div style="width: 100%; height: 2px; background: rgba(255,255,255,0.03); position: relative;">
+                            <div style="width: <%= m.val %>%; height: 100%; background: var(--signal-cyan); box-shadow: 0 0 15px var(--signal-cyan); transition: width 1s ease-out;"></div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+
+        <!-- Heatmap -->
+        <section class="glass-panel" style="grid-area: heatmap; border-top: 1px solid var(--glass-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h4 class="text-soft" style="font-size: 0.7rem; margin: 0;">VITALITY_STREAM</h4>
+                <div class="text-healthy mono" style="font-size: 0.6rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite;"></span>
+                    LIVE_CONNECTION_ACTIVE
+                </div>
+            </div>
+            <div id="heatmap-status" class="text-soft" style="font-size: 0.85rem; padding: 2rem; border: 1px dashed var(--glass-border); text-align: center;">
+                Real-time activity telemetry synchronized with Zero Authority network. <br>
+                <span class="mono" style="font-size: 0.7rem; opacity: 0.5;">AWAITING_ACTIVITY_BUFFER...</span>
+            </div>
+        </section>
+
+        <!-- AI Insight Panel -->
+        <section class="glass-panel" style="grid-area: insights; background: rgba(0, 212, 255, 0.01);" id="ai-insights-panel">
+            <h4 class="text-cyan glow-text" style="font-size: 0.7rem; margin-bottom: 2rem;">NEURAL_INSIGHTS_ENGINE_V3</h4>
+            <div id="insight-loading" class="text-soft mono" style="font-size: 0.8rem; display: flex; align-items: center; gap: 1rem;">
+                <span style="width: 12px; height: 12px; border: 2px solid var(--signal-cyan); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></span>
+                SYNCHRONIZING_WITH_LLAMA_3.3_70B...
+            </div>
+        </section>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script>
+        const daoId = "<%= latest.daoId %>";
+        fetch(`/api/insights/${daoId}`)
+            .then(res => res.json())
+            .then(res => {
+                const panel = document.getElementById('ai-insights-panel');
+                if (res.status === 'success' && res.data) {
+                    const d = res.data;
+                    panel.innerHTML = `
+                        <h4 class="text-cyan glow-text" style="font-size: 0.7rem; margin-bottom: 2rem;">NEURAL_INSIGHTS_ENGINE_V3</h4>
+                        <div class="grid-3">
+                            <div style="border-left: 1px solid var(--glass-border); padding-left: 1.5rem;">
+                                <div class="text-cyan mono" style="font-size: 0.65rem; margin-bottom: 1rem;">[EXEC_SUMMARY]</div>
+                                <p class="text-soft" style="font-size: 0.9rem; line-height: 1.6;">${d.summary}</p>
+                            </div>
+                            <div style="border-left: 1px solid var(--status-warning); padding-left: 1.5rem;">
+                                <div class="text-warning mono" style="font-size: 0.65rem; margin-bottom: 1rem;">[RISK_FACTORS]</div>
+                                <ul class="text-soft" style="font-size: 0.85rem; padding-left: 1.2rem; list-style-type: square;">
+                                    ${d.risks.map(r => `<li style="margin-bottom: 0.5rem;">${r}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div style="border-left: 1px solid var(--status-healthy); padding-left: 1.5rem;">
+                                <div class="text-healthy mono" style="font-size: 0.65rem; margin-bottom: 1rem;">[GROWTH_OPPORTUNITIES]</div>
+                                <ul class="text-soft" style="font-size: 0.85rem; padding-left: 1.2rem; list-style-type: square;">
+                                    ${d.opportunities.map(o => `<li style="margin-bottom: 0.5rem;">${o}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('insight-loading').innerHTML = `<span class="text-critical">[OFFLINE]</span> CONFIG_GROQ_API_KEY_REQUIRED`;
+                }
+            })
+            .catch(() => {
+                document.getElementById('insight-loading').innerHTML = `<span class="text-critical">[ERROR]</span> TELEMETRY_LINK_BROKEN`;
+            });
+    </script>
+<% } %>
