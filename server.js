@@ -45,7 +45,16 @@ app.use(express.urlencoded({ extended: false }));
 
 // Routes
 app.use('/api', require('./routes/api'));
-app.use('/', require('./routes/index')); // Legacy frontend routes
+app.use('/', require('./routes/index'));
+
+// SPA Catch-all for Vercel - serve index for non-API routes
+app.use((req, res, next) => {
+    if (!req.path.startsWith('/api')) {
+        res.render('index');
+    } else {
+        next();
+    }
+});
 
 // Error Handling
 app.use(errorHandler);

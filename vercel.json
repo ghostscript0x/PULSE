@@ -3,5 +3,8 @@
   "devCommand": "node server.js",
   "installCommand": "npm install",
   "framework": null,
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
