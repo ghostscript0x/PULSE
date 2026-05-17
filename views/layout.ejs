@@ -35,15 +35,16 @@
         <div class="container">
             <div class="nav-content">
                 <a href="/" class="logo">
-                    PULSE<span class="text-cyan">.</span>
+                    <img src="/assets/logo.png" alt="PULSE" class="nav-logo">
                 </a>
                 
                 <nav class="center-nav">
                     <% if (user) { %>
                         <a href="/dashboard">Dashboard</a>
-                        <a href="/features">Features</a>
+                        <a href="/intelligence">Intelligence</a>
+                        <a href="/bounties">Bounties</a>
                         <a href="/contributors">Communities</a>
-                        <a href="/insights">Intelligence</a>
+                        <a href="/insights">Insights</a>
                         <a href="/docs">Docs</a>
                     <% } else { %>
                         <a href="/about">Protocol</a>
@@ -77,15 +78,16 @@
         <nav class="mobile-nav-links">
             <% if (user) { %>
                 <a href="/dashboard">Dashboard</a>
-                <a href="/features">Features</a>
+                <a href="/intelligence">Intelligence</a>
+                <a href="/bounties">Bounties</a>
                 <a href="/contributors">Communities</a>
-                <a href="/insights">Intelligence</a>
+                <a href="/insights">Insights</a>
                 <a href="/command-center">Command Center</a>
                 <a href="/docs">Docs</a>
                 <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
                 <a href="/auth/logout" style="color: var(--status-critical);">Logout</a>
             <% } else { %>
-                <a href="/">Home</a>
+    ...
                 <a href="/about">Protocol</a>
                 <a href="/features">Features</a>
                 <a href="/auth/login">Sign In</a>
@@ -117,7 +119,9 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <div class="logo">PULSE<span class="text-cyan">.</span></div>
+                    <a href="/" class="logo">
+                        <img src="/assets/logo.png" alt="PULSE" class="footer-logo" style="margin-bottom: 1rem;">
+                    </a>
                     <p class="text-muted">Community Health Intelligence for Web3.</p>
                 </div>
                 <div class="footer-links">

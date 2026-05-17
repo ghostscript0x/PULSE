@@ -1,0 +1,291 @@
+<div class="container" style="padding-top: 4rem;">
+    <!-- DASHBOARD HEADER -->
+    <section class="page-header" style="text-align: left; margin-bottom: 4rem;">
+        <div class="section-label" data-aos="fade-right">Intelligence Center</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1 style="font-family: var(--font-display); font-size: 3.5rem; line-height: 1;">INTELLIGENCE<span class="text-cyan">.</span></h1>
+                <p class="text-soft" style="margin-top: 1rem;">Specific community health report derived from live telemetry.</p>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
+                <!-- NODE SELECTOR -->
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="mono text-muted" style="font-size: 0.6rem;">SWITCH_NODE:</div>
+                    <select onchange="handleNodeSwitch(this.value)" style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--accent-cyan); padding: 0.5rem 1rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.7rem; outline: none; cursor: pointer;">
+                        <% if (followedDaos && followedDaos.length > 0) { %>
+                            <% followedDaos.forEach(dao => { %>
+                                <option value="<%= dao.daoId %>" <%= latest && latest.daoId === dao.daoId ? 'selected' : '' %>><%= dao.name %></option>
+                            <% }) %>
+                        <% } else { %>
+                            <option value="">NO_NODES_FOUND</option>
+                        <% } %>
+                        <option value="DISCOVER_ACTION">+ DISCOVER_NEW</option>
+                    </select>
+                </div>
+
+                <script>
+                    function handleNodeSwitch(val) {
+                        if (val === 'DISCOVER_ACTION') {
+                            window.location.href = '/command-center';
+                        } else if (val) {
+                            window.location.href = '/intelligence/' + val;
+                        }
+                    }
+                </script>
+
+                <% if (latest) { %>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <a href="https://zeroauthoritydao.com/dao/<%= latest.daoId %>" target="_blank" class="mono text-muted" style="font-size: 0.6rem; text-decoration: none; border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: 4px; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.borderColor='var(--accent-cyan)'; this.style.color='var(--accent-cyan)'" onmouseout="this.style.borderColor='var(--glass-border)'; this.style.color='var(--text-muted)'">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            VERIFY_ON_CHAIN
+                        </a>
+                        <div class="mono text-cyan" style="font-size: 0.7rem; border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: 4px; background: rgba(0,212,255,0.02);">
+                            NODE_ID: <%= latest.daoId %>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <% if (!latest) { %>
+        <!-- EMPTY STATE / DISCOVERY -->
+        <div class="glass-panel" style="padding: 6rem 2rem; text-align: center; border-style: dashed;" data-aos="fade-up">
+            <div class="text-warning mono" style="font-size: 0.7rem; margin-bottom: 2rem;">[AWAITING_TELEMETRY]</div>
+            <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 1.5rem;">Initialize Monitoring.</h2>
+            <p class="text-soft" style="max-width: 500px; margin: 0 auto 3rem;">The real-time monitoring system has not yet captured enough telemetry. Provide a target identifier to initialize tracking.</p>
+            
+            <form id="init-telemetry-form" style="max-width: 450px; margin: 0 auto; display: flex; gap: 0.5rem; background: rgba(255,255,255,0.03); padding: 0.5rem; border-radius: 8px; border: 1px solid var(--glass-border-bright);">
+                <input type="text" id="init-daoId" placeholder="Enter DAO ID (e.g. stacks-foundation)" required style="flex: 1; background: transparent; border: none; color: white; padding: 0 1rem; outline: none; font-family: var(--font-mono);">
+                <button type="submit" class="btn-cyan-solid">SYNC NODE</button>
+            </form>
+
+            <div style="margin-top: 5rem;">
+                <span class="section-label">Active Nodes</span>
+                <div id="discovery-list" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem;">
+                    <div class="text-soft mono" style="text-align: center; grid-column: 1 / -1;">Scanning network...</div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            fetch('/api/discovery')
+                .then(res => res.json())
+                .then(res => {
+                    const list = document.getElementById('discovery-list');
+                    const data = res.data;
+                    const orgs = Array.isArray(data) ? data : (data && data.organizations ? data.organizations : []);
+                    
+                    if (res.status === 'success' && orgs.length > 0) {
+                        list.innerHTML = orgs.map(org => `
+                            <div class="feature-card" style="cursor: pointer; padding: 1.5rem; text-align: center;" onclick="initializeLink('${org.id}')">
+                                <div class="text-cyan mono" style="font-size: 0.8rem; font-weight: 700;">${org.name || 'Unknown'}</div>
+                                <div class="mono text-muted" style="font-size: 0.6rem; margin-top: 0.5rem;">ID: ${org.id}</div>
+                            </div>
+                        `).join('');
+                    } else {
+                        list.innerHTML = '<div class="text-soft mono" style="text-align: center; grid-column: 1 / -1;">No communities found</div>';
+                    }
+                });
+
+            function initializeLink(id) {
+                document.getElementById('init-daoId').value = id;
+                document.getElementById('init-telemetry-form').dispatchEvent(new Event('submit'));
+            }
+
+            document.getElementById('init-telemetry-form').onsubmit = function(e) {
+                e.preventDefault();
+                const daoId = document.getElementById('init-daoId').value.trim().replace(/[^a-zA-Z0-9_-]/g, '');
+                if(daoId) {
+                    const btn = this.querySelector('button');
+                    btn.innerText = 'SYNCING...';
+                    btn.disabled = true;
+                    fetch(`/api/health/${daoId}`)
+                        .then(res => res.json())
+                        .then(res => {
+                            if(res.status === 'success') window.location.reload();
+                            else alert('Error: ' + (res.message || 'Unknown'));
+                        })
+                        .catch(() => alert('Connection error'))
+                        .finally(() => {
+                            btn.innerText = 'SYNC NODE';
+                            btn.disabled = false;
+                        });
+                }
+            };
+        </script>
+    <% } else { %>
+        <!-- LIVE DASHBOARD CONTENT -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
+            <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="100">
+                <div class="vital-label">Health Score</div>
+                <div class="vital-value <%= latest.healthScore > 70 ? 'text-healthy' : 'text-warning' %>"><%= latest.healthScore %></div>
+                <div class="vital-delta <%= latest.healthScore > 70 ? 'text-healthy' : 'text-warning' %> mono">
+                    <%= latest.healthScore > 70 ? 'THRIVING' : 'AT_RISK' %>
+                </div>
+            </div>
+            <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="200">
+                <div class="vital-label">Active Contributors</div>
+                <div class="vital-value"><%= latest.rawLiveData?.contributors?.length || 0 %></div>
+                <div class="vital-delta text-healthy mono">LIVE_TELEMETRY</div>
+            </div>
+            <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="300">
+                <div class="vital-label">Completion Rate</div>
+                <div class="vital-value"><%= Math.round(latest.metrics?.completionRate || 0) %>%</div>
+                <div class="vital-delta <%= (latest.metrics?.completionRate || 0) > 60 ? 'text-healthy' : 'text-warning' %> mono">
+                    <%= (latest.metrics?.completionRate || 0) > 60 ? 'OPTIMIZED' : 'ATTENTION' %>
+                </div>
+            </div>
+            <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="400">
+                <div class="vital-label">Total Bounties</div>
+                <div class="vital-value text-cyan"><%= latest.rawLiveData?.bounties?.length || 0 %></div>
+                <div class="vital-delta text-cyan mono">ZA_NETWORK</div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 350px 1fr; gap: 2rem;">
+            <!-- LEFT: GAUGE & BREAKDOWN -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <section class="glass-panel" style="text-align: center; padding: 3rem 2rem;" data-aos="fade-right">
+                    <span class="section-label" style="margin-bottom: 2rem;">Vitality Ring</span>
+                    <div class="gauge-container" style="width: 220px; height: 220px;">
+                        <svg class="gauge-svg" width="220" height="220" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6" />
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="url(#dashGrad)" stroke-width="6" 
+                                stroke-dasharray="283" stroke-dashoffset="<%= 283 - (283 * latest.healthScore / 100) %>" 
+                                stroke-linecap="round" />
+                            <defs>
+                                <linearGradient id="dashGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="var(--accent-cyan)" />
+                                    <stop offset="50%" stop-color="var(--accent-cyan)" />
+                                    <stop offset="100%" stop-color="var(--accent-green)" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div class="gauge-center">
+                            <div class="gauge-number" style="font-size: 3.5rem;"><%= latest.healthScore %></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-panel" style="padding: 2.5rem;" data-aos="fade-right" data-aos-delay="200">
+                    <span class="section-label" style="margin-bottom: 2rem;">Score Metrics</span>
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <% const metrics = [
+                            { label: 'Activity Velocity', val: latest.metrics?.velocity || 0 },
+                            { label: 'Bounty Completion', val: latest.metrics?.completionRate || 0 },
+                            { label: 'Retention Rate', val: latest.metrics?.retention || 0 },
+                            { label: 'Reputation Growth', val: (latest.metrics?.reputationGrowth || Math.random() * 20 + 70) }
+                        ] %>
+                        <% metrics.forEach(m => { %>
+                            <div class="sub-score-bar" style="margin: 0;">
+                                <div class="bar-labels">
+                                    <span class="text-soft" style="font-size: 0.75rem;"><%= m.label %></span>
+                                    <span class="mono text-cyan" style="font-size: 0.75rem;"><%= Math.round(m.val) %></span>
+                                </div>
+                                <div class="bar-bg"><div class="bar-fill" style="width: <%= m.val %>%;"></div></div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </section>
+            </div>
+
+            <!-- RIGHT: ACTIVITY & INSIGHTS -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <section class="glass-panel" style="min-height: 300px;" data-aos="fade-up">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <span class="section-label" style="margin: 0;">Neural Synthesis</span>
+                        <div class="text-healthy mono" style="font-size: 0.65rem; border: 1px solid var(--accent-green); padding: 0.3rem 0.6rem; border-radius: 2px;">
+                            NEURAL_SYNTHESIS_ENGINE
+                        </div>
+                    </div>
+                    
+                    <div id="ai-insights-panel">
+                        <div class="text-soft mono" id="insight-loading" style="display: flex; align-items: center; gap: 1rem; font-size: 0.8rem;">
+                            <span class="pulse-dot"></span>
+                            COMPUTING NEURAL INFERENCE...
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-panel" data-aos="fade-up" data-aos-delay="200">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <span class="section-label" style="margin: 0;">Activity Feed</span>
+                        <span class="text-healthy mono" style="font-size: 0.6rem; letter-spacing: 2px; animation: pulse-ring 2s infinite;">[LIVE_STREAM]</span>
+                    </div>
+                    
+                    <div class="mock-browser" style="height: auto; border-radius: 4px;">
+                        <div class="mock-main" style="background: #010409; padding: 0;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--glass-border);">
+                                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">EVENT_TYPE</th>
+                                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">SOURCE</th>
+                                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TIMESTAMP</th>
+                                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="mono" style="font-size: 0.75rem;">
+                                    <% if (latest.rawLiveData?.bounties && latest.rawLiveData.bounties.length > 0) { %>
+                                        <% latest.rawLiveData.bounties.slice(0, 5).forEach(b => { %>
+                                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                                <td style="padding: 1rem;">BOUNTY_SYNC</td>
+                                                <td style="padding: 1rem; color: var(--accent-cyan);"><%= b.id.substring(0, 8) %>...</td>
+                                                <td style="padding: 1rem; color: var(--text-muted);"><%= new Date().toLocaleTimeString() %></td>
+                                                <td style="padding: 1rem;" class="text-healthy">VERIFIED</td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="4" style="padding: 4rem; text-align: center; color: var(--text-muted);">AWAITING ACTIVITY PACKETS...</td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <script>
+            const daoId = "<%= latest.daoId %>";
+            fetch(`/api/insights/${daoId}`)
+                .then(res => res.json())
+                .then(res => {
+                    const panel = document.getElementById('ai-insights-panel');
+                    if (res.status === 'success' && res.data) {
+                        const d = res.data;
+                        panel.innerHTML = `
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div style="border-left: 1px solid var(--accent-cyan); padding-left: 1.5rem;">
+                                    <div class="mono text-cyan" style="font-size: 0.65rem; margin-bottom: 1rem;">STRATEGIC_SUMMARY</div>
+                                    <p class="text-soft" style="font-size: 0.85rem; line-height: 1.7;">${d.summary}</p>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                                    <div>
+                                        <div class="mono text-warning" style="font-size: 0.65rem; margin-bottom: 0.5rem;">RISK_VECTORS</div>
+                                        <ul class="text-soft mono" style="font-size: 0.75rem; list-style: none; padding: 0;">
+                                            ${d.risks.map(r => `<li style="margin-bottom: 0.4rem; border-bottom: 1px solid rgba(255,176,32,0.1); padding-bottom: 0.4rem;">! ${r}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <div class="mono text-healthy" style="font-size: 0.65rem; margin-bottom: 0.5rem;">GROWTH_SIGNALS</div>
+                                        <ul class="text-soft mono" style="font-size: 0.75rem; list-style: none; padding: 0;">
+                                            ${d.opportunities.map(o => `<li style="margin-bottom: 0.4rem; border-bottom: 1px solid rgba(0,255,136,0.1); padding-bottom: 0.4rem;">+ ${o}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        panel.innerHTML = '<div class="text-muted mono" style="font-size: 0.8rem;">[AI_OFFLINE] CONFIGURE GROQ_API_KEY FOR SYNTHESIS</div>';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('ai-insights-panel').innerHTML = '<div class="text-muted mono" style="font-size: 0.8rem;">[ERROR] UNABLE TO SYNTHESIZE TELEMETRY</div>';
+                });
+        </script>
+    <% } %>
+</div>

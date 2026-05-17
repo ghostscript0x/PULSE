@@ -35,7 +35,7 @@
                             <p class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 2rem;">UUID: <%= dao.daoId %></p>
                             
                             <div style="display: flex; gap: 1rem;">
-                                <a href="/dashboard/<%= dao.daoId %>" class="btn-cyan-solid" style="flex: 1; font-size: 0.7rem;">MONITOR</a>
+                                <a href="/intelligence/<%= dao.daoId %>" class="btn-cyan-solid" style="flex: 1; font-size: 0.7rem;">MONITOR</a>
                                 <form action="/unfollow-dao" method="POST" style="margin: 0; flex: 1;">
                                     <input type="hidden" name="daoId" value="<%= dao.daoId %>">
                                     <button type="submit" class="btn-ghost" style="width: 100%; font-size: 0.7rem; border-color: rgba(255,59,59,0.2); color: #ff3b3b;">TERMINATE</button>

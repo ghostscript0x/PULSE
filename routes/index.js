@@ -3,6 +3,7 @@ const router = express.Router();
 const { 
     getLanding, 
     getDashboard, 
+    getIntelligence,
     getContributors, 
     getBounties,
     getCommandCenter,
@@ -20,7 +21,9 @@ const ensureAuth = (req, res, next) => {
 router.get('/', getLanding);
 router.get('/about', (req, res) => res.render('about', { title: 'PULSE | System Protocol' }));
 router.get('/features', (req, res) => res.render('features', { title: 'PULSE | Core Capabilities' }));
-router.get('/dashboard/:daoId?', ensureAuth, getDashboard);
+router.get('/dashboard', ensureAuth, getDashboard);
+router.get('/dashboard/:daoId', ensureAuth, (req, res) => res.redirect('/intelligence/' + req.params.daoId));
+router.get('/intelligence/:daoId?', ensureAuth, getIntelligence);
 router.get('/contributors/:daoId?', ensureAuth, getContributors);
 router.get('/bounties/:daoId?', ensureAuth, getBounties);
 router.get('/insights', ensureAuth, (req, res) => res.render('insights', { title: 'PULSE | Data Intelligence' }));
