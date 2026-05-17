@@ -16,13 +16,17 @@
             Turn raw contributor data into vital signals before your community flatlines.
         </p>
         <div class="hero-actions" data-aos="fade-up" data-aos-delay="1000">
-            <a href="/dashboard" class="btn-cyan-solid btn-lg">View Live Dashboard</a>
-            <a href="/about" class="btn-ghost btn-lg">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-                See How It Works
-            </a>
+            <% if (user) { %>
+                <a href="/dashboard" class="btn-cyan-solid btn-lg">Return to Dashboard</a>
+            <% } else { %>
+                <a href="/auth/register" class="btn-cyan-solid btn-lg">Get Started</a>
+                <a href="/about" class="btn-ghost btn-lg">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    See How It Works
+                </a>
+            <% } %>
         </div>
 
         <div class="scroll-indicator" data-aos="fade-up" data-aos-delay="1200">
@@ -94,7 +98,7 @@
                         <div class="mock-card" data-aos="fade-up" data-aos-delay="800"><div class="card-title">Health</div><div class="card-val text-healthy">78</div></div>
                         <div class="mock-card" data-aos="fade-up" data-aos-delay="900"><div class="card-title">Active</div><div class="card-val">412</div></div>
                         <div class="mock-card" data-aos="fade-up" data-aos-delay="1000"><div class="card-title">Completion</div><div class="card-val">92%</div></div>
-                        <div class="mock-card" data-aos="fade-up" data-aos-delay="1100"><div class="card-title">Risk</div><div class="card-val" style="color: #ff3b3b;">Low</div></div>
+                        <div class="mock-card" data-aos="fade-up" data-aos-delay="1100"><div class="card-title">Risk</div><div class="card-val text-risk-low">Low</div></div>
                     </div>
                     <div class="mock-chart" data-aos="fade-up" data-aos-delay="1200">
                         <div class="card-title">Health Trend (30D)</div>
@@ -115,6 +119,14 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div style="margin-top: 4rem;" data-aos="fade-up">
+            <% if (user) { %>
+                <a href="/dashboard" class="btn-cyan-solid">Access Full Intelligence Layer</a>
+            <% } else { %>
+                <a href="/auth/register" class="btn-cyan-solid">Initialize Your Access Node</a>
+            <% } %>
         </div>
     </div>
 </section>

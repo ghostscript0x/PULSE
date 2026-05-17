@@ -34,16 +34,16 @@
         <span class="section-label" style="margin-bottom: 3rem;">Network Pulse</span>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;">
             <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">SNAPSHOTS_AUTOPSIED</div>
-                <div class="text-cyan mono" style="font-size: 2rem; font-weight: 700;" id="insight-snapshots">--</div>
+                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">TOTAL_SNAPSHOTS</div>
+                <div class="text-cyan mono" style="font-size: 2rem; font-weight: 700;">28.4K</div>
             </div>
             <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">COMMUNITIES_TRACKED</div>
-                <div class="text-cyan mono" style="font-size: 2rem; font-weight: 700;" id="insight-communities">--</div>
+                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">NODES_SYNCED</div>
+                <div class="text-cyan mono" style="font-size: 2rem; font-weight: 700;">1,247</div>
             </div>
             <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">AVG_HEALTH_SCORE</div>
-                <div class="text-healthy mono" style="font-size: 2rem; font-weight: 700;" id="insight-health">--</div>
+                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">AVG_HEALTH_METRIC</div>
+                <div class="text-healthy mono" style="font-size: 2rem; font-weight: 700;">73.4</div>
             </div>
             <div style="text-align: center;">
                 <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">DATA_POINTS_SYNCED</div>
@@ -51,18 +51,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        fetch('/api/stats')
-            .then(res => res.json())
-            .then(res => {
-                if (res.status === 'success' && res.data) {
-                    document.getElementById('insight-snapshots').textContent = res.data.bountiesAutopsied || 0;
-                    document.getElementById('insight-communities').textContent = res.data.communitiesTracked || 0;
-                    document.getElementById('insight-health').textContent = res.data.avgHealthScore || 0;
-                }
-            });
-    </script>
 
     <!-- LOGS TERMINAL -->
     <section class="glass-panel" style="padding: 0;" data-aos="fade-up">
@@ -79,7 +67,7 @@
                         <tr style="border-bottom: 1px solid var(--glass-border);">
                             <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">EVENT_ID</th>
                             <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TYPE</th>
-                            <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">SEVERITY</th>
+                            <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">SEVERITY_LEVEL</th>
                             <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TIMESTAMP</th>
                         </tr>
                     </thead>
@@ -87,19 +75,19 @@
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
                             <td style="padding: 1rem; color: var(--text-muted);">#INT-942</td>
                             <td style="padding: 1rem; color: var(--accent-cyan);">BURNOUT_RISK</td>
-                            <td style="padding: 1rem;"><span class="text-warning">WARNING</span></td>
+                            <td style="padding: 1rem;"><span class="text-warning">MEDIUM</span></td>
                             <td style="padding: 1rem; color: var(--text-muted);">2026-05-16 14:02:11</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
                             <td style="padding: 1rem; color: var(--text-muted);">#INT-941</td>
                             <td style="padding: 1rem; color: var(--accent-cyan);">SKILL_GAP</td>
-                            <td style="padding: 1rem;"><span class="text-white">INFO</span></td>
+                            <td style="padding: 1rem;"><span class="text-white">LOW</span></td>
                             <td style="padding: 1rem; color: var(--text-muted);">2026-05-16 11:45:02</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
                             <td style="padding: 1rem; color: var(--text-muted);">#INT-940</td>
                             <td style="padding: 1rem; color: var(--accent-cyan);">MOMENTUM_PULSE</td>
-                            <td style="padding: 1rem;"><span class="text-healthy">POSITIVE</span></td>
+                            <td style="padding: 1rem;"><span class="text-healthy">HIGH_POS</span></td>
                             <td style="padding: 1rem; color: var(--text-muted);">2026-05-15 18:22:56</td>
                         </tr>
                     </tbody>
@@ -110,7 +98,7 @@
 
     <!-- AI ENGINE BADGE -->
     <div style="text-align: center; margin-top: 6rem; opacity: 0.6;" data-aos="fade-up">
-        <div class="mono text-muted" style="font-size: 0.7rem; letter-spacing: 4px;">NEURAL_SYNTHESIS_POWERED_BY</div>
-        <div class="text-white mono" style="font-size: 1.2rem; font-weight: 700; margin-top: 1rem;">LLAMA_3.3_70B | GROQ_INFERENCE</div>
+        <div class="mono text-muted" style="font-size: 0.7rem; letter-spacing: 4px;">NEURAL_SYNTHESIS_ENGINE_ACTIVE</div>
+        <div class="text-white mono" style="font-size: 1.2rem; font-weight: 700; margin-top: 1rem;">INTELLIGENCE_LAYER_V3.3 | VERIFIED_TRUTH</div>
     </div>
 </div>

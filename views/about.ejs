@@ -122,11 +122,18 @@
 <section class="cta-section" style="background: var(--bg-darker);">
     <div class="cta-bg-glow" style="background: radial-gradient(circle, rgba(0, 245, 255, 0.05) 0%, transparent 70%);"></div>
     <div class="container">
-        <h2 data-aos="fade-up">Ready to initialize?</h2>
-        <p class="text-soft" data-aos="fade-up" data-aos-delay="200">Establish a telemetry link with your community today.</p>
-        
-        <div style="margin-top: 3rem;" data-aos="fade-up" data-aos-delay="400">
-            <a href="/dashboard" class="btn-cyan-solid btn-lg">Launch Dashboard →</a>
-        </div>
+        <% if (user) { %>
+            <h2 data-aos="fade-up">Ready to monitor?</h2>
+            <p class="text-soft" data-aos="fade-up" data-aos-delay="200">Return to your command center to manage telemetry links.</p>
+            <div style="margin-top: 3rem;" data-aos="fade-up" data-aos-delay="400">
+                <a href="/command-center" class="btn-cyan-solid btn-lg">Command Center →</a>
+            </div>
+        <% } else { %>
+            <h2 data-aos="fade-up">Ready to initialize?</h2>
+            <p class="text-soft" data-aos="fade-up" data-aos-delay="200">Establish a telemetry link with your community today.</p>
+            <div style="margin-top: 3rem;" data-aos="fade-up" data-aos-delay="400">
+                <a href="/auth/register" class="btn-cyan-solid btn-lg">Get Started Now →</a>
+            </div>
+        <% } %>
     </div>
 </section>

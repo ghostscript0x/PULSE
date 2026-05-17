@@ -37,8 +37,11 @@ exports.postRegister = async (req, res) => {
                         newUser.password = hash;
                         newUser.save()
                             .then(user => {
-                                req.flash('success_msg', 'ACCOUNT_INITIALIZED');
-                                res.redirect('/auth/login');
+                                req.login(user, (err) => {
+                                    if (err) throw err;
+                                    req.flash('success_msg', 'NODE_SYNC_ESTABLISHED');
+                                    res.redirect('/command-center');
+                                });
                             })
                             .catch(err => console.log(err));
                     });

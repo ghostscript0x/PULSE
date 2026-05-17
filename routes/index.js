@@ -19,11 +19,12 @@ const ensureAuth = (req, res, next) => {
 
 router.get('/', getLanding);
 router.get('/about', (req, res) => res.render('about', { title: 'PULSE | System Protocol' }));
-router.get('/dashboard/:daoId?', getDashboard);
-router.get('/contributors/:daoId?', getContributors);
-router.get('/bounties/:daoId?', getBounties);
-router.get('/insights', (req, res) => res.render('insights', { title: 'PULSE | Data Intelligence' }));
-router.get('/docs', (req, res) => res.render('docs', { title: 'PULSE | Documentation' }));
+router.get('/features', (req, res) => res.render('features', { title: 'PULSE | Core Capabilities' }));
+router.get('/dashboard/:daoId?', ensureAuth, getDashboard);
+router.get('/contributors/:daoId?', ensureAuth, getContributors);
+router.get('/bounties/:daoId?', ensureAuth, getBounties);
+router.get('/insights', ensureAuth, (req, res) => res.render('insights', { title: 'PULSE | Data Intelligence' }));
+router.get('/docs', ensureAuth, (req, res) => res.render('docs', { title: 'PULSE | Documentation' }));
 
 // Protected Routes
 router.get('/command-center', ensureAuth, getCommandCenter);

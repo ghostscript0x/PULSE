@@ -39,11 +39,17 @@
                 </a>
                 
                 <nav class="center-nav">
-                    <a href="/dashboard">Dashboard</a>
-                    <a href="/about">Analytics</a>
-                    <a href="/contributors">Communities</a>
-                    <a href="/insights">Intelligence</a>
-                    <a href="/docs">Docs</a>
+                    <% if (user) { %>
+                        <a href="/dashboard">Dashboard</a>
+                        <a href="/features">Features</a>
+                        <a href="/contributors">Communities</a>
+                        <a href="/insights">Intelligence</a>
+                        <a href="/docs">Docs</a>
+                    <% } else { %>
+                        <a href="/about">Protocol</a>
+                        <a href="/features">Features</a>
+                        <a href="/auth/login">Network Status</a>
+                    <% } %>
                 </nav>
 
                 <div class="nav-actions">
@@ -52,7 +58,7 @@
                         <a href="/auth/logout" class="btn-cyan-solid desktop-only">Logout</a>
                     <% } else { %>
                         <a href="/auth/login" class="nav-link desktop-only">Sign In</a>
-                        <a href="/auth/register" class="btn-cyan-solid desktop-only">Request Access</a>
+                        <a href="/auth/register" class="btn-cyan-solid desktop-only">Get Started</a>
                     <% } %>
                     
                     <!-- MOBILE TOGGLE -->
@@ -69,18 +75,21 @@
     <!-- MOBILE MENU OVERLAY -->
     <div class="mobile-menu" id="mobile-menu">
         <nav class="mobile-nav-links">
-            <a href="/dashboard">Dashboard</a>
-            <a href="/about">Analytics</a>
-            <a href="/contributors">Communities</a>
-            <a href="/insights">Intelligence</a>
-            <a href="/docs">Docs</a>
-            <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
             <% if (user) { %>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/features">Features</a>
+                <a href="/contributors">Communities</a>
+                <a href="/insights">Intelligence</a>
                 <a href="/command-center">Command Center</a>
+                <a href="/docs">Docs</a>
+                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
                 <a href="/auth/logout" style="color: var(--status-critical);">Logout</a>
             <% } else { %>
+                <a href="/">Home</a>
+                <a href="/about">Protocol</a>
+                <a href="/features">Features</a>
                 <a href="/auth/login">Sign In</a>
-                <a href="/auth/register" class="text-cyan">Request Access</a>
+                <a href="/auth/register" class="text-cyan">Get Started</a>
             <% } %>
         </nav>
     </div>

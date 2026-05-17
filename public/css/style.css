@@ -23,7 +23,7 @@
     
     /* Layout */
     --container-width: 1300px;
-    --section-spacing: 10rem;
+    --section-spacing: 6rem;
     
     /* Effects */
     --transition-base: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -68,6 +68,9 @@ body {
 .text-soft { color: var(--text-soft); }
 .text-muted { color: var(--text-muted); }
 .text-healthy { color: var(--accent-green); }
+.text-warning { color: #ffb020; }
+.text-critical { color: #ff3b3b; }
+.text-risk-low { color: var(--accent-green) !important; }
 
 /* Status Bar */
 .top-status-bar {
@@ -167,13 +170,17 @@ body {
 .btn-cyan-solid {
     background: var(--accent-cyan);
     color: var(--bg-void);
-    padding: 0.7rem 1.4rem;
+    padding: 0.8rem 1.8rem;
     border-radius: 4px;
     text-decoration: none;
     font-weight: 700;
     font-size: 0.85rem;
     transition: var(--transition-base);
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    min-height: 48px;
 }
 
 .btn-cyan-solid:hover {
@@ -397,7 +404,7 @@ body {
 .mock-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
+    gap: 1rem;
     margin-bottom: 2rem;
 }
 
@@ -427,7 +434,7 @@ body {
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(3, 2fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-top: 4rem;
 }
@@ -771,13 +778,13 @@ body {
 
 /* Responsive Overrides */
 @media (max-width: 1024px) {
-    :root { --section-spacing: 6rem; }
+    :root { --section-spacing: 4rem; }
     .vitals-container { grid-template-columns: repeat(3, 1fr); }
-    .features-grid { grid-template-columns: 1fr 1fr; }
+    .features-grid { grid-template-columns: 1fr !important; }
     .split-section { grid-template-columns: 1fr; gap: 4rem; text-align: center; }
     .mock-content { grid-template-columns: 1fr; height: auto; }
     .mock-sidebar { display: none; }
-    .mock-grid { grid-template-columns: 1fr 1fr; }
+    .mock-grid { grid-template-columns: repeat(2, 1fr); }
     
     /* Contributors & Dashboard */
     .dashboard-grid { grid-template-columns: 1fr 1fr !important; }
