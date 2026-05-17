@@ -48,16 +48,42 @@
 
                 <div class="nav-actions">
                     <% if (user) { %>
-                        <a href="/command-center" class="nav-link">Command Center</a>
-                        <a href="/auth/logout" class="btn-cyan-solid">Logout</a>
+                        <a href="/command-center" class="nav-link desktop-only">Command Center</a>
+                        <a href="/auth/logout" class="btn-cyan-solid desktop-only">Logout</a>
                     <% } else { %>
-                        <a href="/auth/login" class="nav-link">Sign In</a>
-                        <a href="/auth/register" class="btn-cyan-solid">Request Access</a>
+                        <a href="/auth/login" class="nav-link desktop-only">Sign In</a>
+                        <a href="/auth/register" class="btn-cyan-solid desktop-only">Request Access</a>
                     <% } %>
+                    
+                    <!-- MOBILE TOGGLE -->
+                    <button class="mobile-toggle" id="mobile-toggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
                 </div>
             </div>
         </div>
     </header>
+
+    <!-- MOBILE MENU OVERLAY -->
+    <div class="mobile-menu" id="mobile-menu">
+        <nav class="mobile-nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/about">Analytics</a>
+            <a href="/contributors">Communities</a>
+            <a href="/insights">Intelligence</a>
+            <a href="/docs">Docs</a>
+            <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
+            <% if (user) { %>
+                <a href="/command-center">Command Center</a>
+                <a href="/auth/logout" style="color: var(--status-critical);">Logout</a>
+            <% } else { %>
+                <a href="/auth/login">Sign In</a>
+                <a href="/auth/register" class="text-cyan">Request Access</a>
+            <% } %>
+        </nav>
+    </div>
 
     <main>
         <% if(success_msg != '') { %>
