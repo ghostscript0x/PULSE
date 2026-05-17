@@ -1,50 +1,39 @@
-<div class="container" style="min-height: calc(100vh - 100px); display: flex; align-items: center; justify-content: center; padding: 4rem 0;">
-    <div class="hero-aura" style="background: radial-gradient(circle, rgba(0, 245, 255, 0.03) 0%, transparent 70%);"></div>
-    
-    <div style="width: 100%; max-width: 450px;" data-aos="fade-up">
-        <section class="glass-panel" style="padding: 3.5rem 3rem; border-top: 2px solid var(--accent-cyan);">
-            <div class="section-label" style="text-align: center; margin-bottom: 2rem;">Registry Access</div>
-            <h2 style="font-family: var(--font-display); font-size: 2.5rem; text-align: center; margin-bottom: 2.5rem;">REGISTER NODE<span class="text-cyan">.</span></h2>
+<div class="container" style="min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;">
+    <div class="hero-aura-enhanced" style="width: 300px; height: 300px; position: absolute;" aria-hidden="true"></div>
+    <div style="width: 100%; max-width: 420px; position: relative; z-index: 1;">
+        <section class="glass-panel premium-card card-accent-top" style="padding: 2rem 1.5rem;" data-aos="fade-in-up">
+            <div class="section-label" style="text-align: center; margin-bottom: 1.5rem;">Registry Access</div>
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.5rem, 5vw, 2rem); text-align: center; margin-bottom: 2rem; line-height: 1.1;">REGISTER NODE<span class="text-gradient">.</span></h2>
 
             <% if(typeof errors != 'undefined') { %>
                 <% errors.forEach(function(error) { %>
-                    <div class="glass-panel" style="border-color: var(--status-critical); padding: 1rem; margin-bottom: 1rem; background: rgba(255,59,59,0.03);">
+                    <div class="alert-error" style="margin-bottom: 1rem;" role="alert">
                         <div class="text-critical mono" style="font-size: 0.75rem; text-align: center;">[FAULT] <%= error.msg %></div>
                     </div>
                 <% }); %>
             <% } %>
 
-            <form action="/auth/register" method="POST" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <label class="text-muted mono" style="font-size: 0.65rem; letter-spacing: 2px;">NODE_USERNAME</label>
-                    <input type="text" name="username" value="<%= typeof username != 'undefined' ? username : '' %>" required 
-                        style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 1rem; color: white; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 0.9rem;">
+            <form action="/auth/register" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;" novalidate>
+                <div class="form-group">
+                    <label for="username" class="form-label">USERNAME</label>
+                    <input type="text" id="username" name="username" value="<%= typeof username != 'undefined' ? username : '' %>" required
+                        class="form-input" placeholder="Choose your username" autocomplete="username">
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <label class="text-muted mono" style="font-size: 0.65rem; letter-spacing: 2px;">CREATE_ACCESS_KEY</label>
-                    <div style="position: relative; display: flex; align-items: center;">
-                        <input type="password" name="password" id="reg-password" required 
-                            style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 1rem; color: white; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 0.9rem;">
-                        <button type="button" class="password-toggle" data-target="reg-password" style="position: absolute; right: 1rem; background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">ACCESS_KEY</label>
+                    <input type="password" id="password" name="password" required
+                        class="form-input" placeholder="Create a password" autocomplete="new-password">
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <label class="text-muted mono" style="font-size: 0.65rem; letter-spacing: 2px;">CONFIRM_ACCESS_KEY</label>
-                    <div style="position: relative; display: flex; align-items: center;">
-                        <input type="password" name="confirmPassword" id="confirm-password" required 
-                            style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 1rem; color: white; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 0.9rem;">
-                        <button type="button" class="password-toggle" data-target="confirm-password" style="position: absolute; right: 1rem; background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">CONFIRM_KEY</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required
+                        class="form-input" placeholder="Confirm your password" autocomplete="new-password">
                 </div>
-                <button type="submit" class="btn-cyan-solid" style="width: 100%; margin-top: 1rem; border: none; cursor: pointer;">INITIALIZE_NODE_REGISTRY</button>
+                <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">INITIALIZE_NODE</button>
             </form>
 
-            <div style="margin-top: 2.5rem; text-align: center;">
-                <a href="/auth/login" class="text-soft mono" style="font-size: 0.7rem; text-decoration: none; border-bottom: 1px solid transparent; transition: 0.3s;" onmouseover="this.style.borderColor='var(--accent-cyan)'" onmouseout="this.style.borderColor='transparent'">ALREADY_REGISTERED?_AUTHENTICATE</a>
+            <div style="margin-top: 2rem; text-align: center;">
+                <a href="/auth/login" class="btn-link" style="font-size: 0.875rem;">ALREADY REGISTERED? →</a>
             </div>
         </section>
     </div>

@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PULSE - Real-time health intelligence layer for Web3 DAOs and protocols">
+    <meta name="theme-color" content="#030508">
     <title><%= title %></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,34 +13,37 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="aura-bg">
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <!-- NOISE OVERLAY -->
-    <div class="noise-overlay"></div>
-    
+    <div class="noise-overlay" aria-hidden="true"></div>
+
     <!-- STATUS BAR -->
-    <div class="top-status-bar">
+    <div class="top-status-bar" role="status" aria-label="System status">
         <div class="container-full">
             <div class="status-content">
                 <div class="status-left">
-                    <span class="pulse-dot"></span>
+                    <span class="pulse-dot" aria-hidden="true"></span>
                     <span class="mono">ALL SYSTEMS OPERATIONAL</span>
                 </div>
-                <div class="status-center mono">
+                <div class="status-center mono" aria-hidden="true">
                     ZA API: <span class="text-cyan">CONNECTED</span> | NODES: <span class="text-cyan">1,247</span>
                 </div>
-                <div class="status-right mono" id="typewriter-status"></div>
+                <div class="status-right mono" id="typewriter-status" aria-live="polite"></div>
             </div>
         </div>
     </div>
 
     <!-- STICKY NAV -->
-    <header class="sticky-nav">
+    <header class="sticky-nav" role="navigation" aria-label="Main navigation">
         <div class="container">
             <div class="nav-content">
-                <a href="/" class="logo">
-                    <img src="/assets/logo.png" alt="PULSE" class="nav-logo">
+                <a href="/" class="nav-logo" aria-label="PULSE Home">
+                    <img src="/assets/logo.png" alt="PULSE" width="120" height="42">
                 </a>
-                
-                <nav class="center-nav">
+
+                <nav class="center-nav" aria-label="Desktop navigation">
                     <% if (user) { %>
                         <a href="/dashboard">Dashboard</a>
                         <a href="/intelligence">Intelligence</a>
@@ -47,23 +52,30 @@
                         <a href="/insights">Insights</a>
                         <a href="/docs">Docs</a>
                     <% } else { %>
+                        <a href="/">Home</a>
                         <a href="/about">Protocol</a>
                         <a href="/features">Features</a>
-                        <a href="/auth/login">Network Status</a>
+                        <a href="/auth/login">Sign In</a>
                     <% } %>
                 </nav>
 
                 <div class="nav-actions">
                     <% if (user) { %>
-                        <a href="/command-center" class="nav-link desktop-only">Command Center</a>
-                        <a href="/auth/logout" class="btn-cyan-solid desktop-only">Logout</a>
+                        <% if (user.isWalletAuth && user.walletAddress) { %>
+                            <div class="wallet-badge desktop-only" style="margin-right: 1rem; padding: 0.35rem 0.75rem; background: var(--bg-card); border: 1px solid var(--accent-cyan); border-radius: var(--radius-md);">
+                                <span class="mono text-cyan" style="font-size: 0.7rem;"><%= user.walletAddress.substring(0, 6) %>...<%= user.walletAddress.substring(user.walletAddress.length - 4) %></span>
+                            </div>
+                        <% } else if (user.username) { %>
+                            <span class="desktop-only mono text-soft" style="margin-right: 1rem; font-size: 0.8rem;"><%= user.username %></span>
+                        <% } %>
+                        <a href="/auth/logout" class="btn btn-sm btn-secondary desktop-only">Logout</a>
                     <% } else { %>
-                        <a href="/auth/login" class="nav-link desktop-only">Sign In</a>
-                        <a href="/auth/register" class="btn-cyan-solid desktop-only">Get Started</a>
+                        <a href="/auth/login" class="nav-link desktop-only" style="margin-right: 1.5rem; text-decoration: none; color: white; font-size: 0.85rem;">Sign In</a>
+                        <a href="/auth/register" class="btn btn-sm btn-primary desktop-only">Get Started</a>
                     <% } %>
-                    
+
                     <!-- MOBILE TOGGLE -->
-                    <button class="mobile-toggle" id="mobile-toggle">
+                    <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-menu">
                         <span></span>
                         <span></span>
                         <span></span>
@@ -74,29 +86,142 @@
     </header>
 
     <!-- MOBILE MENU OVERLAY -->
-    <div class="mobile-menu" id="mobile-menu">
-        <nav class="mobile-nav-links">
+    <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+        <div class="mobile-menu-header">
+            <a href="/" class="nav-logo" aria-label="PULSE Home">
+                <img src="/assets/logo.png" alt="PULSE">
+            </a>
+            <button class="mobile-close" id="mobile-close" aria-label="Close menu">&times;</button>
+        </div>
+        <nav class="mobile-nav-links" aria-label="Mobile navigation">
             <% if (user) { %>
-                <a href="/dashboard">Dashboard</a>
-                <a href="/intelligence">Intelligence</a>
-                <a href="/bounties">Bounties</a>
-                <a href="/contributors">Communities</a>
-                <a href="/insights">Insights</a>
-                <a href="/command-center">Command Center</a>
-                <a href="/docs">Docs</a>
-                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 1rem 0;">
-                <a href="/auth/logout" style="color: var(--status-critical);">Logout</a>
+                <a href="/dashboard" class="mobile-nav-item">Dashboard</a>
+                <a href="/intelligence" class="mobile-nav-item">Intelligence</a>
+                <a href="/bounties" class="mobile-nav-item">Bounties</a>
+                <a href="/contributors" class="mobile-nav-item">Communities</a>
+                <a href="/insights" class="mobile-nav-item">Insights</a>
+                <a href="/command-center" class="mobile-nav-item">Command Center</a>
+                <a href="/docs" class="mobile-nav-item">Docs</a>
+                <div class="nav-divider"></div>
+                <a href="/auth/logout" class="mobile-nav-item" style="color: var(--accent-critical);">Logout</a>
             <% } else { %>
-    ...
-                <a href="/about">Protocol</a>
-                <a href="/features">Features</a>
-                <a href="/auth/login">Sign In</a>
-                <a href="/auth/register" class="text-cyan">Get Started</a>
+                <a href="/" class="mobile-nav-item">Home</a>
+                <a href="/about" class="mobile-nav-item">Protocol</a>
+                <a href="/features" class="mobile-nav-item">Features</a>
+                <a href="/auth/login" class="mobile-nav-item">Sign In</a>
+                <div class="nav-divider"></div>
+                <a href="/auth/register" class="mobile-nav-item" style="color: var(--accent-cyan);">Get Started</a>
             <% } %>
         </nav>
+        <div class="mobile-menu-footer">
+            <div class="mono text-muted" style="font-size: 0.65rem; text-align: center;">
+                PULSE // SYSTEM ONLINE
+            </div>
+        </div>
     </div>
 
-    <main>
+    <!-- Mobile menu backdrop -->
+    <div class="mobile-backdrop" id="mobile-backdrop" aria-hidden="true"></div>
+
+    <!-- Stacks Wallet Provider Detection -->
+    <script>
+        (function() {
+            // Stacks wallets inject these global objects:
+            // - window.HiroWallet (Hiro Wallet)
+            // - window.leather (Leather Wallet)
+            // - window.xverse (Xverse Wallet)
+
+            // Make wallet detection available globally
+            window.getStacksWallet = function() {
+                if (window.HiroWallet && typeof window.HiroWallet === 'object') {
+                    return { type: 'hiro', wallet: window.HiroWallet };
+                }
+                if (window.leather && typeof window.leather === 'object') {
+                    return { type: 'leather', wallet: window.leather };
+                }
+                if (window.xverse && typeof window.xverse === 'object') {
+                    return { type: 'xverse', wallet: window.xverse };
+                }
+                return null;
+            };
+        })();
+    </script>
+
+    <script>
+        // Mobile Menu Functionality
+        (function() {
+            const toggle = document.getElementById('mobile-toggle');
+            const menu = document.getElementById('mobile-menu');
+            const closeBtn = document.getElementById('mobile-close');
+            const backdrop = document.getElementById('mobile-backdrop');
+
+            function openMenu() {
+                menu.classList.add('active');
+                menu.setAttribute('aria-hidden', 'false');
+                toggle.classList.add('active');
+                toggle.setAttribute('aria-expanded', 'true');
+                if (backdrop) backdrop.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMenu() {
+                menu.classList.remove('active');
+                menu.setAttribute('aria-hidden', 'true');
+                toggle.classList.remove('active');
+                toggle.setAttribute('aria-expanded', 'false');
+                if (backdrop) backdrop.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    if (menu.classList.contains('active')) {
+                        closeMenu();
+                    } else {
+                        openMenu();
+                    }
+                });
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeMenu);
+            }
+
+            if (backdrop) {
+                backdrop.addEventListener('click', closeMenu);
+            }
+
+            // Close menu on link click
+            document.querySelectorAll('.mobile-nav-links a').forEach(link => {
+                link.addEventListener('click', closeMenu);
+            });
+
+            // Close on escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && menu.classList.contains('active')) {
+                    closeMenu();
+                }
+            });
+
+            // Set aria-current for active page
+            (function() {
+                const currentPath = window.location.pathname;
+                const centerNav = document.querySelector('.center-nav');
+                if (centerNav) {
+                    const links = centerNav.querySelectorAll('a');
+                    links.forEach(link => {
+                        const href = link.getAttribute('href');
+                        if (href === currentPath || (currentPath === '/' && href === '/') || (currentPath.startsWith(href) && href !== '/')) {
+                            link.setAttribute('aria-current', 'page');
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            })();
+        })();
+    </script>
+
+    <main id="main-content">
         <% if(success_msg != '') { %>
             <div class="container" style="margin-top: 2rem;">
                 <div class="glass-panel alert-success">
@@ -115,24 +240,41 @@
         <%- body %>
     </main>
 
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <div class="container">
-            <div class="footer-grid">
+            <div class="responsive-grid">
                 <div class="footer-brand">
-                    <a href="/" class="logo">
-                        <img src="/assets/logo.png" alt="PULSE" class="footer-logo" style="margin-bottom: 1rem;">
+                    <a href="/" class="nav-logo" aria-label="PULSE Home">
+                        <img src="/assets/logo.png" alt="PULSE">
                     </a>
-                    <p class="text-muted">Community Health Intelligence for Web3.</p>
+                    <p class="text-muted mono">VITALITY_INT_LAYER_V3.3</p>
+                    <div class="footer-social">
+                        <a href="https://github.com" aria-label="GitHub" target="_blank" rel="noopener noreferrer">GH</a>
+                        <a href="https://discord.com" aria-label="Discord" target="_blank" rel="noopener noreferrer">DC</a>
+                        <a href="https://twitter.com" aria-label="Twitter" target="_blank" rel="noopener noreferrer">X</a>
+                    </div>
                 </div>
-                <div class="footer-links">
-                    <a href="/dashboard">Dashboard</a>
-                    <a href="/docs">Docs</a>
-                    <a href="/api">API</a>
-                    <a href="https://github.com">GitHub</a>
-                    <a href="https://twitter.com">Twitter</a>
+                <div class="footer-links-group">
+                    <h4>Platform</h4>
+                    <a href="/dashboard">DASHBOARD</a>
+                    <a href="/intelligence">INT_REPORT</a>
+                    <a href="/bounties">BOUNTIES</a>
+                    <a href="/contributors">COMMUNITIES</a>
+                </div>
+                <div class="footer-links-group">
+                    <h4>Resources</h4>
+                    <a href="/docs">PROTOCOL_DOCS</a>
+                    <a href="/about">ABOUT</a>
+                    <a href="/contributors">CONTRIBUTORS</a>
+                    <a href="/insights">INSIGHTS</a>
+                </div>
+                <div class="footer-links-group">
+                    <h4>Legal</h4>
+                    <a href="/privacy">PRIVACY</a>
+                    <a href="/terms">TERMS</a>
                 </div>
                 <div class="footer-copy">
-                    <div class="mono">© 2026 PULSE · SYSTEM_ONLINE</div>
+                    <div class="mono text-muted">© 2026 PULSE // SYSTEM_ONLINE</div>
                 </div>
             </div>
         </div>

@@ -1,48 +1,61 @@
-<div class="container" style="padding-top: 4rem;">
+<div class="container" style="padding-top: 2rem;">
     <!-- DASHBOARD HEADER -->
-    <section class="page-header" style="text-align: left; margin-bottom: 4rem;">
+    <div class="hero-aura-enhanced"></div>
+    
+    <section class="page-header" style="text-align: left; margin-bottom: 3rem;">
         <div class="section-label" data-aos="fade-right">Ecosystem Overview</div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
             <div>
-                <h1 style="font-family: var(--font-display); font-size: 3.5rem; line-height: 1;">DASHBOARD<span class="text-cyan">.</span></h1>
-                <p class="text-soft" style="margin-top: 1rem;">Real-time health telemetry across the entire Zero Authority network.</p>
+                <h1 style="font-family: var(--font-display); font-size: clamp(2.5rem, 8vw, 3.5rem); line-height: 1; margin: 0;">DASHBOARD<span class="text-gradient">.</span></h1>
+                <p class="text-soft" style="margin-top: 0.5rem; font-size: 0.95rem;">Real-time telemetry across the Zero Authority network.</p>
             </div>
-            <div class="mono text-cyan" style="font-size: 0.7rem; border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: 4px; background: rgba(0,212,255,0.02);">
-                NETWORK_STATUS: <span class="text-healthy">OPERATIONAL</span>
+            <div class="mono text-cyan gradient-border" style="font-size: 0.65rem; padding: 0.5rem 1rem; border-radius: 4px; background: rgba(0,212,255,0.03); letter-spacing: 1px;">
+                STATUS: <span class="text-healthy pulse-ring" style="padding-left: 0.5rem;">● OPERATIONAL</span>
             </div>
         </div>
     </section>
 
     <!-- GLOBAL METRICS -->
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
-        <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="100">
-            <div class="vital-label">Ecosystem Health</div>
-            <div class="vital-value text-healthy"><%= stats.healthScore %></div>
-            <div class="vital-delta text-healthy mono">↑ +2.1 PTS THIS WEEK</div>
+    <div class="responsive-grid responsive-grid-3" style="margin-bottom: 2.5rem;">
+        <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1.5rem;">
+            <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">ECOSYSTEM_HEALTH</div>
+            <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                <div class="text-healthy" style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display);"><%= stats.healthScore %></div>
+                <div class="text-healthy mono" style="font-size: 0.65rem;">↑ +2.1</div>
+            </div>
+            <div class="text-muted mono" style="font-size: 0.55rem; margin-top: 0.5rem;">VITALITY_INDEX_STABLE</div>
         </div>
-        <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="200">
-            <div class="vital-label">Active Contributors</div>
-            <div class="vital-value"><%= (stats.activeContributors || 0).toLocaleString() %></div>
-            <div class="vital-delta text-cyan mono">LIVE_NETWORK_NODES</div>
+        
+        <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-cyan); padding: 1.5rem;">
+            <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">ACTIVE_NODES</div>
+            <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                <div class="text-cyan" style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display);"><%= (stats.activeContributors || 0).toLocaleString() %></div>
+                <div class="text-cyan mono" style="font-size: 0.65rem;">LIVE</div>
+            </div>
+            <div class="text-muted mono" style="font-size: 0.55rem; margin-top: 0.5rem;">CONTRIBUTOR_NETWORK_ACTIVE</div>
         </div>
-        <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="300">
-            <div class="vital-label">Avg. Completion Rate</div>
-            <div class="vital-value"><%= stats.completionRate || 0 %>%</div>
-            <div class="vital-delta text-healthy mono">OPTIMIZED_VELOCITY</div>
+
+        <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1.5rem;">
+            <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">COMPLETION_RATE</div>
+            <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                <div class="text-healthy" style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display);"><%= stats.completionRate || 0 %>%</div>
+                <div class="text-healthy mono" style="font-size: 0.65rem;">OPTIMIZED</div>
+            </div>
+            <div class="text-muted mono" style="font-size: 0.55rem; margin-top: 0.5rem;">PRODUCTION_VELOCITY_PEAK</div>
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 350px 1fr; gap: 2rem;">
+    <div class="responsive-grid responsive-grid-2" style="margin-bottom: 4rem; align-items: start;">
         <!-- LEFT: ECOSYSTEM VITALITY -->
-        <div style="display: flex; flex-direction: column; gap: 2rem;">
-            <section class="glass-panel" style="text-align: center; padding: 3rem 2rem;" data-aos="fade-right">
-                <span class="section-label" style="margin-bottom: 2rem;">Network Vitality</span>
-                <div class="gauge-container" style="width: 220px; height: 220px;">
-                    <svg class="gauge-svg" width="220" height="220" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6" />
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#dashGrad)" stroke-width="6" 
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <section class="glass-panel premium-card" style="text-align: center; padding: 3rem 2rem; background: radial-gradient(circle at center, rgba(0,245,255,0.05) 0%, transparent 100%);">
+                <span class="section-label" style="margin-bottom: 2.5rem;">Network Vitality</span>
+                <div class="gauge-container pulse-ring" style="max-width: 240px;">
+                    <svg class="gauge-svg" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="5" />
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#dashGrad)" stroke-width="5" 
                             stroke-dasharray="283" stroke-dashoffset="<%= 283 - (283 * stats.healthScore / 100) %>" 
-                            stroke-linecap="round" />
+                            stroke-linecap="round" style="filter: drop-shadow(0 0 8px var(--accent-cyan));" />
                         <defs>
                             <linearGradient id="dashGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" stop-color="var(--accent-cyan)" />
@@ -51,71 +64,86 @@
                         </defs>
                     </svg>
                     <div class="gauge-center">
-                        <div class="gauge-number" style="font-size: 3.5rem;"><%= stats.healthScore %></div>
+                        <div class="gauge-number text-gradient"><%= stats.healthScore %></div>
+                        <div class="mono text-soft" style="font-size: 0.6rem; margin-top: 0.5rem; letter-spacing: 2px;">INDEX</div>
                     </div>
                 </div>
-                <div class="mono text-soft" style="font-size: 0.7rem; margin-top: 2rem;">THRIVING</div>
+                <div class="mono text-healthy" style="font-size: 0.65rem; margin-top: 2.5rem; letter-spacing: 3px;">STATUS_THRIVING</div>
             </section>
 
-            <a href="/intelligence" class="btn-cyan-solid" style="padding: 1.5rem; text-align: center; text-decoration: none; display: block;">
-                INITIALIZE SPECIFIC TELEMETRY →
+            <a href="/intelligence" class="btn-glow" style="padding: 1.25rem; text-align: center; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 1px;">
+                INITIALIZE_SPECIFIC_TELEMETRY →
             </a>
         </div>
 
         <!-- RIGHT: NEURAL SYNTHESIS & RECENT ACTIVITY -->
-        <div style="display: flex; flex-direction: column; gap: 2rem;">
-            <section class="glass-panel" style="min-height: 250px;" data-aos="fade-up">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <section class="glass-panel premium-card" style="border-left: 3px solid var(--accent-cyan);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <span class="section-label" style="margin: 0;">Ecosystem Synthesis</span>
-                    <div class="text-healthy mono" style="font-size: 0.65rem; border: 1px solid var(--accent-green); padding: 0.3rem 0.6rem; border-radius: 2px;">
-                        AI_STRATEGIC_LAYER
-                    </div>
+                    <span class="mono text-cyan" style="font-size: 0.55rem; opacity: 0.6;">LLAMA_3.3_INFERENCE</span>
                 </div>
-                
-                <div style="border-left: 2px solid var(--accent-cyan); padding-left: 1.5rem;">
-                    <p class="text-soft" style="font-size: 0.95rem; line-height: 1.8;">
-                        The Zero Authority network is currently showing <span class="text-white">High Momentum</span>. Contributor retention has stabilized at 74% while bounty velocity across the Stacks ecosystem has increased by 12% in the last 24 hours. No critical burnout risks detected at the ecosystem level.
-                    </p>
+                <p class="text-soft" style="font-size: 0.9rem; line-height: 1.8;">
+                    The network core is exhibiting <span class="text-white">High Momentum</span>. Contributor retention has stabilized at optimal levels while production velocity across the Stacks ecosystem has increased by 12% in this cycle.
+                </p>
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span class="feature-tag" style="background: rgba(0,255,136,0.1); color: var(--accent-green);">NO_RISK_DETECTED</span>
+                    <span class="feature-tag" style="background: rgba(0,245,255,0.1); color: var(--accent-cyan);">GROWTH_OPTIMIZED</span>
                 </div>
             </section>
 
-            <section class="glass-panel" data-aos="fade-up" data-aos-delay="200">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <span class="section-label" style="margin: 0;">Global Activity Feed</span>
-                    <span class="text-healthy mono" style="font-size: 0.6rem;">[LIVE_STREAM]</span>
-                </div>
-                
-                <div class="mock-browser" style="height: auto; border-radius: 4px;">
-                    <div class="mock-main" style="background: #010409; padding: 0;">
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="border-bottom: 1px solid var(--glass-border);">
-                                    <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">EVENT_TYPE</th>
-                                    <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">NODE_SOURCE</th>
-                                    <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">STATUS</th>
-                                </tr>
-                            </thead>
-                            <tbody class="mono" style="font-size: 0.75rem;">
-                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                    <td style="padding: 1rem;">NETWORK_SYNC</td>
-                                    <td style="padding: 1rem; color: var(--accent-cyan);">STACKS_MAINNET</td>
-                                    <td style="padding: 1rem;" class="text-healthy">VERIFIED</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                    <td style="padding: 1rem;">REPUTATION_MINT</td>
-                                    <td style="padding: 1rem; color: var(--accent-cyan);">DAO_NODE_0x2...</td>
-                                    <td style="padding: 1rem;" class="text-healthy">COMPLETED</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                    <td style="padding: 1rem;">BOUNTY_PUBLISHED</td>
-                                    <td style="padding: 1rem; color: var(--accent-cyan);">ARKADIKO_PROTOCOL</td>
-                                    <td style="padding: 1rem;" class="text-healthy">BROADCASTED</td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <section class="glass-panel premium-card" style="padding: 0; overflow: hidden;">
+                <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01);">
+                    <span class="section-label" style="margin: 0;">Global Activity</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="pulse-dot" style="width: 4px; height: 4px;"></span>
+                        <span class="text-healthy mono" style="font-size: 0.55rem;">LIVE_FEED</span>
                     </div>
+                </div>
+                <div class="table-wrapper">
+                    <table style="min-width: 400px;">
+                        <tbody class="mono" style="font-size: 0.7rem;">
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                <td style="padding: 1rem; color: var(--text-muted);">[09:42:01]</td>
+                                <td style="padding: 1rem;">NETWORK_SYNC</td>
+                                <td style="padding: 1rem;" class="text-cyan">MAINNET_CORE</td>
+                                <td style="padding: 1rem;" class="text-healthy">VERIFIED</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                <td style="padding: 1rem; color: var(--text-muted);">[09:41:45]</td>
+                                <td style="padding: 1rem;">BOUNTY_MINT</td>
+                                <td style="padding: 1rem;" class="text-cyan">DAO_NODE_73A</td>
+                                <td style="padding: 1rem;" class="text-healthy">BROADCAST</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 1rem; color: var(--text-muted);">[09:41:22]</td>
+                                <td style="padding: 1rem;">REPUTATION_UP</td>
+                                <td style="padding: 1rem;" class="text-cyan">CONTRIB_0x2...</td>
+                                <td style="padding: 1rem;" class="text-healthy">SIGNED</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
         </div>
     </div>
+
+    <!-- QUICK ACCESS STRIP -->
+    <% if (followedDaos && followedDaos.length > 0) { %>
+        <section style="margin-bottom: 6rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <span class="section-label" style="margin: 0;">Your Tracked Nodes</span>
+                <a href="/command-center" class="mono text-soft" style="font-size: 0.6rem; text-decoration: none;">MANAGE_ALL →</a>
+            </div>
+            <div class="responsive-grid responsive-grid-4">
+                <% followedDaos.slice(0, 4).forEach(dao => { %>
+                    <a href="/intelligence/<%= dao.daoId %>" class="glass-panel premium-card tracked-node-card" style="padding: 1.25rem;">
+                        <div class="mono text-cyan pulse-ring" style="font-size: 0.5rem; margin-bottom: 0.5rem; letter-spacing: 1px; display: inline-block;">LINK_ACTIVE</div>
+                        <div class="text-white mono node-name"><%= dao.name %></div>
+                        <div class="text-muted mono" style="font-size: 0.5rem; letter-spacing: 1px; margin-top: 0.5rem;">[MONITOR_NODE]</div>
+                    </a>
+                <% }) %>
+            </div>
+        </section>
+    <% } %>
 </div>

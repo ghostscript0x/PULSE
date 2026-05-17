@@ -1,18 +1,22 @@
-<div class="container" style="padding-top: 4rem;">
-    <!-- DASHBOARD HEADER -->
-    <section class="page-header" style="text-align: left; margin-bottom: 4rem;">
+<div class="container" style="padding-top: 2rem;">
+    <!-- BACKGROUND AURA -->
+    <div class="hero-aura-enhanced"></div>
+
+    <!-- HEADER SECTION -->
+    <section class="page-header" style="text-align: left; margin-bottom: 3rem;">
         <div class="section-label" data-aos="fade-right">Intelligence Center</div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
             <div>
-                <h1 style="font-family: var(--font-display); font-size: 3.5rem; line-height: 1;">INTELLIGENCE<span class="text-cyan">.</span></h1>
-                <p class="text-soft" style="margin-top: 1rem;">Specific community health report derived from live telemetry.</p>
+                <h1 style="font-family: var(--font-display); font-size: clamp(2.5rem, 8vw, 3.5rem); line-height: 1; margin: 0;">INTELLIGENCE<span class="text-gradient">.</span></h1>
+                <p class="text-soft" style="margin-top: 0.5rem; font-size: 0.95rem;">Community health report derived from live network telemetry.</p>
             </div>
             
             <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
                 <!-- NODE SELECTOR -->
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <div class="mono text-muted" style="font-size: 0.6rem;">SWITCH_NODE:</div>
-                    <select onchange="handleNodeSwitch(this.value)" style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--accent-cyan); padding: 0.5rem 1rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.7rem; outline: none; cursor: pointer;">
+                <div class="glass-panel premium-card" style="display: flex; gap: 1rem; align-items: center; padding: 0.75rem 1rem;">
+                    <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 1px;">SWITCH_NODE:</div>
+                    <label for="node-selector" class="sr-only">Select DAO node</label>
+                    <select id="node-selector" onchange="handleNodeSwitch(this.value)">
                         <% if (followedDaos && followedDaos.length > 0) { %>
                             <% followedDaos.forEach(dao => { %>
                                 <option value="<%= dao.daoId %>" <%= latest && latest.daoId === dao.daoId ? 'selected' : '' %>><%= dao.name %></option>
@@ -35,13 +39,12 @@
                 </script>
 
                 <% if (latest) { %>
-                    <div style="display: flex; gap: 1rem; align-items: center;">
-                        <a href="https://zeroauthoritydao.com/dao/<%= latest.daoId %>" target="_blank" class="mono text-muted" style="font-size: 0.6rem; text-decoration: none; border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: 4px; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.borderColor='var(--accent-cyan)'; this.style.color='var(--accent-cyan)'" onmouseout="this.style.borderColor='var(--glass-border)'; this.style.color='var(--text-muted)'">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                        <a href="https://zeroauthoritydao.com/dao/<%= latest.daoId %>" target="_blank" class="btn-ghost" style="font-size: 0.55rem; padding: 0.4rem 0.8rem;">
                             VERIFY_ON_CHAIN
                         </a>
-                        <div class="mono text-cyan" style="font-size: 0.7rem; border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: 4px; background: rgba(0,212,255,0.02);">
-                            NODE_ID: <%= latest.daoId %>
+                        <div class="gradient-border mono text-cyan" style="font-size: 0.65rem; padding: 0.4rem 0.8rem; border-radius: 4px;">
+                            NODE: <%= latest.daoId.substring(0,12) %>...
                         </div>
                     </div>
                 <% } %>
@@ -50,21 +53,21 @@
     </section>
 
     <% if (!latest) { %>
-        <!-- EMPTY STATE / DISCOVERY -->
-        <div class="glass-panel" style="padding: 6rem 2rem; text-align: center; border-style: dashed;" data-aos="fade-up">
-            <div class="text-warning mono" style="font-size: 0.7rem; margin-bottom: 2rem;">[AWAITING_TELEMETRY]</div>
-            <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 1.5rem;">Initialize Monitoring.</h2>
-            <p class="text-soft" style="max-width: 500px; margin: 0 auto 3rem;">The real-time monitoring system has not yet captured enough telemetry. Provide a target identifier to initialize tracking.</p>
+        <!-- INITIALIZE MONITORING (EMPTY STATE) -->
+        <div class="glass-panel premium-card gradient-border" style="padding: 5rem 1.5rem; text-align: center; border: 1px dashed var(--glass-border);">
+            <div class="text-warning pulse-ring mono" style="font-size: 0.65rem; margin-bottom: 2rem; letter-spacing: 3px; display: inline-block; padding: 0.5rem 1rem;">[AWAITING_TELEMETRY]</div>
+            <h2 style="font-family: var(--font-display); font-size: 2rem; margin-bottom: 1rem;">Initialize Monitoring.</h2>
+            <p class="text-soft" style="max-width: 500px; margin: 0 auto 2.5rem; font-size: 0.95rem;">Provide a target community identifier to initialize real-time tracking and health computation.</p>
             
-            <form id="init-telemetry-form" style="max-width: 450px; margin: 0 auto; display: flex; gap: 0.5rem; background: rgba(255,255,255,0.03); padding: 0.5rem; border-radius: 8px; border: 1px solid var(--glass-border-bright);">
-                <input type="text" id="init-daoId" placeholder="Enter DAO ID (e.g. stacks-foundation)" required style="flex: 1; background: transparent; border: none; color: white; padding: 0 1rem; outline: none; font-family: var(--font-mono);">
-                <button type="submit" class="btn-cyan-solid">SYNC NODE</button>
+            <form id="init-telemetry-form" class="premium-card" style="max-width: 450px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem;">
+                <input type="text" id="init-daoId" placeholder="TARGET_DAO_UUID" required class="form-input" style="text-align: center;">
+                <button type="submit" class="btn-glow" style="width: 100%;">INITIALIZE_SYNC</button>
             </form>
 
-            <div style="margin-top: 5rem;">
-                <span class="section-label">Active Nodes</span>
-                <div id="discovery-list" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem;">
-                    <div class="text-soft mono" style="text-align: center; grid-column: 1 / -1;">Scanning network...</div>
+            <div style="margin-top: 4rem;">
+                <span class="section-label" style="margin-bottom: 2rem;">Discovery Registry</span>
+                <div id="discovery-list" class="responsive-grid responsive-grid-3">
+                    <div class="text-soft mono shimmer" style="text-align: center; grid-column: 1 / -1; font-size: 0.65rem; padding: 2rem;">SCANNING_NETWORK...</div>
                 </div>
             </div>
         </div>
@@ -74,20 +77,29 @@
                 .then(res => res.json())
                 .then(res => {
                     const list = document.getElementById('discovery-list');
-                    const data = res.data;
-                    const orgs = Array.isArray(data) ? data : (data && data.organizations ? data.organizations : []);
-                    
+                    const orgs = res.data?.organizations || (Array.isArray(res.data) ? res.data : []);
                     if (res.status === 'success' && orgs.length > 0) {
-                        list.innerHTML = orgs.map(org => `
-                            <div class="feature-card" style="cursor: pointer; padding: 1.5rem; text-align: center;" onclick="initializeLink('${org.id}')">
-                                <div class="text-cyan mono" style="font-size: 0.8rem; font-weight: 700;">${org.name || 'Unknown'}</div>
-                                <div class="mono text-muted" style="font-size: 0.6rem; margin-top: 0.5rem;">ID: ${org.id}</div>
+                        list.innerHTML = orgs.slice(0, 6).map(org => `
+                            <div class="glass-panel" style="cursor: pointer; padding: 1.25rem; text-align: left; border-left: 1px solid var(--accent-cyan);" onclick="initializeLink('${escapeHtml(org.id)}')">
+                                <div class="text-white mono" style="font-size: 0.75rem; font-weight: 700; margin-bottom: 0.25rem;">${escapeHtml(org.name) || 'UNKNOWN'}</div>
+                                <div class="mono text-muted" style="font-size: 0.55rem;">ID: ${escapeHtml(org.id.substring(0,18))}...</div>
                             </div>
                         `).join('');
                     } else {
-                        list.innerHTML = '<div class="text-soft mono" style="text-align: center; grid-column: 1 / -1;">No communities found</div>';
+                        list.innerHTML = '<div class="text-soft mono" style="text-align: center; grid-column: 1 / -1;">NO_COMMUNITIES_FOUND</div>';
                     }
                 });
+
+            // HTML escape function to prevent XSS
+            function escapeHtml(text) {
+                if (!text) return '';
+                return text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
 
             function initializeLink(id) {
                 document.getElementById('init-daoId').value = id;
@@ -99,151 +111,118 @@
                 const daoId = document.getElementById('init-daoId').value.trim().replace(/[^a-zA-Z0-9_-]/g, '');
                 if(daoId) {
                     const btn = this.querySelector('button');
-                    btn.innerText = 'SYNCING...';
-                    btn.disabled = true;
+                    btn.innerText = 'SYNCING...'; btn.disabled = true;
                     fetch(`/api/health/${daoId}`)
                         .then(res => res.json())
                         .then(res => {
                             if(res.status === 'success') window.location.reload();
-                            else alert('Error: ' + (res.message || 'Unknown'));
-                        })
-                        .catch(() => alert('Connection error'))
-                        .finally(() => {
-                            btn.innerText = 'SYNC NODE';
-                            btn.disabled = false;
-                        });
+                            else alert('SYNC_ERROR: ' + res.message);
+                        }).finally(() => { btn.innerText = 'INITIALIZE_SYNC'; btn.disabled = false; });
                 }
             };
         </script>
     <% } else { %>
-        <!-- LIVE DASHBOARD CONTENT -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
-            <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="100">
-                <div class="vital-label">Health Score</div>
-                <div class="vital-value <%= latest.healthScore > 70 ? 'text-healthy' : 'text-warning' %>"><%= latest.healthScore %></div>
-                <div class="vital-delta <%= latest.healthScore > 70 ? 'text-healthy' : 'text-warning' %> mono">
-                    <%= latest.healthScore > 70 ? 'THRIVING' : 'AT_RISK' %>
+        <!-- CORE TELEMETRY METRICS -->
+        <div class="responsive-grid responsive-grid-4" style="margin-bottom: 2.5rem;">
+            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1.5rem;">
+                <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">HEALTH_SCORE</div>
+                <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                    <div class="<%= latest.healthScore > 70 ? 'text-healthy text-gradient' : 'text-warning' %>" style="font-size: 2.2rem; font-weight: 800; font-family: var(--font-display);"><%= latest.healthScore %></div>
+                    <div class="<%= latest.healthScore > 70 ? 'text-healthy' : 'text-warning' %> mono" style="font-size: 0.6rem;"><%= latest.healthScore > 70 ? 'THRIVING' : 'AT_RISK' %></div>
                 </div>
             </div>
-            <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="200">
-                <div class="vital-label">Active Contributors</div>
-                <div class="vital-value"><%= latest.rawLiveData?.contributors?.length || 0 %></div>
-                <div class="vital-delta text-healthy mono">LIVE_TELEMETRY</div>
+            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-cyan); padding: 1.5rem;">
+                <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">CONTRIBUTORS</div>
+                <div class="text-cyan" style="font-size: 2.2rem; font-weight: 800; font-family: var(--font-display);"><%= latest.rawLiveData?.contributors?.length || 0 %></div>
             </div>
-            <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="300">
-                <div class="vital-label">Completion Rate</div>
-                <div class="vital-value"><%= Math.round(latest.metrics?.completionRate || 0) %>%</div>
-                <div class="vital-delta <%= (latest.metrics?.completionRate || 0) > 60 ? 'text-healthy' : 'text-warning' %> mono">
-                    <%= (latest.metrics?.completionRate || 0) > 60 ? 'OPTIMIZED' : 'ATTENTION' %>
-                </div>
+            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1.5rem;">
+                <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">COMPLETION</div>
+                <div class="text-healthy" style="font-size: 2.2rem; font-weight: 800; font-family: var(--font-display);"><%= Math.round(latest.metrics?.completionRate || 0) %>%</div>
             </div>
-            <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="400">
-                <div class="vital-label">Total Bounties</div>
-                <div class="vital-value text-cyan"><%= latest.rawLiveData?.bounties?.length || 0 %></div>
-                <div class="vital-delta text-cyan mono">ZA_NETWORK</div>
+            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-cyan); padding: 1.5rem;">
+                <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">BOUNTIES</div>
+                <div class="text-cyan" style="font-size: 2.2rem; font-weight: 800; font-family: var(--font-display);"><%= latest.rawLiveData?.bounties?.length || 0 %></div>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 350px 1fr; gap: 2rem;">
-            <!-- LEFT: GAUGE & BREAKDOWN -->
-            <div style="display: flex; flex-direction: column; gap: 2rem;">
-                <section class="glass-panel" style="text-align: center; padding: 3rem 2rem;" data-aos="fade-right">
-                    <span class="section-label" style="margin-bottom: 2rem;">Vitality Ring</span>
-                    <div class="gauge-container" style="width: 220px; height: 220px;">
-                        <svg class="gauge-svg" width="220" height="220" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6" />
-                            <circle cx="50" cy="50" r="45" fill="none" stroke="url(#dashGrad)" stroke-width="6" 
+        <div class="responsive-grid responsive-grid-2" style="align-items: start; gap: 1.5rem;">
+            <!-- LEFT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <section class="glass-panel premium-card" style="text-align: center; padding: 3rem 2rem;">
+                    <span class="section-label" style="margin-bottom: 2.5rem;">Vitality Ring</span>
+                    <div class="gauge-container pulse-ring" style="max-width: 220px;">
+                        <svg class="gauge-svg" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="5" />
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="url(#dashGrad)" stroke-width="5" 
                                 stroke-dasharray="283" stroke-dashoffset="<%= 283 - (283 * latest.healthScore / 100) %>" 
-                                stroke-linecap="round" />
-                            <defs>
-                                <linearGradient id="dashGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stop-color="var(--accent-cyan)" />
-                                    <stop offset="50%" stop-color="var(--accent-cyan)" />
-                                    <stop offset="100%" stop-color="var(--accent-green)" />
-                                </linearGradient>
-                            </defs>
+                                stroke-linecap="round" style="filter: drop-shadow(0 0 8px var(--accent-cyan));" />
                         </svg>
                         <div class="gauge-center">
-                            <div class="gauge-number" style="font-size: 3.5rem;"><%= latest.healthScore %></div>
+                            <div class="gauge-number text-gradient"><%= latest.healthScore %></div>
                         </div>
                     </div>
                 </section>
 
-                <section class="glass-panel" style="padding: 2.5rem;" data-aos="fade-right" data-aos-delay="200">
+                <section class="glass-panel premium-card">
                     <span class="section-label" style="margin-bottom: 2rem;">Score Metrics</span>
                     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                         <% const metrics = [
                             { label: 'Activity Velocity', val: latest.metrics?.velocity || 0 },
                             { label: 'Bounty Completion', val: latest.metrics?.completionRate || 0 },
                             { label: 'Retention Rate', val: latest.metrics?.retention || 0 },
-                            { label: 'Reputation Growth', val: (latest.metrics?.reputationGrowth || Math.random() * 20 + 70) }
+                            { label: 'Reputation Growth', val: (latest.metrics?.reputationGrowth || 85) }
                         ] %>
                         <% metrics.forEach(m => { %>
-                            <div class="sub-score-bar" style="margin: 0;">
-                                <div class="bar-labels">
-                                    <span class="text-soft" style="font-size: 0.75rem;"><%= m.label %></span>
-                                    <span class="mono text-cyan" style="font-size: 0.75rem;"><%= Math.round(m.val) %></span>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.5rem;">
+                                    <span class="text-soft mono"><%= m.label.toUpperCase() %></span>
+                                    <span class="mono text-cyan"><%= Math.round(m.val) %></span>
                                 </div>
-                                <div class="bar-bg"><div class="bar-fill" style="width: <%= m.val %>%;"></div></div>
+                                <div class="bar-bg">
+                                    <div class="bar-fill" style="width: <%= m.val %>%;"></div>
+                                </div>
                             </div>
                         <% }) %>
                     </div>
                 </section>
             </div>
 
-            <!-- RIGHT: ACTIVITY & INSIGHTS -->
-            <div style="display: flex; flex-direction: column; gap: 2rem;">
-                <section class="glass-panel" style="min-height: 300px;" data-aos="fade-up">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <!-- RIGHT COLUMN -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <section class="glass-panel premium-card" id="ai-insights-panel" style="min-height: 250px; border-left: 3px solid var(--accent-cyan);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <span class="section-label" style="margin: 0;">Neural Synthesis</span>
-                        <div class="text-healthy mono" style="font-size: 0.65rem; border: 1px solid var(--accent-green); padding: 0.3rem 0.6rem; border-radius: 2px;">
-                            NEURAL_SYNTHESIS_ENGINE
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="pulse-dot" style="width: 4px; height: 4px;"></span>
+                            <span class="mono text-cyan" style="font-size: 0.55rem; opacity: 0.7;">INFERENCE_ACTIVE</span>
                         </div>
                     </div>
-                    
-                    <div id="ai-insights-panel">
-                        <div class="text-soft mono" id="insight-loading" style="display: flex; align-items: center; gap: 1rem; font-size: 0.8rem;">
-                            <span class="pulse-dot"></span>
-                            COMPUTING NEURAL INFERENCE...
-                        </div>
-                    </div>
+                    <div class="text-soft mono shimmer" style="font-size: 0.75rem; padding: 1rem;">INITIALIZING_NEURAL_LAYERS...</div>
                 </section>
 
-                <section class="glass-panel" data-aos="fade-up" data-aos-delay="200">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <section class="glass-panel premium-card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
                         <span class="section-label" style="margin: 0;">Activity Feed</span>
-                        <span class="text-healthy mono" style="font-size: 0.6rem; letter-spacing: 2px; animation: pulse-ring 2s infinite;">[LIVE_STREAM]</span>
+                        <span class="mono text-muted" style="font-size: 0.55rem;">NODE_0x73...</span>
                     </div>
-                    
-                    <div class="mock-browser" style="height: auto; border-radius: 4px;">
-                        <div class="mock-main" style="background: #010409; padding: 0;">
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <thead>
-                                    <tr style="border-bottom: 1px solid var(--glass-border);">
-                                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">EVENT_TYPE</th>
-                                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">SOURCE</th>
-                                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TIMESTAMP</th>
-                                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">STATUS</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="mono" style="font-size: 0.75rem;">
-                                    <% if (latest.rawLiveData?.bounties && latest.rawLiveData.bounties.length > 0) { %>
-                                        <% latest.rawLiveData.bounties.slice(0, 5).forEach(b => { %>
-                                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                                <td style="padding: 1rem;">BOUNTY_SYNC</td>
-                                                <td style="padding: 1rem; color: var(--accent-cyan);"><%= b.id.substring(0, 8) %>...</td>
-                                                <td style="padding: 1rem; color: var(--text-muted);"><%= new Date().toLocaleTimeString() %></td>
-                                                <td style="padding: 1rem;" class="text-healthy">VERIFIED</td>
-                                            </tr>
-                                        <% }) %>
-                                    <% } else { %>
-                                        <tr>
-                                            <td colspan="4" style="padding: 4rem; text-align: center; color: var(--text-muted);">AWAITING ACTIVITY PACKETS...</td>
+                    <div class="table-wrapper">
+                        <table style="min-width: 450px;">
+                            <tbody class="mono" style="font-size: 0.75rem;">
+                                <% if (latest.rawLiveData?.bounties && latest.rawLiveData.bounties.length > 0) { %>
+                                    <% latest.rawLiveData.bounties.slice(0, 5).forEach(b => { %>
+                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                                            <td style="padding: 1rem; color: var(--text-muted);">EVENT_SYNC</td>
+                                            <td style="padding: 1rem;" class="text-cyan"><%= b.id.substring(0, 12) %>...</td>
+                                            <td style="padding: 1rem;" class="text-healthy">VERIFIED</td>
                                         </tr>
-                                    <% } %>
-                                </tbody>
-                            </table>
-                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="3" style="text-align: center; padding: 4rem; color: var(--text-muted);">AWAITING_ACTIVITY_PACKETS...</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             </div>
@@ -258,33 +237,33 @@
                     if (res.status === 'success' && res.data) {
                         const d = res.data;
                         panel.innerHTML = `
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                                <div style="border-left: 1px solid var(--accent-cyan); padding-left: 1.5rem;">
-                                    <div class="mono text-cyan" style="font-size: 0.65rem; margin-bottom: 1rem;">STRATEGIC_SUMMARY</div>
-                                    <p class="text-soft" style="font-size: 0.85rem; line-height: 1.7;">${d.summary}</p>
+                            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                                <div>
+                                    <div class="mono text-cyan" style="font-size: 0.6rem; margin-bottom: 0.75rem; letter-spacing: 1px;">STRATEGIC_SUMMARY</div>
+                                    <p class="text-soft" style="font-size: 0.85rem; line-height: 1.7; border-left: 1px solid var(--accent-cyan); padding-left: 1rem;">${escapeHtml(d.summary)}</p>
                                 </div>
-                                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                                <div class="responsive-grid responsive-grid-2" style="gap: 1.5rem;">
                                     <div>
-                                        <div class="mono text-warning" style="font-size: 0.65rem; margin-bottom: 0.5rem;">RISK_VECTORS</div>
-                                        <ul class="text-soft mono" style="font-size: 0.75rem; list-style: none; padding: 0;">
-                                            ${d.risks.map(r => `<li style="margin-bottom: 0.4rem; border-bottom: 1px solid rgba(255,176,32,0.1); padding-bottom: 0.4rem;">! ${r}</li>`).join('')}
+                                        <div class="mono text-warning" style="font-size: 0.6rem; margin-bottom: 0.75rem; letter-spacing: 1px;">RISK_VECTORS</div>
+                                        <ul style="list-style: none; padding: 0; font-size: 0.75rem; color: var(--text-soft);" class="mono">
+                                            ${d.risks.map(r => `<li style="margin-bottom: 0.4rem;">! ${escapeHtml(r)}</li>`).join('')}
                                         </ul>
                                     </div>
                                     <div>
-                                        <div class="mono text-healthy" style="font-size: 0.65rem; margin-bottom: 0.5rem;">GROWTH_SIGNALS</div>
-                                        <ul class="text-soft mono" style="font-size: 0.75rem; list-style: none; padding: 0;">
-                                            ${d.opportunities.map(o => `<li style="margin-bottom: 0.4rem; border-bottom: 1px solid rgba(0,255,136,0.1); padding-bottom: 0.4rem;">+ ${o}</li>`).join('')}
+                                        <div class="mono text-healthy" style="font-size: 0.6rem; margin-bottom: 0.75rem; letter-spacing: 1px;">GROWTH_SIGNALS</div>
+                                        <ul style="list-style: none; padding: 0; font-size: 0.75rem; color: var(--text-soft);" class="mono">
+                                            ${d.opportunities.map(o => `<li style="margin-bottom: 0.4rem;">+ ${escapeHtml(o)}</li>`).join('')}
                                         </ul>
                                     </div>
                                 </div>
                             </div>
                         `;
                     } else {
-                        panel.innerHTML = '<div class="text-muted mono" style="font-size: 0.8rem;">[AI_OFFLINE] CONFIGURE GROQ_API_KEY FOR SYNTHESIS</div>';
+                        panel.innerHTML = '<div class="text-muted mono" style="font-size: 0.8rem;">[AI_OFFLINE] CONFIGURE_API_KEY</div>';
                     }
                 })
                 .catch(() => {
-                    document.getElementById('ai-insights-panel').innerHTML = '<div class="text-muted mono" style="font-size: 0.8rem;">[ERROR] UNABLE TO SYNTHESIZE TELEMETRY</div>';
+                    document.getElementById('ai-insights-panel').innerHTML = '<div class="text-muted mono" style="font-size: 0.8rem;">[ERROR] INFERENCE_FAILED</div>';
                 });
         </script>
     <% } %>

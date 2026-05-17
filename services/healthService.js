@@ -55,7 +55,7 @@ const syncDaoData = async (daoId) => {
         const metrics = {
             velocity: Math.min(100, (totalBounties / 50) * 100), // Normalized to 50 for higher sensitivity
             completionRate: totalBounties > 0 ? (completedBounties / totalBounties) * 100 : 0,
-            retention: Math.max(20, Math.min(100, retentionVal + 30)), // Add base floor but keep dynamic
+            retention: Math.min(100, retentionVal), // Strictly dynamic from data
             reputationGrowth: contributors.length > 0 ? (contributors.reduce((acc, c) => acc + (c.reputationScore || 0), 0) / contributors.length) / 10 : 0,
             diversity: totalSubmissions > 0 ? Math.min(100, (totalSubmissions / (totalBounties || 1)) * 20) : 0
         };

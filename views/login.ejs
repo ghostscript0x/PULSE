@@ -1,45 +1,170 @@
-<div class="container" style="min-height: calc(100vh - 100px); display: flex; align-items: center; justify-content: center; padding: 4rem 0;">
-    <div class="hero-aura" style="background: radial-gradient(circle, rgba(0, 245, 255, 0.03) 0%, transparent 70%);"></div>
-    
-    <div style="width: 100%; max-width: 450px;" data-aos="fade-up">
-        <section class="glass-panel" style="padding: 3.5rem 3rem; border-top: 2px solid var(--accent-cyan);">
-            <div class="section-label" style="text-align: center; margin-bottom: 2rem;">Authentication Required</div>
-            <h2 style="font-family: var(--font-display); font-size: 2.5rem; text-align: center; margin-bottom: 2.5rem;">INITIALIZE SESSION<span class="text-cyan">.</span></h2>
+<div class="container" style="min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;">
+    <div class="hero-aura-enhanced" style="width: 300px; height: 300px; position: absolute;" aria-hidden="true"></div>
+    <div style="width: 100%; max-width: 420px; position: relative; z-index: 1;">
+        <section class="glass-panel premium-card card-accent-top" style="padding: 2rem 1.5rem;" data-aos="fade-in-up">
+            <div class="section-label" style="text-align: center; margin-bottom: 1.5rem;">Authentication</div>
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.5rem, 5vw, 2rem); text-align: center; margin-bottom: 2rem; line-height: 1.1;">INITIALIZE SESSION<span class="text-gradient">.</span></h2>
 
             <% if(error != '') { %>
-                <div class="glass-panel" style="border-color: var(--status-critical); padding: 1rem; margin-bottom: 2rem; background: rgba(255,59,59,0.03);">
+                <div class="alert-error" style="margin-bottom: 1.5rem;" role="alert">
                     <div class="text-critical mono" style="font-size: 0.75rem; text-align: center;">[ERROR] <%= error %></div>
                 </div>
             <% } %>
 
-            <% if(success_msg != '') { %>
-                <div class="glass-panel" style="border-color: var(--status-healthy); padding: 1rem; margin-bottom: 2rem; background: rgba(0,255,136,0.03);">
-                    <div class="text-healthy mono" style="font-size: 0.75rem; text-align: center;">[OK] <%= success_msg %></div>
+            <!-- Wallet Connection -->
+            <div id="wallet-connect-section" style="margin-bottom: 1.5rem;">
+                <button type="button" id="connect-wallet-btn" class="btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="4" fill="currentColor"/>
+                    </svg>
+                    CONNECT_STACKS_WALLET
+                </button>
+                <div id="wallet-status" style="margin-top: 0.75rem; text-align: center; display: none;">
+                    <div class="text-muted mono" style="font-size: 0.7rem;"></div>
                 </div>
-            <% } %>
+            </div>
 
-            <form action="/auth/login" method="POST" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <label class="text-muted mono" style="font-size: 0.65rem; letter-spacing: 2px;">NODE_USERNAME</label>
-                    <input type="text" name="username" required 
-                        style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 1rem; color: white; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 0.9rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0;">
+                <div style="flex: 1; height: 1px; background: var(--glass-border);"></div>
+                <span class="mono text-muted" style="font-size: 0.65rem;">OR</span>
+                <div style="flex: 1; height: 1px; background: var(--glass-border);"></div>
+            </div>
+
+            <form action="/auth/login" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;" novalidate>
+                <div class="form-group">
+                    <label for="username" class="form-label">USERNAME</label>
+                    <input type="text" id="username" name="username" class="form-input" placeholder="Enter your username" autocomplete="username">
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <label class="text-muted mono" style="font-size: 0.65rem; letter-spacing: 2px;">ACCESS_KEY</label>
-                    <div style="position: relative; display: flex; align-items: center;">
-                        <input type="password" name="password" id="password" required 
-                            style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 1rem; color: white; border-radius: 4px; outline: none; font-family: var(--font-mono); font-size: 0.9rem;">
-                        <button type="button" class="password-toggle" data-target="password" style="position: absolute; right: 1rem; background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">ACCESS_KEY</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" autocomplete="current-password">
                 </div>
-                <button type="submit" class="btn-cyan-solid" style="width: 100%; margin-top: 1rem; border: none; cursor: pointer;">AUTHENTICATE_NODE</button>
+                <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">AUTHENTICATE_NODE</button>
             </form>
 
-            <div style="margin-top: 2.5rem; text-align: center;">
-                <a href="/auth/register" class="text-soft mono" style="font-size: 0.7rem; text-decoration: none; border-bottom: 1px solid transparent; transition: 0.3s;" onmouseover="this.style.borderColor='var(--accent-cyan)'" onmouseout="this.style.borderColor='transparent'">CREATE_NEW_ACCESS_NODE_REGISTRY</a>
+            <div style="margin-top: 2rem; text-align: center;">
+                <a href="/auth/register" class="btn-link" style="font-size: 0.875rem;">CREATE_NEW_ACCESS_NODE →</a>
             </div>
         </section>
     </div>
 </div>
+
+<script>
+    // Stacks Wallet Authentication
+    (function() {
+        const connectBtn = document.getElementById('connect-wallet-btn');
+        const walletStatus = document.getElementById('wallet-status');
+
+        // Detect available Stacks wallets
+        function getStacksProvider() {
+            // Check for Hiro Wallet (window.HiroWallet)
+            if (window.HiroWallet && typeof window.HiroWallet === 'object') {
+                return { type: 'hiro', provider: window.HiroWallet };
+            }
+            // Check for Leather Wallet (window.leather)
+            if (window.leather && typeof window.leather === 'object') {
+                return { type: 'leather', provider: window.leather };
+            }
+            // Check for Xverse Wallet (window.xverse)
+            if (window.xverse && typeof window.xverse === 'object') {
+                return { type: 'xverse', provider: window.xverse };
+            }
+            return null;
+        }
+
+        // Sign message with wallet
+        async function signMessage(providerObj, message, walletType) {
+            const provider = providerObj;
+
+            // All Stacks wallets support signMessage
+            if (provider.signMessage) {
+                return await provider.signMessage(message);
+            }
+            throw new Error('Wallet does not support message signing');
+        }
+
+        // Get address from wallet
+        async function getWalletAddress(providerObj, walletType) {
+            const provider = providerObj;
+
+            try {
+                if (provider.getAddresses) {
+                    const addresses = await provider.getAddresses();
+                    return addresses.stx;
+                }
+            } catch (e) {
+                console.error('Error getting wallet address:', e);
+            }
+            return null;
+        }
+
+        connectBtn.addEventListener('click', async function() {
+            const providerObj = getStacksProvider();
+
+            if (!providerObj) {
+                walletStatus.style.display = 'block';
+                walletStatus.querySelector('div').innerHTML = '<span class="text-critical">[ERROR] No Stacks wallet detected. Please install Hiro, Leather, or Xverse wallet.</span>';
+                return;
+            }
+
+            try {
+                connectBtn.disabled = true;
+                connectBtn.innerHTML = '<span class="loading-spinner" style="width: 16px; height: 16px; border: 2px solid var(--text-muted); border-top-color: var(--accent-cyan); border-radius: 50%;"></span> CONNECTING...';
+
+                // Get authentication challenge from server
+                const challengeRes = await fetch('/auth/wallet/challenge');
+                const challengeData = await challengeRes.json();
+
+                if (!challengeData.success) {
+                    throw new Error('Failed to get authentication challenge');
+                }
+
+                const { challenge, message, domain } = challengeData;
+                const { provider, type: walletType } = providerObj;
+
+                // Request wallet signature
+                const signatureResult = await signMessage(provider, message, walletType);
+
+                // Get address from provider
+                let walletAddress = await getWalletAddress(provider, walletType);
+
+                if (!walletAddress) {
+                    throw new Error('Could not get wallet address');
+                }
+
+                // Verify signature with server
+                const verifyRes = await fetch('/auth/wallet/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        walletAddress,
+                        walletType,
+                        signature: signatureResult.signature || signatureResult,
+                        publicKey: signatureResult.publicKey || null
+                    })
+                });
+
+                const verifyData = await verifyRes.json();
+
+                if (verifyData.success) {
+                    walletStatus.style.display = 'block';
+                    walletStatus.querySelector('div').innerHTML = '<span class="text-healthy">[SUCCESS] Wallet authenticated! Redirecting...</span>';
+                    // Redirect to command center
+                    window.location.href = verifyData.redirect || '/command-center';
+                } else {
+                    throw new Error(verifyData.error || 'Verification failed');
+                }
+
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                walletStatus.style.display = 'block';
+                walletStatus.querySelector('div').innerHTML = '<span class="text-critical">[ERROR] ' + (error.message || 'Connection failed') + '</span>';
+                connectBtn.disabled = false;
+                connectBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg> CONNECT_STACKS_WALLET';
+            }
+        });
+    })();
+</script>

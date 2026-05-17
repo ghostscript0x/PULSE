@@ -1,70 +1,52 @@
 <!-- HERO SECTION -->
-<section class="hero" data-aos="fade-zoom-in" data-aos-delay="200">
-    <div class="hero-aura"></div>
+<section class="hero" data-aos="fade-zoom-in">
+    <div class="hero-aura-enhanced"></div>
     <div class="container">
-        <div class="badge-pill" data-aos="fade-down" data-aos-delay="400">
+        <div class="badge-pill premium-card" style="margin-bottom: 2rem; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); padding: 0.5rem 1rem; border-radius: 100px; font-size: 0.7rem;">
             <span class="pulse-dot"></span>
             POWERED BY ZERO AUTHORITY DAO
         </div>
-        <h1 data-aos="fade-up" data-aos-delay="600">
-            <span class="gradient-text">KNOW IF YOUR</span>
-            <span class="gradient-text">COMMUNITY</span>
-            <span class="outline-text">IS ALIVE.</span>
+        <h1 style="margin-bottom: 1.5rem; font-weight: 800;">
+            KNOW IF YOUR<br>
+            <span class="text-gradient">COMMUNITY</span><br>
+            IS ALIVE.
         </h1>
-        <p class="hero-sub" data-aos="fade-up" data-aos-delay="800">
-            The first real-time health intelligence layer for Web3 DAOs and protocols. 
-            Turn raw contributor data into vital signals before your community flatlines.
+        <p class="text-soft" style="max-width: 600px; margin: 0 auto 3rem; font-size: 1.1rem; line-height: 1.6;">
+            The first real-time health intelligence layer for Web3. Turn raw contributor data into vital signals before your community flatlines.
         </p>
-        <div class="hero-actions" data-aos="fade-up" data-aos-delay="1000">
+        <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
             <% if (user) { %>
-                <a href="/dashboard" class="btn-cyan-solid btn-lg">View Live Dashboard</a>
+                <a href="/dashboard" class="btn-glow">View Live Dashboard</a>
             <% } else { %>
-                <a href="/auth/register" class="btn-cyan-solid btn-lg">Get Started</a>
-                <a href="/about" class="btn-ghost btn-lg">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                    </svg>
-                    See How It Works
-                </a>
+                <a href="/auth/register" class="btn-glow">Initialize Node</a>
+                <a href="/about" class="mono" style="color: var(--text-soft); text-decoration: none; font-size: 0.8rem; margin-top: 1rem;">LEARN_MORE →</a>
             <% } %>
-        </div>
-
-        <div class="scroll-indicator" data-aos="fade-up" data-aos-delay="1200">
-            <div class="scroll-line"></div>
-            <span class="mono">SCROLL</span>
         </div>
     </div>
 </section>
 
 <!-- VITALS STRIP -->
-<section class="vitals-strip" data-aos="fade-up">
-    <div class="container-full">
-        <div class="vitals-container">
-            <div class="vital-panel" data-aos="fade-right" data-aos-delay="100">
-                <div class="vital-label">Communities Tracked</div>
-                <div class="vital-value">1,247</div>
-                <div class="vital-delta text-healthy">↑ +38 THIS WEEK</div>
-            </div>
-            <div class="vital-panel" data-aos="fade-right" data-aos-delay="200">
-                <div class="vital-label">Average Health Score</div>
-                <div class="vital-value">73.4</div>
-                <div class="vital-delta text-healthy">↑ +2.1 PTS</div>
-            </div>
-            <div class="vital-panel" data-aos="fade-right" data-aos-delay="300">
-                <div class="vital-label">Alerts Fired</div>
-                <div class="vital-value" style="color: var(--status-warning, #ffb020);">142</div>
-                <div class="vital-delta" style="color: var(--status-warning, #ffb020);">↓ -12% BURNOUT</div>
-            </div>
-            <div class="vital-panel" data-aos="fade-right" data-aos-delay="400">
-                <div class="vital-label">Contributors Rising</div>
-                <div class="vital-value">3,891</div>
-                <div class="vital-delta">↑ MOMENTUM</div>
-            </div>
-            <div class="vital-panel" data-aos="fade-right" data-aos-delay="500">
-                <div class="vital-label">Bounties Autopsied</div>
-                <div class="vital-value text-cyan">28.4K</div>
-                <div class="vital-delta text-cyan">↑ +1.2K TODAY</div>
-            </div>
+<section class="gradient-border" style="border-top: 1px solid var(--glass-border); border-bottom: 1px solid var(--glass-border); background: rgba(5,8,12,0.5);">
+    <div class="vitals-container">
+        <div class="vital-panel premium-card">
+            <div class="mono" style="font-size: 0.6rem; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 2px;">COMMUNITIES</div>
+            <div style="font-size: 1.75rem; font-weight: 700; color: var(--accent-cyan);">1,247</div>
+            <div class="text-healthy mono" style="font-size: 0.6rem;">↑ +38 WEEKLY</div>
+        </div>
+        <div class="vital-panel premium-card">
+            <div class="mono" style="font-size: 0.6rem; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 2px;">AVG_HEALTH</div>
+            <div style="font-size: 1.75rem; font-weight: 700;">73.4</div>
+            <div class="text-healthy mono" style="font-size: 0.6rem;">↑ +2.1 PTS</div>
+        </div>
+        <div class="vital-panel premium-card">
+            <div class="mono" style="font-size: 0.6rem; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 2px;">ALERTS_FIRED</div>
+            <div style="font-size: 1.75rem; font-weight: 700; color: var(--text-warning);">142</div>
+            <div class="text-warning mono" style="font-size: 0.6rem;">↓ -12% BURNOUT</div>
+        </div>
+        <div class="vital-panel premium-card">
+            <div class="mono" style="font-size: 0.6rem; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 2px;">BOUNTIES</div>
+            <div style="font-size: 1.75rem; font-weight: 700; color: var(--accent-cyan);">28.4K</div>
+            <div class="text-cyan mono" style="font-size: 0.6rem;">↑ +1.2K TODAY</div>
         </div>
     </div>
 </section>
@@ -73,7 +55,7 @@
 <section class="dashboard-preview">
     <div class="container">
         <span class="section-label" data-aos="fade-up">Live Product</span>
-        <h2 data-aos="fade-up" data-aos-delay="200">Your DAO's vital signs. Finally readable.</h2>
+        <h2 data-aos="fade-up" data-aos-delay="200">Your DAO's vital signs. <span class="text-gradient">Finally readable.</span></h2>
         <p class="text-soft" data-aos="fade-up" data-aos-delay="400">One dashboard. Every health signal your community generates — turned into intelligence you can act on.</p>
         
         <div class="mock-browser" data-aos="zoom-in-up" data-aos-delay="600">
@@ -95,12 +77,12 @@
                 </div>
                 <div class="mock-main">
                     <div class="mock-grid">
-                        <div class="mock-card" data-aos="fade-up" data-aos-delay="800"><div class="card-title">Health</div><div class="card-val text-healthy">78</div></div>
-                        <div class="mock-card" data-aos="fade-up" data-aos-delay="900"><div class="card-title">Active</div><div class="card-val">412</div></div>
-                        <div class="mock-card" data-aos="fade-up" data-aos-delay="1000"><div class="card-title">Completion</div><div class="card-val">92%</div></div>
-                        <div class="mock-card" data-aos="fade-up" data-aos-delay="1100"><div class="card-title">Risk</div><div class="card-val text-risk-low">Low</div></div>
+                        <div class="mock-card premium-card" data-aos="fade-up" data-aos-delay="800"><div class="card-title">Health</div><div class="card-val text-healthy">78</div></div>
+                        <div class="mock-card premium-card" data-aos="fade-up" data-aos-delay="900"><div class="card-title">Active</div><div class="card-val text-cyan">412</div></div>
+                        <div class="mock-card premium-card" data-aos="fade-up" data-aos-delay="1000"><div class="card-title">Completion</div><div class="card-val text-healthy">92%</div></div>
+                        <div class="mock-card premium-card" data-aos="fade-up" data-aos-delay="1100"><div class="card-title">Risk</div><div class="card-val text-healthy">Low</div></div>
                     </div>
-                    <div class="mock-chart" data-aos="fade-up" data-aos-delay="1200">
+                    <div class="mock-chart premium-card" data-aos="fade-up" data-aos-delay="1200">
                         <div class="card-title">Health Trend (30D)</div>
                         <svg viewBox="0 0 800 200" style="width: 100%; height: 120px; margin-top: 1rem;">
                             <path d="M0,150 Q100,140 200,100 T400,80 T600,120 T800,40" fill="none" stroke="var(--accent-cyan)" stroke-width="3" />
@@ -113,7 +95,7 @@
                             </defs>
                         </svg>
                     </div>
-                    <div class="mock-card" style="margin-top: 2rem; border-left: 2px solid var(--accent-cyan);" data-aos="fade-up" data-aos-delay="1400">
+                    <div class="mock-card premium-card" style="margin-top: 2rem; border-left: 2px solid var(--accent-cyan);" data-aos="fade-up" data-aos-delay="1400">
                         <div class="card-title">AI Insight</div>
                         <p class="mono" style="font-size: 0.8rem; color: var(--text-soft);">Contributor velocity in 'Development' pod has increased by 14%. Recommend increasing bounty liquidity for Q3 goals.</p>
                     </div>
@@ -123,9 +105,9 @@
 
         <div style="margin-top: 4rem;" data-aos="fade-up">
             <% if (user) { %>
-                <a href="/intelligence" class="btn-cyan-solid">Access Full Intelligence Layer</a>
+                <a href="/intelligence" class="btn-glow">Access Full Intelligence Layer</a>
             <% } else { %>
-                <a href="/auth/register" class="btn-cyan-solid">Initialize Your Access Node</a>
+                <a href="/auth/register" class="btn-glow">Initialize Your Access Node</a>
             <% } %>
         </div>
     </div>
@@ -136,20 +118,20 @@
     <div class="container">
         <div style="text-align: center; margin-bottom: 5rem;" data-aos="fade-up">
             <span class="section-label">Workflow</span>
-            <h2 style="font-family: var(--font-display); font-size: 3rem;">Three steps to intelligence.</h2>
+            <h2 style="font-family: var(--font-display); font-size: 3rem;">Three steps to <span class="text-gradient">intelligence.</span></h2>
         </div>
-        <div class="features-grid" style="grid-template-columns: repeat(3, 1fr);">
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="features-grid">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="200">
                 <div class="feature-icon">01</div>
                 <h3>Connect Your Community</h3>
                 <p>Link your Zero Authority DAO profile. Pulse immediately starts reading your contributor activity and reputation data.</p>
             </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="400">
                 <div class="feature-icon">02</div>
                 <h3>Read the Health Score</h3>
                 <p>A live 0–100 score recalculates continuously from six weighted signals. You see the number and the breakdown.</p>
             </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="600">
                 <div class="feature-icon">03</div>
                 <h3>Act on Intelligence</h3>
                 <p>AI-generated insights tell you exactly what's happening and what to do before community stagnation becomes a crisis.</p>
@@ -163,40 +145,40 @@
     <div class="container">
         <div style="text-align: center; margin-bottom: 5rem;" data-aos="fade-up">
             <span class="section-label">Capabilities</span>
-            <h2 style="font-family: var(--font-display); font-size: 3rem;">Engineered for scale.</h2>
+            <h2 style="font-family: var(--font-display); font-size: 3rem;">Engineered for <span class="text-gradient">scale.</span></h2>
         </div>
         <div class="features-grid">
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="100">
                 <div class="feature-icon">◈</div>
                 <h3>Health Score</h3>
                 <p>Proprietary 0-100 vitality metric based on real-time activity.</p>
                 <span class="feature-tag">ZA API</span>
             </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="200">
                 <div class="feature-icon">◈</div>
                 <h3>Bounty Autopsy</h3>
                 <p>Deep historical analysis of bounty completion and contributor ROI.</p>
                 <span class="feature-tag">MONGODB</span>
             </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="300">
                 <div class="feature-icon">◈</div>
                 <h3>Contributor Heatmap</h3>
                 <p>Visualizing the density and momentum of your contributor base.</p>
                 <span class="feature-tag">REAL-TIME</span>
             </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="400">
                 <div class="feature-icon">◈</div>
                 <h3>AI Insight Panel</h3>
                 <p>Automated plain-language intelligence delivered by Claude AI.</p>
                 <span class="feature-tag">LLM LAYER</span>
             </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="500">
                 <div class="feature-icon">◈</div>
                 <h3>Ecosystem Gaps</h3>
                 <p>Identify missing skills and roles within your DAO automatically.</p>
                 <span class="feature-tag">ZA DATA</span>
             </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="600">
                 <div class="feature-icon">◈</div>
                 <h3>Momentum Alerts</h3>
                 <p>Get notified when a contributor's reputation is rising rapidly.</p>
@@ -248,18 +230,18 @@
     <div class="container">
         <div style="text-align: center; margin-bottom: 5rem;" data-aos="fade-up">
             <span class="section-label">Target Nodes</span>
-            <h2 style="font-family: var(--font-display); font-size: 3rem;">Who is Pulse for?</h2>
+            <h2 style="font-family: var(--font-display); font-size: 3rem;">Who is Pulse <span class="text-gradient">for?</span></h2>
         </div>
-        <div class="features-grid" style="grid-template-columns: repeat(3, 1fr);">
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="features-grid">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="200">
                 <h3>DAOs & Protocols</h3>
                 <p>Catch burnout early, write better bounties, and retain your most valuable contributors through data.</p>
             </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="400">
                 <h3>Investors & Funds</h3>
                 <p>Use health scores as a signal for which protocols are genuinely thriving before deploying capital.</p>
             </div>
-            <div class="feature-card" data-aos="fade-up" data-aos-delay="600">
+            <div class="feature-card premium-card" data-aos="fade-up" data-aos-delay="600">
                 <h3>Contributors</h3>
                 <p>Get noticed when your reputation momentum is being tracked by top-tier organizations.</p>
             </div>
@@ -271,12 +253,15 @@
 <section class="cta-section">
     <div class="cta-bg-glow"></div>
     <div class="container">
-        <h2 data-aos="fade-up">Stop guessing. Start knowing.</h2>
+        <h2 data-aos="fade-up">Stop guessing. <span class="text-gradient">Start knowing.</span></h2>
         <p class="text-soft" data-aos="fade-up" data-aos-delay="200">Join DAOs and protocols getting early access to the community health layer Web3 has been missing.</p>
         
-        <form class="email-form" data-aos="fade-up" data-aos-delay="400">
-            <input type="email" placeholder="your@dao.xyz" required>
-            <button type="submit">Request Access →</button>
+        <form class="email-form premium-card" data-aos="fade-up" data-aos-delay="400" action="/api/request-access" method="POST">
+            <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%;">
+                <input type="email" name="email" placeholder="your@dao.xyz" required aria-label="Email address" style="flex: 1;">
+                <button type="submit">Request Access →</button>
+            </div>
+            <div id="form-status" class="mono" style="font-size: 0.7rem; margin-top: 0.5rem; min-height: 1.2rem;" aria-live="polite"></div>
         </form>
         
         <div class="mono text-muted" style="font-size: 0.7rem; margin-top: 2rem;" data-aos="fade-up" data-aos-delay="600">

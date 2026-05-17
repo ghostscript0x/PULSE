@@ -17,12 +17,12 @@ exports.getLanding = async (req, res) => {
  */
 exports.getDashboard = async (req, res) => {
     try {
-        const liveStats = await apiService.getNetworkVitals();
+        const stats = await apiService.getNetworkVitals();
         const user = await User.findById(req.user.id);
         
-        // Merge live stats with defaults to prevent undefined property errors
-        const defaultStats = { healthScore: 73, activeContributors: 1247, completionRate: 68 };
-        const stats = { ...defaultStats, ...(liveStats || {}) };
+        if (!stats) {
+            throw new Error('NO_LIVE_STATS_RETURNED_FROM_API');
+        }
         
         res.render('dashboard', { 
             title: 'PULSE | Ecosystem Dashboard',

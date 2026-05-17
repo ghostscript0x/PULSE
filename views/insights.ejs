@@ -1,104 +1,85 @@
-<div class="container" style="padding-top: 4rem;">
+<div class="container" style="padding-top: 2rem;">
     <!-- HEADER -->
-    <section class="page-header" style="text-align: left; margin-bottom: 4rem;">
-        <div class="section-label" data-aos="fade-right">Data Intelligence</div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-            <div>
-                <h1 style="font-family: var(--font-display); font-size: 3.5rem; line-height: 1;">ANALYTICS<span class="text-cyan">.</span></h1>
-                <p class="text-soft" style="margin-top: 1rem;">Deep historical analysis and qualitative intelligence generated from live community telemetry.</p>
-            </div>
-        </div>
+    <section class="page-header" style="text-align: left; margin-bottom: 3rem;">
+        <div class="section-label">Data Intelligence</div>
+        <h1 style="font-family: var(--font-display); font-size: 2.5rem; line-height: 1.1;">ANALYTICS<span class="text-cyan">.</span></h1>
+        <p class="text-soft" style="margin-top: 1rem;">Deep historical analysis and qualitative intelligence generated from live telemetry.</p>
     </section>
 
-    <!-- AI INSIGHTS GRID -->
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 4rem;">
-        <div class="feature-card" style="border-color: var(--status-warning);" data-aos="fade-up" data-aos-delay="100">
-            <div class="text-warning mono" style="font-size: 0.7rem; margin-bottom: 1.5rem;">[BURNOUT_WARNING]</div>
-            <h3>Activity Spike Detected</h3>
-            <p>High activity streaks detected in contributor metrics. Monitor for signs of burnout and consider implementing mandatory rest periods.</p>
+    <!-- AI INSIGHTS -->
+    <div class="responsive-grid responsive-grid-3" style="margin-bottom: 4rem;">
+        <div class="feature-card" style="border-color: var(--status-warning);">
+            <div class="text-warning mono" style="font-size: 0.7rem; margin-bottom: 1rem;">[BURNOUT_WARNING]</div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Activity Spike</h3>
+            <p class="text-soft" style="font-size: 0.85rem;">High activity streaks detected. Monitor for burnout and consider mandatory rest periods.</p>
         </div>
-        <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
-            <div class="text-cyan mono" style="font-size: 0.7rem; margin-bottom: 1.5rem;">[SKILL_GAP_ALERT]</div>
-            <h3>Demand vs Supply</h3>
-            <p>Cross-reference open bounties with active contributor skills to identify underrepresented categories. Prioritize recruitment.</p>
+        <div class="feature-card">
+            <div class="text-cyan mono" style="font-size: 0.7rem; margin-bottom: 1rem;">[SKILL_GAP_ALERT]</div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Demand vs Supply</h3>
+            <p class="text-soft" style="font-size: 0.85rem;">Cross-reference open bounties with skills to identify underrepresented categories.</p>
         </div>
-        <div class="feature-card" style="border-color: var(--accent-green);" data-aos="fade-up" data-aos-delay="300">
-            <div class="text-healthy mono" style="font-size: 0.7rem; margin-bottom: 1.5rem;">[MOMENTUM_SIGNAL]</div>
-            <h3>Contributor Growth</h3>
-            <p>Track reputation growth patterns to identify rising stars. These contributors show consistent engagement and readiness for core roles.</p>
+        <div class="feature-card" style="border-color: var(--accent-green);">
+            <div class="text-healthy mono" style="font-size: 0.7rem; margin-bottom: 1rem;">[MOMENTUM_SIGNAL]</div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Contributor Growth</h3>
+            <p class="text-soft" style="font-size: 0.85rem;">Track reputation patterns to identify rising stars ready for core roles.</p>
         </div>
     </div>
 
     <!-- NETWORK STATS -->
-    <div class="glass-panel" style="margin-bottom: 4rem; padding: 3rem;" data-aos="fade-up">
-        <span class="section-label" style="margin-bottom: 3rem;">Network Pulse</span>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;">
+    <section class="glass-panel" style="margin-bottom: 4rem; padding: 2rem;">
+        <span class="section-label" style="margin-bottom: 2rem;">Network Pulse</span>
+        <div class="responsive-grid responsive-grid-4">
             <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">TOTAL_SNAPSHOTS</div>
-                <div class="text-cyan mono" style="font-size: 2rem; font-weight: 700;">28.4K</div>
-            </div>
-            <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">NODES_SYNCED</div>
-                <div class="text-cyan mono" style="font-size: 2rem; font-weight: 700;">1,247</div>
+                <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">SNAPSHOTS</div>
+                <div class="text-cyan mono" style="font-size: 1.5rem; font-weight: 700;">28.4K</div>
             </div>
             <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">AVG_HEALTH_METRIC</div>
-                <div class="text-healthy mono" style="font-size: 2rem; font-weight: 700;">73.4</div>
+                <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">NODES</div>
+                <div class="text-cyan mono" style="font-size: 1.5rem; font-weight: 700;">1,247</div>
             </div>
             <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">DATA_POINTS_SYNCED</div>
-                <div class="text-white mono" style="font-size: 2rem; font-weight: 700;">LIVE</div>
+                <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">AVG_HEALTH</div>
+                <div class="text-healthy mono" style="font-size: 1.5rem; font-weight: 700;">73.4</div>
             </div>
-        </div>
-    </div>
-
-    <!-- LOGS TERMINAL -->
-    <section class="glass-panel" style="padding: 0;" data-aos="fade-up">
-        <div class="mock-browser" style="height: auto; border: none; border-radius: 0;">
-            <div class="browser-header">
-                <div class="dot-group">
-                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                </div>
-                <div class="browser-url mono">intelligence_logs.tail</div>
-            </div>
-            <div class="mock-main" style="background: #010409; padding: 0;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid var(--glass-border);">
-                            <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">EVENT_ID</th>
-                            <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TYPE</th>
-                            <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">SEVERITY_LEVEL</th>
-                            <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TIMESTAMP</th>
-                        </tr>
-                    </thead>
-                    <tbody class="mono" style="font-size: 0.75rem;">
-                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                            <td style="padding: 1rem; color: var(--text-muted);">#INT-942</td>
-                            <td style="padding: 1rem; color: var(--accent-cyan);">BURNOUT_RISK</td>
-                            <td style="padding: 1rem;"><span class="text-warning">MEDIUM</span></td>
-                            <td style="padding: 1rem; color: var(--text-muted);">2026-05-16 14:02:11</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                            <td style="padding: 1rem; color: var(--text-muted);">#INT-941</td>
-                            <td style="padding: 1rem; color: var(--accent-cyan);">SKILL_GAP</td>
-                            <td style="padding: 1rem;"><span class="text-white">LOW</span></td>
-                            <td style="padding: 1rem; color: var(--text-muted);">2026-05-16 11:45:02</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                            <td style="padding: 1rem; color: var(--text-muted);">#INT-940</td>
-                            <td style="padding: 1rem; color: var(--accent-cyan);">MOMENTUM_PULSE</td>
-                            <td style="padding: 1rem;"><span class="text-healthy">HIGH_POS</span></td>
-                            <td style="padding: 1rem; color: var(--text-muted);">2026-05-15 18:22:56</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div style="text-align: center;">
+                <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">STATUS</div>
+                <div class="text-white mono" style="font-size: 1.5rem; font-weight: 700;">LIVE</div>
             </div>
         </div>
     </section>
 
-    <!-- AI ENGINE BADGE -->
-    <div style="text-align: center; margin-top: 6rem; opacity: 0.6;" data-aos="fade-up">
-        <div class="mono text-muted" style="font-size: 0.7rem; letter-spacing: 4px;">NEURAL_SYNTHESIS_ENGINE_ACTIVE</div>
-        <div class="text-white mono" style="font-size: 1.2rem; font-weight: 700; margin-top: 1rem;">INTELLIGENCE_LAYER_V3.3 | VERIFIED_TRUTH</div>
+    <!-- LOGS TERMINAL -->
+    <section class="glass-panel" style="padding: 0; overflow: hidden; margin-bottom: 4rem;">
+        <div class="table-wrapper">
+            <table style="min-width: 600px;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--glass-border);">
+                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">EVENT_ID</th>
+                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TYPE</th>
+                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">SEVERITY</th>
+                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TIMESTAMP</th>
+                    </tr>
+                </thead>
+                <tbody class="mono" style="font-size: 0.7rem;">
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                        <td style="padding: 1rem; color: var(--text-muted);">#INT-942</td>
+                        <td style="padding: 1rem; color: var(--accent-cyan);">BURNOUT_RISK</td>
+                        <td style="padding: 1rem;"><span class="text-warning">MEDIUM</span></td>
+                        <td style="padding: 1rem; color: var(--text-muted);">2026-05-16 14:02</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                        <td style="padding: 1rem; color: var(--text-muted);">#INT-941</td>
+                        <td style="padding: 1rem; color: var(--accent-cyan);">SKILL_GAP</td>
+                        <td style="padding: 1rem;"><span class="text-white">LOW</span></td>
+                        <td style="padding: 1rem; color: var(--text-muted);">2026-05-16 11:45</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- FOOTER BADGE -->
+    <div style="text-align: center; padding-bottom: 4rem; opacity: 0.5;">
+        <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px;">NEURAL_SYNTHESIS_ENGINE_ACTIVE</div>
     </div>
 </div>

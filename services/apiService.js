@@ -1,7 +1,10 @@
 const axios = require('axios');
 require('dotenv').config();
 
-const API_BASE = process.env.ZERO_AUTH_API_BASE_URL || 'https://zeroauthoritydao.com/api';
+const API_BASE = process.env.ZERO_AUTH_API_BASE_URL;
+if (!API_BASE) {
+    console.error('[CRITICAL_ERROR] ZERO_AUTH_API_BASE_URL is not defined in environment.');
+}
 const API_KEY = process.env.ZERO_AUTH_API_KEY;
 
 const client = axios.create({
@@ -37,17 +40,6 @@ const fetchWithRetry = async (endpoint, retries = 2) => {
 
         console.log(`[API RESPONSE RECEIVED] ${endpoint} | Items: ${Array.isArray(result) ? result.length : 'Object'}`);
 
-        // STRICT FILTERING: If organization was requested, enforce it on the result set
-        if (endpoint.includes('organization=') && Array.isArray(result)) {
-            const requestedId = endpoint.split('organization=')[1].split('&')[0];
-            console.log(`[ENFORCING_FILTER] Target: ${requestedId}`);
-            result = result.filter(item => {
-                const itemOrgId = item.organization || item.organizationId || item.orgId || item.daoId;
-                return itemOrgId === requestedId;
-            });
-            console.log(`[FILTER_COMPLETE] Items remaining: ${result.length}`);
-        }
-
         return result;
     } catch (err) {
         if (retries > 0) {
@@ -60,7 +52,7 @@ const fetchWithRetry = async (endpoint, retries = 2) => {
 };
 
 exports.getOrganizations = () => fetchWithRetry('/bounties/organizations');
-exports.getContributors = (daoId) => fetchWithRetry(`/users?organization=${daoId}`);
-exports.getBounties = (daoId) => fetchWithRetry(`/bounties?organization=${daoId}`);
+exports.getContributors = (daoId) => fetchWithRetry(`/users?organizationId=${daoId}`);
+exports.getBounties = (daoId) => fetchWithRetry(`/bounties?organizationId=${daoId}`);
 exports.getNetworkVitals = () => fetchWithRetry('/stats');
 exports.getUserProfile = (stxAddress) => fetchWithRetry(`/users/${stxAddress}`);

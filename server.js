@@ -23,12 +23,12 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-            "script-src": ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+            "script-src": ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://stacks.js.org"],
             "script-src-attr": ["'unsafe-inline'"],
             "style-src": ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://fonts.googleapis.com"],
             "font-src": ["'self'", "https://fonts.gstatic.com"],
             "img-src": ["'self'", "data:", "https://*"],
-            "connect-src": ["'self'", "https://zeroauthoritydao.com", "https://*"],
+            "connect-src": ["'self'", "https://stacks-api", "https://*.stacks.co", "https://zeroauthoritydao.com", "https://*"],
         },
     },
 }));
