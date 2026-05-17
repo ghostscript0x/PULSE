@@ -36,6 +36,18 @@ const fetchWithRetry = async (endpoint, retries = 2) => {
         }
 
         console.log(`[API RESPONSE RECEIVED] ${endpoint} | Items: ${Array.isArray(result) ? result.length : 'Object'}`);
+
+        // STRICT FILTERING: If organizationId was requested, enforce it on the result set
+        if (endpoint.includes('organizationId=') && Array.isArray(result)) {
+            const requestedId = endpoint.split('organizationId=')[1].split('&')[0];
+            console.log(`[ENFORCING_FILTER] Target: ${requestedId}`);
+            result = result.filter(item => {
+                const itemOrgId = item.organizationId || item.orgId || item.daoId;
+                return itemOrgId === requestedId;
+            });
+            console.log(`[FILTER_COMPLETE] Items remaining: ${result.length}`);
+        }
+
         return result;
     } catch (err) {
         if (retries > 0) {
@@ -50,4 +62,5 @@ const fetchWithRetry = async (endpoint, retries = 2) => {
 exports.getOrganizations = () => fetchWithRetry('/bounties/organizations');
 exports.getContributors = (daoId) => fetchWithRetry(`/users?organizationId=${daoId}`);
 exports.getBounties = (daoId) => fetchWithRetry(`/bounties?organizationId=${daoId}`);
+exports.getNetworkVitals = () => fetchWithRetry('/stats');
 exports.getUserProfile = (stxAddress) => fetchWithRetry(`/users/${stxAddress}`);

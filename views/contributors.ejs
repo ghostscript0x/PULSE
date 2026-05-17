@@ -2,10 +2,43 @@
     <!-- HEADER -->
     <section class="page-header" style="text-align: left; margin-bottom: 4rem;">
         <div class="section-label" data-aos="fade-right">Network Registry</div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <h1 style="font-family: var(--font-display); font-size: 3.5rem; line-height: 1;">CONTRIBUTORS<span class="text-cyan">.</span></h1>
                 <p class="text-soft" style="margin-top: 1rem;">Real-time reputation telemetry and engagement tracking for your community.</p>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
+                <!-- NODE SELECTOR -->
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="mono text-muted" style="font-size: 0.6rem;">SWITCH_NODE:</div>
+                    <select onchange="handleNodeSwitch(this.value)" style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--accent-cyan); padding: 0.5rem 1rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.7rem; outline: none; cursor: pointer;">
+                        <% if (followedDaos && followedDaos.length > 0) { %>
+                            <% followedDaos.forEach(dao => { %>
+                                <option value="<%= dao.daoId %>" <%= activeDao === dao.daoId ? 'selected' : '' %>><%= dao.name %></option>
+                            <% }) %>
+                        <% } else { %>
+                            <option value="">NO_NODES_FOUND</option>
+                        <% } %>
+                        <option value="DISCOVER_ACTION">+ DISCOVER_NEW</option>
+                    </select>
+                </div>
+
+                <script>
+                    function handleNodeSwitch(val) {
+                        if (val === 'DISCOVER_ACTION') {
+                            window.location.href = '/command-center';
+                        } else if (val) {
+                            window.location.href = '/contributors/' + val;
+                        }
+                    }
+                </script>
+
+                <% if (activeDao) { %>
+                    <div class="mono text-cyan" style="font-size: 0.7rem; border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: 4px; background: rgba(0,212,255,0.02);">
+                        ACTIVE_NODE: <%= activeDao %>
+                    </div>
+                <% } %>
             </div>
         </div>
     </section>

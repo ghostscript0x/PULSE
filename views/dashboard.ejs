@@ -2,16 +2,50 @@
     <!-- DASHBOARD HEADER -->
     <section class="page-header" style="text-align: left; margin-bottom: 4rem;">
         <div class="section-label" data-aos="fade-right">Intelligence Center</div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
                 <h1 style="font-family: var(--font-display); font-size: 3.5rem; line-height: 1;">DASHBOARD<span class="text-cyan">.</span></h1>
                 <p class="text-soft" style="margin-top: 1rem;">Real-time community health monitoring and vital sign tracking.</p>
             </div>
-            <% if (latest) { %>
-                <div class="mono text-cyan" style="font-size: 0.7rem; border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: 4px;">
-                    NODE_ID: <%= latest.daoId %>
+            
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1rem;">
+                <!-- NODE SELECTOR -->
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="mono text-muted" style="font-size: 0.6rem;">SWITCH_NODE:</div>
+                    <select onchange="handleNodeSwitch(this.value)" style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--accent-cyan); padding: 0.5rem 1rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.7rem; outline: none; cursor: pointer;">
+                        <% if (followedDaos && followedDaos.length > 0) { %>
+                            <% followedDaos.forEach(dao => { %>
+                                <option value="<%= dao.daoId %>" <%= latest && latest.daoId === dao.daoId ? 'selected' : '' %>><%= dao.name %></option>
+                            <% }) %>
+                        <% } else { %>
+                            <option value="">NO_NODES_FOUND</option>
+                        <% } %>
+                        <option value="DISCOVER_ACTION">+ DISCOVER_NEW</option>
+                    </select>
                 </div>
-            <% } %>
+
+                <script>
+                    function handleNodeSwitch(val) {
+                        if (val === 'DISCOVER_ACTION') {
+                            window.location.href = '/command-center';
+                        } else if (val) {
+                            window.location.href = '/dashboard/' + val;
+                        }
+                    }
+                </script>
+
+                <% if (latest) { %>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <a href="https://zeroauthoritydao.com/dao/<%= latest.daoId %>" target="_blank" class="mono text-muted" style="font-size: 0.6rem; text-decoration: none; border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: 4px; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.borderColor='var(--accent-cyan)'; this.style.color='var(--accent-cyan)'" onmouseout="this.style.borderColor='var(--glass-border)'; this.style.color='var(--text-muted)'">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            VERIFY_ON_CHAIN
+                        </a>
+                        <div class="mono text-cyan" style="font-size: 0.7rem; border: 1px solid var(--glass-border); padding: 0.5rem 1rem; border-radius: 4px; background: rgba(0,212,255,0.02);">
+                            NODE_ID: <%= latest.daoId %>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
         </div>
     </section>
 
