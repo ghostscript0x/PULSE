@@ -4,6 +4,7 @@ const apiController = require('../controllers/apiController');
 
 // API Routes
 router.get('/discovery', apiController.getDiscovery);
+router.get('/stats', apiController.getGlobalStats);
 router.get('/health/:daoId', apiController.getHealth);
 router.get('/contributors/:daoId', apiController.getContributors);
 router.get('/bounties/:daoId', apiController.getBounties);

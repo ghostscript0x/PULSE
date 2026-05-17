@@ -6,9 +6,15 @@ const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 const xss = require('xss-clean');
 const compression = require('compression');
+const session = require('express-session');
+const passport = require('passport');
+const flash = require('connect-flash');
 const connectDB = require('./config/db');
 const errorHandler = require('./middlewares/errorMiddleware');
 require('dotenv').config();
+
+// Passport Config
+require('./config/passport')(passport);
 
 const app = express();
 
@@ -17,23 +23,48 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-            "script-src": ["'self'", "'unsafe-inline'"], // Required for EJS logic
-            "script-src-attr": ["'unsafe-inline'"], // Allow event handlers in HTML if necessary
+            "script-src": ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+            "script-src-attr": ["'unsafe-inline'"],
+            "style-src": ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://fonts.googleapis.com"],
+            "font-src": ["'self'", "https://fonts.gstatic.com"],
             "img-src": ["'self'", "data:", "https://*"],
-            "connect-src": ["'self'", "https://zeroauthoritydao.com"],
+            "connect-src": ["'self'", "https://zeroauthoritydao.com", "https://*"],
         },
     },
 }));
-app.use(mongoSanitize()); // Prevent NoSQL Injection
-app.use(xss()); // Prevent XSS
-app.use(hpp()); // Prevent HTTP Parameter Pollution
-app.use(compression()); // Compress responses
+app.use(mongoSanitize());
+app.use(xss());
+app.use(hpp());
+app.use(compression());
+
+// Express Session
+app.use(session({
+    secret: 'pulse_core_v3_secure',
+    resave: true,
+    saveUninitialized: true
+}));
+
+// Passport Middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Connect Flash
+app.use(flash());
+
+// Global Vars for Views
+app.use((req, res, next) => {
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+    res.locals.user = req.user || null;
+    next();
+});
 
 // Database Connectivity
 console.log('[DB CONNECTING]');
 connectDB();
 
-// View Engine (Maintaining frontend support)
+// View Engine
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
 app.set('layout', 'layout');
@@ -45,16 +76,8 @@ app.use(express.urlencoded({ extended: false }));
 
 // Routes
 app.use('/api', require('./routes/api'));
+app.use('/auth', require('./routes/auth'));
 app.use('/', require('./routes/index'));
-
-// SPA Catch-all for Vercel - serve index for non-API routes
-app.use((req, res, next) => {
-    if (!req.path.startsWith('/api')) {
-        res.render('index');
-    } else {
-        next();
-    }
-});
 
 // Error Handling
 app.use(errorHandler);
@@ -62,5 +85,5 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`[INIT] Backend running on port ${PORT}`);
+    console.log(`[INIT] Command Center Online | Port ${PORT}`);
 });

@@ -1,0 +1,70 @@
+<div class="container" style="padding-top: 4rem;">
+    <div style="display: grid; grid-template-columns: 280px 1fr; gap: 4rem;">
+        <!-- SIDEBAR -->
+        <aside style="position: sticky; top: 100px; height: calc(100vh - 100px);">
+            <div class="section-label" style="margin-bottom: 2rem;">Documentation</div>
+            <nav style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <a href="#introduction" class="text-cyan mono" style="font-size: 0.85rem; text-decoration: none;">01_INTRODUCTION</a>
+                <a href="#quickstart" class="text-soft mono" style="font-size: 0.85rem; text-decoration: none;">02_QUICKSTART</a>
+                <a href="#api-reference" class="text-soft mono" style="font-size: 0.85rem; text-decoration: none;">03_API_REFERENCE</a>
+                <a href="#health-score" class="text-soft mono" style="font-size: 0.85rem; text-decoration: none;">04_HEALTH_SCORE</a>
+                <a href="#contributor-rep" class="text-soft mono" style="font-size: 0.85rem; text-decoration: none;">05_CONTRIBUTOR_REP</a>
+            </nav>
+        </aside>
+
+        <!-- CONTENT -->
+        <main style="max-width: 800px;">
+            <section id="introduction" style="margin-bottom: 6rem;" data-aos="fade-up">
+                <h1 style="font-family: var(--font-display); font-size: 3.5rem; margin-bottom: 2rem;">Introduction<span class="text-cyan">.</span></h1>
+                <p class="text-soft" style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem;">
+                    Pulse is the definitive community health intelligence layer for Web3. It provides DAOs, protocols, and contributors with real-time, deterministic signals derived from on-chain telemetry.
+                </p>
+                <div class="mock-card" style="padding: 2rem; border-left: 2px solid var(--accent-cyan); background: rgba(0,245,255,0.02);">
+                    <div class="card-title">Core Philosophy</div>
+                    <p class="text-soft" style="font-size: 0.95rem;">Decentralization is not transparency. Pulse bridge the gap by synthesizing raw data into actionable intelligence without relying on simulated or off-chain data packets.</p>
+                </div>
+            </section>
+
+            <section id="quickstart" style="margin-bottom: 6rem;" data-aos="fade-up">
+                <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 2rem;">Quickstart<span class="text-cyan">_</span></h2>
+                <p class="text-soft" style="margin-bottom: 2rem;">To initialize a community node for monitoring, follow these steps:</p>
+                
+                <div class="features-grid" style="grid-template-columns: 1fr; gap: 1rem;">
+                    <div class="feature-card" style="padding: 2rem;">
+                        <div class="text-cyan mono" style="margin-bottom: 1rem;">STEP_01</div>
+                        <h3>Find Your DAO UUID</h3>
+                        <p>Locate the unique cryptographic identifier for your community on the Zero Authority Network registry.</p>
+                    </div>
+                    <div class="feature-card" style="padding: 2rem;">
+                        <div class="text-cyan mono" style="margin-bottom: 1rem;">STEP_02</div>
+                        <h3>Establish Telemetry Sync</h3>
+                        <p>Enter the UUID into the Pulse Dashboard. This initiates a real-time fetch-and-compute cycle for your node.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="api-reference" style="margin-bottom: 6rem;" data-aos="fade-up">
+                <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 2rem;">API Reference<span class="text-cyan">_</span></h2>
+                <div class="mock-browser" style="height: auto;">
+                    <div class="browser-header">
+                        <div class="dot-group"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                        <div class="browser-url mono">GET /api/health/:daoId</div>
+                    </div>
+                    <div class="mock-main" style="background: #010409; padding: 2rem;">
+                        <pre class="mono" style="font-size: 0.85rem; color: var(--accent-cyan);">
+{
+  "status": "success",
+  "data": {
+    "healthScore": 78,
+    "metrics": {
+      "velocity": 84,
+      "completionRate": 92
+    }
+  }
+}</pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>

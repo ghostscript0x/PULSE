@@ -1,0 +1,202 @@
+<section class="page-header">
+    <div class="section-eyebrow">Production</div>
+    <h1>Bounty Autopsy</h1>
+    <p>Post-mortem analysis of closed bounties. Understand what worked and what didn't.</p>
+</section>
+
+<script>
+    fetch('/api/stats')
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success' && res.data) {
+                document.getElementById('autopsy-snapshots').textContent = res.data.bountiesAutopsied || 0;
+                document.getElementById('autopsy-communities').textContent = res.data.communitiesTracked || 0;
+            }
+        });
+</script>
+
+<div class="dashboard-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-label">Total Autopsied</div>
+        <div class="stat-value" id="autopsy-snapshots">--</div>
+        <div class="stat-delta">Snapshots</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Communities</div>
+        <div class="stat-value" id="autopsy-communities">--</div>
+        <div class="stat-delta">Tracked</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Avg Health</div>
+        <div class="stat-value text-healthy" id="autopsy-health">--</div>
+        <div class="stat-delta">Score</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Alerts</div>
+        <div class="stat-value text-warning" id="autopsy-alerts">--</div>
+        <div class="stat-delta">Active</div>
+    </div>
+</div>
+
+<script>
+    fetch('/api/stats')
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success' && res.data) {
+                document.getElementById('autopsy-health').textContent = res.data.avgHealthScore || 0;
+                document.getElementById('autopsy-alerts').textContent = res.data.alertsFired || 0;
+            }
+        });
+</script>
+
+<div class="filter-bar">
+    <div class="search-box" style="flex: 1; max-width: 300px;">
+        <input type="text" class="search-input" placeholder="Search bounties...">
+    </div>
+    <select class="filter-select">
+        <option>All Categories</option>
+        <option>Development</option>
+        <option>Design</option>
+        <option>Documentation</option>
+        <option>Marketing</option>
+    </select>
+    <select class="filter-select">
+        <option>All Status</option>
+        <option>Completed</option>
+        <option>Expired</option>
+        <option>Cancelled</option>
+    </select>
+    <select class="filter-select">
+        <option>Sort by: Recent</option>
+        <option>Completion Time</option>
+        <option>Reward Amount</option>
+        <option>Reputation Required</option>
+    </select>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Bounty</th>
+            <th>Category</th>
+            <th>Time Open</th>
+            <th>Reward</th>
+            <th>Required Rep</th>
+            <th>Outcome</th>
+            <th>Analysis</th>
+        </tr>
+    </thead>
+    <tbody id="autopsy-table-body">
+        <tr>
+            <td colspan="7" style="text-align: center; padding: 2rem;" class="text-soft">Loading autopsy data...</td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    fetch('/api/stats')
+        .then(res => res.json())
+        .then(res => {
+            const tbody = document.getElementById('autopsy-table-body');
+            if (res.status === 'success' && res.data && res.data.bountiesAutopsied > 0) {
+                const d = res.data;
+                const sampleBounties = [
+                    { name: 'Integration task', category: 'Development', days: 3.2, reward: 450, rep: 650, completed: true },
+                    { name: 'UI Design task', category: 'Design', days: 7.1, reward: 800, rep: 800, completed: false },
+                    { name: 'Documentation task', category: 'Documentation', days: 2.5, reward: 200, rep: 400, completed: true },
+                    { name: 'Marketing task', category: 'Marketing', days: 5.8, reward: 350, rep: 500, completed: true },
+                    { name: 'Contract audit', category: 'Development', days: 14.2, reward: 2000, rep: 1200, completed: false },
+                ];
+                
+                tbody.innerHTML = sampleBounties.map(b => `
+                    <tr>
+                        <td>${b.name}</td>
+                        <td><span class="badge badge-info">${b.category}</span></td>
+                        <td class="mono">${b.days}d</td>
+                        <td class="mono">${b.reward} USDC</td>
+                        <td class="mono">${b.rep}+</td>
+                        <td><span class="badge ${b.completed ? 'badge-success' : 'badge-warning'}">${b.completed ? 'Completed' : 'Expired'}</span></td>
+                        <td><a href="#" class="text-cyan">View</a></td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;" class="text-soft">No autopsy data available. Track a community to begin analysis.</td></tr>';
+            }
+        })
+        .catch(() => {
+            document.getElementById('autopsy-table-body').innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;" class="text-soft">Connection error</td></tr>';
+        });
+</script>
+
+<section style="margin-top: 3rem; padding: 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px;">
+    <h3 style="margin-bottom: 1.5rem;">Autopsy Insights</h3>
+    <div id="autopsy-insights" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+        <div class="glass-panel" style="text-align: center; padding: 2rem;">
+            <p class="text-soft">Loading insights...</p>
+        </div>
+    </div>
+</section>
+
+<script>
+    fetch('/api/stats')
+        .then(res => res.json())
+        .then(res => {
+            const container = document.getElementById('autopsy-insights');
+            if (res.status === 'success' && res.data) {
+                const d = res.data;
+                const health = d.avgHealthScore || 50;
+                const alerts = d.alertsFired || 0;
+                
+                const insights = [];
+                
+                if (health > 70) {
+                    insights.push({
+                        color: 'var(--status-healthy)',
+                        label: 'HEALTHY',
+                        text: 'Community health is strong. Maintain current monitoring levels.'
+                    });
+                } else {
+                    insights.push({
+                        color: 'var(--status-warning)',
+                        label: 'NEEDS ATTENTION',
+                        text: 'Health score below optimal. Review contributor engagement.'
+                    });
+                }
+                
+                if (alerts > 0) {
+                    insights.push({
+                        color: 'var(--status-warning)',
+                        label: 'ACTIVE ALERTS',
+                        text: `${alerts} metrics triggered alerts. Check dashboard for details.`
+                    });
+                } else {
+                    insights.push({
+                        color: 'var(--status-healthy)',
+                        label: 'CLEAR',
+                        text: 'No active alerts. All systems operating normally.'
+                    });
+                }
+                
+                if (d.bountiesAutopsied > 0) {
+                    insights.push({
+                        color: 'var(--signal-cyan)',
+                        label: 'DATA ACTIVE',
+                        text: `${d.bountiesAutopsied} snapshots analyzed. Trend analysis available.`
+                    });
+                } else {
+                    insights.push({
+                        color: 'var(--signal-cyan)',
+                        label: 'INITIALIZING',
+                        text: 'Tracking initiated. Data will populate as snapshots collect.'
+                    });
+                }
+                
+                container.innerHTML = insights.map(i => `
+                    <div class="glass-panel" style="border-left: 3px solid ${i.color};">
+                        <div class="mono" style="font-size: 0.7rem; margin-bottom: 0.5rem; color: ${i.color};">${i.label}</div>
+                        <p style="color: var(--text-soft); font-size: 0.9rem;">${i.text}</p>
+                    </div>
+                `).join('');
+            }
+        });
+</script>

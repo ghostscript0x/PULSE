@@ -6,31 +6,100 @@
     <title><%= title %></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
-    <div class="container">
-        <header>
-            <a href="/" class="logo">PULSE</a>
-            <nav>
-                <a href="/" class="<%= title === 'PULSE | Community Health Layer' ? 'active' : '' %>">Base</a>
-                <a href="/about" class="<%= title === 'PULSE | System Protocol' ? 'active' : '' %>">Protocol</a>
-                <a href="/dashboard" class="<%= title.includes('Dashboard') ? 'active' : '' %>">Intelligence</a>
-                <a href="/contributors" class="<%= title.includes('Contributor') ? 'active' : '' %>">Telemetry</a>
-                <a href="/bounties" class="<%= title.includes('Bounty') ? 'active' : '' %>">Production</a>
-            </nav>
-        </header>
-
-        <main>
-            <%- body %>
-        </main>
-
-        <footer style="margin-top: 8rem; padding: 4rem 0; border-top: 1px solid var(--glass-border); text-align: center;">
-            <div class="mono text-soft" style="font-size: 0.6rem; letter-spacing: 4px; margin-bottom: 1rem;">PULSE_INTELLIGENCE_OPERATING_SYSTEM_V3.3</div>
-            <div class="text-soft" style="font-size: 0.7rem; opacity: 0.5;">&copy; 2026 | COMMUNITY ICU MONITORING | DERIVED FROM ZERO AUTHORITY DATA</div>
-        </footer>
+<body class="aura-bg">
+    <!-- NOISE OVERLAY -->
+    <div class="noise-overlay"></div>
+    
+    <!-- STATUS BAR -->
+    <div class="top-status-bar">
+        <div class="container-full">
+            <div class="status-content">
+                <div class="status-left">
+                    <span class="pulse-dot"></span>
+                    <span class="mono">ALL SYSTEMS OPERATIONAL</span>
+                </div>
+                <div class="status-center mono">
+                    ZA API: <span class="text-cyan">CONNECTED</span> | NODES: <span class="text-cyan">1,247</span>
+                </div>
+                <div class="status-right mono" id="typewriter-status"></div>
+            </div>
+        </div>
     </div>
+
+    <!-- STICKY NAV -->
+    <header class="sticky-nav">
+        <div class="container">
+            <div class="nav-content">
+                <a href="/" class="logo">
+                    PULSE<span class="text-cyan">.</span>
+                </a>
+                
+                <nav class="center-nav">
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/about">Analytics</a>
+                    <a href="/contributors">Communities</a>
+                    <a href="/insights">Intelligence</a>
+                    <a href="/docs">Docs</a>
+                </nav>
+
+                <div class="nav-actions">
+                    <% if (user) { %>
+                        <a href="/command-center" class="nav-link">Command Center</a>
+                        <a href="/auth/logout" class="btn-cyan-solid">Logout</a>
+                    <% } else { %>
+                        <a href="/auth/login" class="nav-link">Sign In</a>
+                        <a href="/auth/register" class="btn-cyan-solid">Request Access</a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <% if(success_msg != '') { %>
+            <div class="container" style="margin-top: 2rem;">
+                <div class="glass-panel alert-success">
+                    <div class="text-healthy mono"><%= success_msg %></div>
+                </div>
+            </div>
+        <% } %>
+        <% if(error_msg != '') { %>
+            <div class="container" style="margin-top: 2rem;">
+                <div class="glass-panel alert-error">
+                    <div class="text-critical mono"><%= error_msg %></div>
+                </div>
+            </div>
+        <% } %>
+        
+        <%- body %>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo">PULSE<span class="text-cyan">.</span></div>
+                    <p class="text-muted">Community Health Intelligence for Web3.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/docs">Docs</a>
+                    <a href="/api">API</a>
+                    <a href="https://github.com">GitHub</a>
+                    <a href="https://twitter.com">Twitter</a>
+                </div>
+                <div class="footer-copy">
+                    <div class="mono">© 2026 PULSE · SYSTEM_ONLINE</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="/js/main.js"></script>
 </body>
 </html>

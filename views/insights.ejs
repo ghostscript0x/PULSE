@@ -1,0 +1,116 @@
+<div class="container" style="padding-top: 4rem;">
+    <!-- HEADER -->
+    <section class="page-header" style="text-align: left; margin-bottom: 4rem;">
+        <div class="section-label" data-aos="fade-right">Data Intelligence</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h1 style="font-family: var(--font-display); font-size: 3.5rem; line-height: 1;">ANALYTICS<span class="text-cyan">.</span></h1>
+                <p class="text-soft" style="margin-top: 1rem;">Deep historical analysis and qualitative intelligence generated from live community telemetry.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI INSIGHTS GRID -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 4rem;">
+        <div class="feature-card" style="border-color: var(--status-warning);" data-aos="fade-up" data-aos-delay="100">
+            <div class="text-warning mono" style="font-size: 0.7rem; margin-bottom: 1.5rem;">[BURNOUT_WARNING]</div>
+            <h3>Activity Spike Detected</h3>
+            <p>High activity streaks detected in contributor metrics. Monitor for signs of burnout and consider implementing mandatory rest periods.</p>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="text-cyan mono" style="font-size: 0.7rem; margin-bottom: 1.5rem;">[SKILL_GAP_ALERT]</div>
+            <h3>Demand vs Supply</h3>
+            <p>Cross-reference open bounties with active contributor skills to identify underrepresented categories. Prioritize recruitment.</p>
+        </div>
+        <div class="feature-card" style="border-color: var(--accent-green);" data-aos="fade-up" data-aos-delay="300">
+            <div class="text-healthy mono" style="font-size: 0.7rem; margin-bottom: 1.5rem;">[MOMENTUM_SIGNAL]</div>
+            <h3>Contributor Growth</h3>
+            <p>Track reputation growth patterns to identify rising stars. These contributors show consistent engagement and readiness for core roles.</p>
+        </div>
+    </div>
+
+    <!-- NETWORK STATS -->
+    <div class="glass-panel" style="margin-bottom: 4rem; padding: 3rem;" data-aos="fade-up">
+        <span class="section-label" style="margin-bottom: 3rem;">Network Pulse</span>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;">
+            <div style="text-align: center;">
+                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">SNAPSHOTS_AUTOPSIED</div>
+                <div class="text-cyan mono" style="font-size: 2rem; font-weight: 700;" id="insight-snapshots">--</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">COMMUNITIES_TRACKED</div>
+                <div class="text-cyan mono" style="font-size: 2rem; font-weight: 700;" id="insight-communities">--</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">AVG_HEALTH_SCORE</div>
+                <div class="text-healthy mono" style="font-size: 2rem; font-weight: 700;" id="insight-health">--</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="text-muted mono" style="font-size: 0.65rem; margin-bottom: 0.5rem;">DATA_POINTS_SYNCED</div>
+                <div class="text-white mono" style="font-size: 2rem; font-weight: 700;">LIVE</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        fetch('/api/stats')
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'success' && res.data) {
+                    document.getElementById('insight-snapshots').textContent = res.data.bountiesAutopsied || 0;
+                    document.getElementById('insight-communities').textContent = res.data.communitiesTracked || 0;
+                    document.getElementById('insight-health').textContent = res.data.avgHealthScore || 0;
+                }
+            });
+    </script>
+
+    <!-- LOGS TERMINAL -->
+    <section class="glass-panel" style="padding: 0;" data-aos="fade-up">
+        <div class="mock-browser" style="height: auto; border: none; border-radius: 0;">
+            <div class="browser-header">
+                <div class="dot-group">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+                <div class="browser-url mono">intelligence_logs.tail</div>
+            </div>
+            <div class="mock-main" style="background: #010409; padding: 0;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--glass-border);">
+                            <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">EVENT_ID</th>
+                            <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TYPE</th>
+                            <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">SEVERITY</th>
+                            <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TIMESTAMP</th>
+                        </tr>
+                    </thead>
+                    <tbody class="mono" style="font-size: 0.75rem;">
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                            <td style="padding: 1rem; color: var(--text-muted);">#INT-942</td>
+                            <td style="padding: 1rem; color: var(--accent-cyan);">BURNOUT_RISK</td>
+                            <td style="padding: 1rem;"><span class="text-warning">WARNING</span></td>
+                            <td style="padding: 1rem; color: var(--text-muted);">2026-05-16 14:02:11</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                            <td style="padding: 1rem; color: var(--text-muted);">#INT-941</td>
+                            <td style="padding: 1rem; color: var(--accent-cyan);">SKILL_GAP</td>
+                            <td style="padding: 1rem;"><span class="text-white">INFO</span></td>
+                            <td style="padding: 1rem; color: var(--text-muted);">2026-05-16 11:45:02</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                            <td style="padding: 1rem; color: var(--text-muted);">#INT-940</td>
+                            <td style="padding: 1rem; color: var(--accent-cyan);">MOMENTUM_PULSE</td>
+                            <td style="padding: 1rem;"><span class="text-healthy">POSITIVE</span></td>
+                            <td style="padding: 1rem; color: var(--text-muted);">2026-05-15 18:22:56</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI ENGINE BADGE -->
+    <div style="text-align: center; margin-top: 6rem; opacity: 0.6;" data-aos="fade-up">
+        <div class="mono text-muted" style="font-size: 0.7rem; letter-spacing: 4px;">NEURAL_SYNTHESIS_POWERED_BY</div>
+        <div class="text-white mono" style="font-size: 1.2rem; font-weight: 700; margin-top: 1rem;">LLAMA_3.3_70B | GROQ_INFERENCE</div>
+    </div>
+</div>

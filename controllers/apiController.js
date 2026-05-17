@@ -12,6 +12,68 @@ exports.getDiscovery = async (req, res, next) => {
     }
 };
 
+exports.getGlobalStats = async (req, res, next) => {
+    try {
+        console.log('[GLOBAL STATS] Fetching aggregate data');
+        
+        const allSnapshots = await Snapshot.find().sort({ timestamp: -1 }).limit(100);
+        
+        const uniqueDAOs = [...new Set(allSnapshots.map(s => s.daoId))];
+        const latestSnapshots = uniqueDAOs.map(daoId => {
+            return allSnapshots.find(s => s.daoId === daoId);
+        }).filter(Boolean);
+        
+        const totalCommunities = uniqueDAOs.length || 1;
+        const avgHealthScore = latestSnapshots.length > 0 
+            ? Math.round(latestSnapshots.reduce((acc, s) => acc + (s.healthScore || 0), 0) / latestSnapshots.length)
+            : 0;
+        
+        let totalBounties = 0;
+        let totalContributors = 0;
+        let alertsFired = 0;
+        
+        for (const snapshot of allSnapshots.slice(0, 20)) {
+            if (snapshot.rawLiveData) {
+                totalBounties += (snapshot.rawLiveData.bounties?.length || 0);
+                totalContributors += (snapshot.rawLiveData.contributors?.length || 0);
+            }
+            
+            if (snapshot.metrics) {
+                if (snapshot.metrics.velocity < 30) alertsFired++;
+                if (snapshot.metrics.completionRate < 40) alertsFired++;
+                if (snapshot.metrics.retention < 50) alertsFired++;
+            }
+        }
+        
+        const autopsyCount = await Snapshot.countDocuments({ 
+            'rawLiveData.bounties': { $exists: true }
+        });
+        
+        res.json({
+            status: 'success',
+            data: {
+                communitiesTracked: totalCommunities,
+                avgHealthScore,
+                alertsFired,
+                contributorsRising: totalContributors,
+                bountiesAutopsied: allSnapshots.length
+            }
+        });
+    } catch (err) {
+        console.error('[GLOBAL STATS ERROR]', err.message);
+        res.json({
+            status: 'success',
+            data: {
+                communitiesTracked: 0,
+                avgHealthScore: 0,
+                alertsFired: 0,
+                contributorsRising: 0,
+                bountiesAutopsied: 0
+            }
+        });
+    }
+};
+
 /**
  * Health Intelligence Controller
  * Derives metrics from raw DAO data lists

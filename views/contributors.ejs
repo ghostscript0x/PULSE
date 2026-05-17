@@ -1,55 +1,129 @@
-<section style="margin-bottom: 3rem;">
-    <div class="mono text-cyan" style="font-size: 0.7rem; margin-bottom: 1rem;">[MODULE_04]</div>
-    <h1 style="margin-bottom: 1rem; letter-spacing: 10px;">CONTRIBUTOR_ANALYTICS</h1>
-    <p class="text-soft glow-text" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">Real-time reputation telemetry and engagement tracking.</p>
-</section>
+<div class="container" style="padding-top: 4rem;">
+    <!-- HEADER -->
+    <section class="page-header" style="text-align: left; margin-bottom: 4rem;">
+        <div class="section-label" data-aos="fade-right">Network Registry</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+                <h1 style="font-family: var(--font-display); font-size: 3.5rem; line-height: 1;">CONTRIBUTORS<span class="text-cyan">.</span></h1>
+                <p class="text-soft" style="margin-top: 1rem;">Real-time reputation telemetry and engagement tracking for your community.</p>
+            </div>
+        </div>
+    </section>
 
-<% if (contributors.length === 0) { %>
-    <section class="glass-panel" style="text-align: center; padding: 6rem 2rem; border-style: dashed;">
-        <div class="text-warning glow-text" style="font-size: 2rem; margin-bottom: 1.5rem;">[!]</div>
-        <h2 class="text-warning">ZERO_CONTRIBUTORS_DETECTED</h2>
-        <p class="text-soft">The target DAO registry contains no active contributor entries at this timestamp.</p>
-    </section>
-<% } else { %>
-    <section class="glass-panel" style="padding: 0;">
-        <div style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
-            <div class="mono text-soft" style="font-size: 0.7rem;">REGISTRY_COUNT: <%= contributors.length %></div>
-            <div class="text-healthy mono" style="font-size: 0.6rem;">● LIVE_DATA_STREAM</div>
+    <%
+        const avgRep = contributors.length > 0 ? Math.round(contributors.reduce((a,c) => a + (c.reputationScore||0), 0) / contributors.length) : 0;
+        const activeContributors = contributors.filter(c => {
+            const lastActive = c.lastActive ? new Date(c.lastActive) : null;
+            const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            return lastActive && lastActive > weekAgo;
+        }).length;
+        const activePercent = contributors.length > 0 ? Math.round((activeContributors / contributors.length) * 100) : 0;
+    %>
+
+    <!-- STATS -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
+        <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="100">
+            <div class="vital-label">Total Registered</div>
+            <div class="vital-value"><%= contributors.length %></div>
+            <div class="vital-delta text-healthy mono">↑ ACTIVE_NODES</div>
         </div>
-        <div class="table-container" style="margin-top: 0;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>CONTRIBUTOR_ID</th>
-                        <th>REPUTATION_SCORE</th>
-                        <th>LAST_ACTIVITY_LOG</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% contributors.forEach(c => { %>
-                        <tr>
-                            <td class="mono text-cyan" style="font-size: 0.8rem; letter-spacing: 1px;">
-                                <%= c.stxAddress || c.walletId %>
-                            </td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <span class="mono"><%= c.reputationScore || 0 %></span>
-                                    <div style="width: 60px; height: 3px; background: rgba(255,255,255,0.03);">
-                                        <div style="width: <%= Math.min(100, (c.reputationScore || 0) / 10) %>%; height: 100%; background: var(--status-healthy);"></div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-soft mono" style="font-size: 0.75rem;">
-                                <%= c.lastActive ? new Date(c.lastActive).toISOString().split('T')[0] : 'STALE_SIGNAL' %>
-                            </td>
-                            <td>
-                                <span class="text-healthy mono" style="font-size: 0.7rem; background: rgba(0, 255, 136, 0.05); padding: 0.3rem 0.8rem; border-radius: 2px; border: 1px solid rgba(0, 255, 136, 0.1);">ACTIVE</span>
-                            </td>
-                        </tr>
-                    <% }) %>
-                </tbody>
-            </table>
+        <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="200">
+            <div class="vital-label">Avg Reputation</div>
+            <div class="vital-value text-cyan"><%= avgRep %></div>
+            <div class="vital-delta text-cyan mono">MEAN_SCORE</div>
         </div>
-    </section>
-<% } %>
+        <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="300">
+            <div class="vital-label">Rising Stars</div>
+            <div class="vital-value"><%= contributors.filter(c => (c.reputationScore || 0) > 800).length %></div>
+            <div class="vital-delta text-healthy mono">THRESHOLD_MET</div>
+        </div>
+        <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="400">
+            <div class="vital-label">Weekly Activity</div>
+            <div class="vital-value"><%= activePercent %>%</div>
+            <div class="vital-delta <%= activePercent > 50 ? 'text-healthy' : 'text-warning' %> mono">
+                <%= activePercent > 50 ? 'OPTIMIZED' : 'DORMANT' %>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEADERBOARD & TABLE -->
+    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem;">
+        <div>
+            <section class="glass-panel" style="padding: 0;" data-aos="fade-right">
+                <div class="mock-browser" style="height: auto; border: none; border-radius: 0;">
+                    <div class="mock-main" style="background: #010409; padding: 0;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--glass-border);">
+                                    <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.65rem; color: var(--text-muted);">CONTRIBUTOR_NODE</th>
+                                    <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.65rem; color: var(--text-muted);">REPUTATION</th>
+                                    <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.65rem; color: var(--text-muted);">LAST_SYNC</th>
+                                    <th class="mono" style="padding: 1.5rem; text-align: left; font-size: 0.65rem; color: var(--text-muted);">STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody class="mono" style="font-size: 0.8rem;">
+                                <% if (contributors.length === 0) { %>
+                                    <tr>
+                                        <td colspan="4" style="padding: 6rem; text-align: center; color: var(--text-muted);">NO_CONTRIBUTOR_NODES_DETECTED</td>
+                                    </tr>
+                                <% } else { %>
+                                    <% contributors.forEach(c => { %>
+                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.3s;" class="table-row-hover">
+                                            <td style="padding: 1.5rem;">
+                                                <div class="text-cyan" style="font-weight: 600;"><%= (c.stxAddress || c.walletId || 'UNKNOWN').substring(0, 12) %>...</div>
+                                            </td>
+                                            <td style="padding: 1.5rem;">
+                                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                                    <span style="font-weight: 700; width: 40px;"><%= c.reputationScore || 0 %></span>
+                                                    <div style="width: 100px; height: 2px; background: rgba(255,255,255,0.05);">
+                                                        <div style="width: <%= Math.min(100, (c.reputationScore || 0) / 10) %>%; height: 100%; background: var(--accent-cyan);"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1.5rem; color: var(--text-muted);">
+                                                <%= c.lastActive ? new Date(c.lastActive).toISOString().split('T')[0] : 'NEVER' %>
+                                            </td>
+                                            <td style="padding: 1.5rem;">
+                                                <span class="text-healthy" style="font-size: 0.65rem; border: 1px solid currentColor; padding: 0.2rem 0.5rem; border-radius: 2px;">ACTIVE</span>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <section class="glass-panel" style="padding: 2.5rem;" data-aos="fade-left">
+                <span class="section-label" style="margin-bottom: 2rem;">Top Contributor</span>
+                <% const top = contributors.sort((a,b) => (b.reputationScore||0) - (a.reputationScore||0))[0]; %>
+                <% if (top) { %>
+                    <div style="text-align: center;">
+                        <div class="text-cyan mono" style="font-size: 3rem; font-weight: 800; margin-bottom: 1rem;">#1</div>
+                        <div class="mono" style="font-size: 0.9rem; margin-bottom: 1.5rem; word-break: break-all;"><%= top.stxAddress || top.walletId %></div>
+                        <div class="badge-pill" style="background: rgba(0,255,136,0.1); color: var(--accent-green); border-color: var(--accent-green);">
+                            <%= top.reputationScore || 0 %> REPUTATION
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="text-muted mono" style="text-align: center;">AWAITING_LEADER</div>
+                <% } %>
+            </section>
+
+            <section class="glass-panel" style="padding: 2.5rem;" data-aos="fade-left" data-aos-delay="200">
+                <span class="section-label" style="margin-bottom: 2rem;">System Actions</span>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <a href="/dashboard" class="btn-cyan-solid" style="text-align: center; width: 100%;">Sync Dashboard</a>
+                    <a href="/about" class="btn-ghost" style="text-align: center; width: 100%;">Protocol Docs</a>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-row-hover:hover { background: rgba(0, 245, 255, 0.02) !important; }
+</style>

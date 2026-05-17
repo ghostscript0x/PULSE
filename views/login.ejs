@@ -1,0 +1,36 @@
+<div style="max-width: 400px; margin: 6rem auto;">
+    <section class="glass-panel" style="border-top: 2px solid var(--signal-cyan); padding: 3rem 2rem;">
+        <div class="mono text-cyan" style="font-size: 0.7rem; margin-bottom: 2rem; text-align: center;">[IDENTIFICATION_REQUIRED]</div>
+        <h2 style="text-align: center; margin-bottom: 2.5rem; letter-spacing: 4px;">INITIALIZE_SESSION</h2>
+
+        <% if(error != '') { %>
+            <div class="glass-panel" style="border-color: var(--status-critical); padding: 0.8rem; margin-bottom: 2rem; background: rgba(255,59,59,0.05);">
+                <div class="text-critical mono" style="font-size: 0.7rem; text-align: center;"><%= error %></div>
+            </div>
+        <% } %>
+
+        <% if(success_msg != '') { %>
+            <div class="glass-panel" style="border-color: var(--status-healthy); padding: 0.8rem; margin-bottom: 2rem; background: rgba(0,255,136,0.05);">
+                <div class="text-healthy mono" style="font-size: 0.7rem; text-align: center;"><%= success_msg %></div>
+            </div>
+        <% } %>
+
+        <form action="/auth/login" method="POST" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <label class="text-soft mono" style="font-size: 0.6rem; letter-spacing: 2px;">NODE_USERNAME</label>
+                <input type="text" name="username" required 
+                    style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 0.8rem; color: white; border-radius: 2px; outline: none; font-family: 'JetBrains Mono', monospace;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <label class="text-soft mono" style="font-size: 0.6rem; letter-spacing: 2px;">ACCESS_KEY</label>
+                <input type="password" name="password" required 
+                    style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 0.8rem; color: white; border-radius: 2px; outline: none;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">AUTHENTICATE</button>
+        </form>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="/auth/register" class="text-soft mono" style="font-size: 0.65rem; text-decoration: none; letter-spacing: 1px;">CREATE_NEW_ACCESS_NODE</a>
+        </div>
+    </section>
+</div>

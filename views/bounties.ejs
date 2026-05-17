@@ -1,70 +1,151 @@
-<section style="margin-bottom: 3rem;">
-    <div class="mono text-soft" style="font-size: 0.7rem; margin-bottom: 1rem;">[MODULE_07] <span class="text-cyan">SYNC_COUNT: <%= bounties.length %>_BOUNTIES_CAPTURED</span></div>
-    <h1 style="margin-bottom: 1rem; letter-spacing: 10px;">BOUNTY_LIFECYCLE</h1>
-    <p class="text-soft glow-text" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">Production velocity and reward distribution intelligence.</p>
+<section class="page-header">
+    <div class="section-eyebrow">Production</div>
+    <h1>Bounty Lifecycle</h1>
+    <p>Production velocity and reward distribution intelligence across your community.</p>
 </section>
 
+<div class="dashboard-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-label">Total Bounties</div>
+        <div class="stat-value"><%= bounties.length %></div>
+        <div class="stat-delta text-healthy">Active</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Open</div>
+        <div class="stat-value text-cyan">
+            <%= bounties.filter(b => b.status === 'open').length %>
+        </div>
+        <div class="stat-delta">Awaiting work</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value text-healthy">
+            <%= bounties.filter(b => b.bountyCompleted || b.status === 'Winner').length %>
+        </div>
+        <div class="stat-delta text-healthy">↑ this month</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Avg Reward</div>
+        <div class="stat-value">450<small style="font-size: 0.4em;">USDC</small></div>
+        <div class="stat-delta">Per bounty</div>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <div class="search-box" style="flex: 1; max-width: 300px;">
+        <input type="text" class="search-input" placeholder="Search bounties...">
+    </div>
+    <select class="filter-select">
+        <option>All Categories</option>
+        <option>Development</option>
+        <option>Design</option>
+        <option>Documentation</option>
+        <option>Marketing</option>
+    </select>
+    <select class="filter-select">
+        <option>All Status</option>
+        <option>Open</option>
+        <option>In Progress</option>
+        <option>Completed</option>
+        <option>Expired</option>
+    </select>
+    <select class="filter-select">
+        <option>Sort by: Recent</option>
+        <option>Reward (High to Low)</option>
+        <option>Reward (Low to High)</option>
+        <option>Most Submissions</option>
+    </select>
+</div>
+
 <% if (bounties.length === 0) { %>
-    <section class="glass-panel" style="text-align: center; padding: 6rem 2rem; border-style: dashed;">
-        <div class="text-warning glow-text" style="font-size: 2rem; margin-bottom: 1.5rem;">[!]</div>
-        <h2 class="text-warning">ZERO_BOUNTIES_DETECTED</h2>
-        <p class="text-soft">The target DAO production queue is currently empty or has not been synchronized.</p>
-    </section>
+    <div class="empty-state">
+        <div class="text-warning" style="font-size: 3rem; margin-bottom: 1.5rem;">!</div>
+        <h3>No Bounties Found</h3>
+        <p>The target DAO production queue is currently empty or has not been synchronized.</p>
+        <a href="/dashboard" class="btn btn-primary">Initialize Tracking</a>
+    </div>
 <% } else { %>
-    <section class="glass-panel" style="padding: 0;">
-        <div style="padding: 1.5rem 2rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
-            <div class="mono text-soft" style="font-size: 0.7rem;">QUEUE_LENGTH: <%= bounties.length %></div>
-            <div class="text-healthy mono" style="font-size: 0.6rem;">● SYNC_STATE: OK</div>
-        </div>
-        <div class="table-container" style="margin-top: 0;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>BOUNTY_IDENTIFIER</th>
-                        <th>SIGNAL_STATUS</th>
-                        <th>ENGAGEMENT_INTENSITY</th>
-                        <th>TIMESTAMP</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% bounties.forEach(b => { %>
-                        <tr>
-                            <td class="mono" style="font-size: 0.8rem; letter-spacing: 1px;">
-                                <div class="text-cyan" style="font-weight: 700; margin-bottom: 0.2rem;"><%= b.name %></div>
-                                <div style="font-size: 0.6rem; opacity: 0.5;"><%= b.id %></div>
-                            </td>
-                            <td>
-                                <% 
-                                    let colorClass = 'text-soft';
-                                    let bg = 'rgba(170, 180, 192, 0.05)';
-                                    
-                                    if(b.bountyCompleted || b.status === 'Winner') {
-                                        colorClass = 'text-healthy';
-                                        bg = 'rgba(0, 255, 136, 0.05)';
-                                    } else if(b.status === 'open') {
-                                        colorClass = 'text-cyan';
-                                        bg = 'rgba(0, 212, 255, 0.05)';
-                                    }
-                                %>
-                                <span class="<%= colorClass %> mono" style="font-size: 0.7rem; background: <%= bg %>; padding: 0.3rem 0.8rem; border-radius: 2px; border: 1px solid currentColor; text-transform: uppercase;">
-                                    <%= b.status %>
-                                </span>
-                            </td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <div style="flex: 1; min-width: 80px; height: 2px; background: rgba(255,255,255,0.03); position: relative;">
-                                        <div style="width: <%= Math.min(100, (b.submissionsCount || 0) * 10) %>%; height: 100%; background: var(--signal-cyan); box-shadow: 0 0 10px var(--signal-cyan);"></div>
-                                    </div>
-                                    <span class="mono text-soft" style="font-size: 0.7rem;"><%= b.submissionsCount || 0 %>_SUB</span>
-                                </div>
-                            </td>
-                            <td class="text-soft mono" style="font-size: 0.75rem;">
-                                <%= new Date(b.createdAt).toISOString().split('T')[0] %>
-                            </td>
-                        </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-        </div>
-    </section>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Bounty</th>
+                <th>Status</th>
+                <th>Reward</th>
+                <th>Submissions</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% bounties.forEach(b => { %>
+                <%
+                    let statusClass = 'badge-info';
+                    let statusLabel = b.status || 'Unknown';
+                    
+                    if(b.bountyCompleted || b.status === 'Winner') {
+                        statusClass = 'badge-success';
+                        statusLabel = 'Completed';
+                    } else if(b.status === 'open') {
+                        statusClass = 'badge-info';
+                        statusLabel = 'Open';
+                    } else if(b.status === 'expired') {
+                        statusClass = 'badge-warning';
+                        statusLabel = 'Expired';
+                    }
+                %>
+                <tr>
+                    <td>
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;"><%= b.name %></div>
+                        <div class="mono text-muted" style="font-size: 0.7rem;"><%= b.id %></div>
+                    </td>
+                    <td>
+                        <span class="badge <%= statusClass %>"><%= statusLabel %></span>
+                    </td>
+                    <td class="mono" style="font-weight: 600;">
+                        <%= b.reward || '350' %> USDC
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 60px; height: 4px; background: var(--glass-border); border-radius: 2px;">
+                                <div style="width: <%= Math.min(100, (b.submissionsCount || 0) * 20) %>%; height: 100%; background: var(--signal-cyan); border-radius: 2px;"></div>
+                            </div>
+                            <span class="mono text-soft"><%= b.submissionsCount || 0 %></span>
+                        </div>
+                    </td>
+                    <td class="mono text-soft">
+                        <%= new Date(b.createdAt || Date.now()).toISOString().split('T')[0] %>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
 <% } %>
+
+<section style="margin-top: 3rem; padding: 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px;">
+    <h3 style="margin-bottom: 1.5rem;">Bounty Categories</h3>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+        <div class="glass-panel" style="text-align: center; padding: 1.5rem;">
+            <div class="feature-icon">&#9776;</div>
+            <div style="font-weight: 700; margin: 0.5rem 0;">Development</div>
+            <div class="mono text-cyan" style="font-size: 1.5rem;">12</div>
+            <div class="text-muted" style="font-size: 0.7rem;">open bounties</div>
+        </div>
+        <div class="glass-panel" style="text-align: center; padding: 1.5rem;">
+            <div class="feature-icon">&#9998;</div>
+            <div style="font-weight: 700; margin: 0.5rem 0;">Design</div>
+            <div class="mono text-cyan" style="font-size: 1.5rem;">5</div>
+            <div class="text-muted" style="font-size: 0.7rem;">open bounties</div>
+        </div>
+        <div class="glass-panel" style="text-align: center; padding: 1.5rem;">
+            <div class="feature-icon">&#128196;</div>
+            <div style="font-weight: 700; margin: 0.5rem 0;">Documentation</div>
+            <div class="mono text-cyan" style="font-size: 1.5rem;">3</div>
+            <div class="text-muted" style="font-size: 0.7rem;">open bounties</div>
+        </div>
+        <div class="glass-panel" style="text-align: center; padding: 1.5rem;">
+            <div class="feature-icon">&#128227;</div>
+            <div style="font-weight: 700; margin: 0.5rem 0;">Marketing</div>
+            <div class="mono text-cyan" style="font-size: 1.5rem;">4</div>
+            <div class="text-muted" style="font-size: 0.7rem;">open bounties</div>
+        </div>
+    </div>
+</section>

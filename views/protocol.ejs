@@ -1,0 +1,123 @@
+<section class="page-header">
+    <div class="section-eyebrow">Documentation</div>
+    <h1>System Protocol</h1>
+    <p>The technical foundation behind Pulse's community health intelligence engine.</p>
+</section>
+
+<div class="dashboard-grid" style="margin-bottom: 3rem;">
+    <div class="stat-card">
+        <div class="stat-label">Data Sources</div>
+        <div class="stat-value text-cyan">6</div>
+        <div class="stat-delta">API endpoints</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Health Signals</div>
+        <div class="stat-value">6</div>
+        <div class="stat-delta">Weighted metrics</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Communities</div>
+        <div class="stat-value" id="protocol-communities">--</div>
+        <div class="stat-delta">Tracked</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Avg Health</div>
+        <div class="stat-value text-healthy" id="protocol-health">--</div>
+        <div class="stat-delta">Score</div>
+    </div>
+</div>
+
+<script>
+    fetch('/api/stats')
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success' && res.data) {
+                document.getElementById('protocol-communities').textContent = res.data.communitiesTracked || 0;
+                document.getElementById('protocol-health').textContent = res.data.avgHealthScore || 0;
+            }
+        });
+</script>
+
+<section style="margin-bottom: 3rem;">
+    <h3 style="margin-bottom: 1.5rem;">How It Works</h3>
+    <div class="steps-grid">
+        <div class="step-card">
+            <div class="step-number">01</div>
+            <h3 class="step-title">Data Collection</h3>
+            <p class="step-desc">Pulse connects directly to the Zero Authority API to fetch real-time contributor activity, bounty data, and reputation scores. No mock data. Ever.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">02</div>
+            <h3 class="step-title">Health Computation</h3>
+            <p class="step-desc">Six weighted signals combine into a 0-100 score: Activity Velocity (30%), Completion Rate (25%), Retention (20%), Reputation Growth (15%), Diversity (10%).</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">03</div>
+            <h3 class="step-title">AI Synthesis</h3>
+            <p class="step-desc">Llama 3.3 70B via Groq processes raw metrics into plain-language insights: burnout warnings, skill gaps, momentum signals.</p>
+        </div>
+    </div>
+</section>
+
+<section style="margin-bottom: 3rem;">
+    <h3 style="margin-bottom: 1.5rem;">API Endpoints</h3>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">&#9788;</div>
+            <h3 class="feature-title">Health Score</h3>
+            <p class="feature-desc">GET /bounties + GET /users</p>
+            <div class="feature-tag">ZA API</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#9733;</div>
+            <h3 class="feature-title">Bounty Feed</h3>
+            <p class="feature-desc">GET /bounties</p>
+            <div class="feature-tag">ZA API</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#9679;</div>
+            <h3 class="feature-title">Contributors</h3>
+            <p class="feature-desc">GET /users</p>
+            <div class="feature-tag">ZA API</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#9881;</div>
+            <h3 class="feature-title">Reputation</h3>
+            <p class="feature-desc">GET /users/{id}</p>
+            <div class="feature-tag">ZA API</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#10023;</div>
+            <h3 class="feature-title">Endorsements</h3>
+            <p class="feature-desc">GET /users/{id}/endorsements</p>
+            <div class="feature-tag">ZA API</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">&#9878;</div>
+            <h3 class="feature-title">Snapshots</h3>
+            <p class="feature-desc">Historical trend data</p>
+            <div class="feature-tag">MongoDB</div>
+        </div>
+    </div>
+</section>
+
+<section style="padding: 3rem; background: var(--bg-dark); border-radius: 8px;">
+    <h3 style="margin-bottom: 1.5rem; text-align: center;">Core Principles</h3>
+    <div class="protocol-grid">
+        <div class="protocol-card" style="border-left: 3px solid var(--status-critical);">
+            <div class="protocol-icon">&#9888;</div>
+            <h3 class="protocol-title">No Mock Data</h3>
+            <p class="protocol-desc">Only returns verified truth from live ZA API or MongoDB history.</p>
+        </div>
+        <div class="protocol-card" style="border-left: 3px solid var(--status-warning);">
+            <div class="protocol-icon">&#9888;</div>
+            <h3 class="protocol-title">No Fabrication</h3>
+            <p class="protocol-desc">Explicit error states when data is missing or APIs are down.</p>
+        </div>
+        <div class="protocol-card" style="border-left: 3px solid var(--status-healthy);">
+            <div class="protocol-icon">&#10003;</div>
+            <h3 class="protocol-title">Real-Time</h3>
+            <p class="protocol-desc">Health scores computed on-the-fly using live metrics.</p>
+        </div>
+    </div>
+</section>
