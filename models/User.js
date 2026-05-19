@@ -5,6 +5,8 @@ const userSchema = new mongoose.Schema({
     walletAddress: { type: String, required: true, unique: true },
     walletType: { type: String, enum: ['metamask', 'trustwallet', 'coinbase', 'brave', 'generic'], default: 'generic' },
     isWalletAuth: { type: Boolean, default: true },
+    // Custom username
+    username: { type: String, unique: true, sparse: true },
     // Profile - using wallet address as display name by default
     profile: {
         name: String,
@@ -20,7 +22,7 @@ const userSchema = new mongoose.Schema({
 
 // Auto-generate name from wallet address if not provided
 userSchema.pre('save', function(next) {
-    if (this.isWalletAuth && this.walletAddress && !this.profile.name) {
+    if (this.isWalletAuth && this.walletAddress && !this.profile.name && !this.username) {
         this.profile.name = `0x${this.walletAddress.substring(2, 10)}`;
     }
     next();

@@ -1,0 +1,91 @@
+<div class="container" style="padding-top: 4rem;">
+    <!-- HEADER -->
+    <section class="page-header" style="text-align: left; margin-bottom: 3rem;">
+        <div class="section-label">User Settings</div>
+        <h1 style="font-family: var(--font-display); font-size: 2.5rem; line-height: 1.1;">PROFILE<span class="text-cyan">.</span></h1>
+        <p class="text-soft" style="margin-top: 1rem;">Manage your account settings and display preferences.</p>
+    </section>
+
+    <div style="max-width: 600px;">
+        <!-- PROFILE FORM -->
+        <div class="glass-panel premium-card" style="padding: 2rem;">
+            <form method="POST" action="/profile">
+                <!-- Current Wallet Display -->
+                <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border);">
+                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem; letter-spacing: 1px;">CONNECTED_WALLET</div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="text-cyan mono" style="font-size: 0.9rem; word-break: break-all;">
+                            <%= user.walletAddress %>
+                        </div>
+                        <span class="feature-tag" style="background: rgba(0,255,136,0.1); color: var(--accent-green);">CONNECTED</span>
+                    </div>
+                </div>
+
+                <!-- Username -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label class="mono text-muted" style="font-size: 0.6rem; display: block; margin-bottom: 0.5rem; letter-spacing: 1px;">USERNAME</label>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        placeholder="Choose a username" 
+                        value="<%= user.username || '' %>"
+                        style="width: 100%; padding: 1rem; background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.9rem; border-radius: 4px; outline: none;"
+                    >
+                    <div class="mono text-muted" style="font-size: 0.6rem; margin-top: 0.5rem;">This will be your display name across the platform</div>
+                </div>
+
+                <!-- Display Name -->
+                <div style="margin-bottom: 2rem;">
+                    <label class="mono text-muted" style="font-size: 0.6rem; display: block; margin-bottom: 0.5rem; letter-spacing: 1px;">DISPLAY_NAME</label>
+                    <input 
+                        type="text" 
+                        name="profileName" 
+                        placeholder="Enter display name" 
+                        value="<%= user.profile && user.profile.name ? user.profile.name : '' %>"
+                        style="width: 100%; padding: 1rem; background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.9rem; border-radius: 4px; outline: none;"
+                    >
+                </div>
+
+                <!-- Error Message -->
+                <% if (error) { %>
+                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(255, 59, 59, 0.1); border: 1px solid rgba(255, 59, 59, 0.3); border-radius: 4px;">
+                        <span class="mono text-critical" style="font-size: 0.75rem;"><%= error %></span>
+                    </div>
+                <% } %>
+
+                <!-- Success Message -->
+                <% if (success) { %>
+                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 4px;">
+                        <span class="mono text-healthy" style="font-size: 0.75rem;"><%= success %></span>
+                    </div>
+                <% } %>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">SAVE_SETTINGS</button>
+            </form>
+        </div>
+
+        <!-- ACCOUNT INFO -->
+        <div class="glass-panel" style="padding: 1.5rem; margin-top: 1.5rem;">
+            <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 1rem; letter-spacing: 1px;">ACCOUNT_INFO</div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span class="text-muted" style="font-size: 0.8rem;">Member Since</span>
+                    <span class="text-soft mono" style="font-size: 0.8rem;"><%= new Date(user.createdAt).toLocaleDateString() %></span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span class="text-muted" style="font-size: 0.8rem;">Tracked DAOs</span>
+                    <span class="text-cyan mono" style="font-size: 0.8rem;"><%= user.followedDaos ? user.followedDaos.length : 0 %></span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span class="text-muted" style="font-size: 0.8rem;">Auth Type</span>
+                    <span class="text-soft mono" style="font-size: 0.8rem;"><%= user.isWalletAuth ? 'Wallet' : 'Email' %></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding-bottom: 4rem; opacity: 0.5; margin-top: 3rem;">
+        <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px;">PROFILE_SETTINGS_V1</div>
+    </div>
+</div>

@@ -270,3 +270,61 @@ exports.unfollowDao = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
+
+exports.getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        res.render('profile', { 
+            title: 'PULSE | Profile',
+            user,
+            error: null,
+            success: null
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+};
+
+exports.updateProfile = async (req, res) => {
+    const { username, profileName } = req.body;
+    try {
+        const user = await User.findById(req.user.id);
+        
+        // Check if username is already taken
+        if (username && username !== user.username) {
+            const existingUser = await User.findOne({ username });
+            if (existingUser) {
+                return res.render('profile', {
+                    title: 'PULSE | Profile',
+                    user,
+                    error: 'Username already taken',
+                    success: null
+                });
+            }
+            user.username = username.trim();
+        }
+        
+        // Update profile name
+        if (profileName) {
+            user.profile.name = profileName.trim();
+        }
+        
+        await user.save();
+        
+        res.render('profile', {
+            title: 'PULSE | Profile',
+            user,
+            error: null,
+            success: 'Profile updated successfully'
+        });
+    } catch (err) {
+        console.error(err);
+        res.render('profile', {
+            title: 'PULSE | Profile',
+            user: req.user,
+            error: 'Failed to update profile',
+            success: null
+        });
+    }
+};
