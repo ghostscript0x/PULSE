@@ -26,29 +26,30 @@ exports.getGlobalStats = async (req, res, next) => {
         // 3. Compute derived metrics
         const avgHealthScore = snapshots.length > 0 
             ? Math.round(snapshots.reduce((acc, s) => acc + (s.healthScore || 0), 0) / snapshots.length)
-            : 73.4; // Fallback to network baseline
+            : 0;
         
         res.json({
             status: 'success',
             data: {
-                communitiesTracked: networkVitals.totalOrganizations || 1247,
+                communitiesTracked: networkVitals.totalOrganizations || uniqueDAOs.length || 0,
                 avgHealthScore: avgHealthScore,
-                alertsFired: Math.floor(snapshots.length * 1.4), // Derived from local sync events
-                contributorsRising: networkVitals.totalUsers || 3891,
-                bountiesAutopsied: networkVitals.totalBounties || 28400
+                alertsFired: snapshots.length > 0 ? Math.floor(snapshots.length * 1.4) : 0,
+                contributorsRising: networkVitals.totalUsers || 0,
+                bountiesAutopsied: networkVitals.totalBounties || 0
             }
         });
     } catch (err) {
         console.error('[GLOBAL STATS ERROR]', err.message);
-        // Resilient fallbacks to maintain 'head-blowing' landing page scale
-        res.json({
-            status: 'success',
+        // Return explicit error state - NO FABRICATION per operational rules
+        res.status(503).json({
+            status: 'error',
+            message: 'NETWORK_UNAVAILABLE',
             data: {
-                communitiesTracked: 1247,
-                avgHealthScore: 73.4,
-                alertsFired: 142,
-                contributorsRising: 3891,
-                bountiesAutopsied: 28400
+                communitiesTracked: 0,
+                avgHealthScore: 0,
+                alertsFired: 0,
+                contributorsRising: 0,
+                bountiesAutopsied: 0
             }
         });
     }
@@ -82,10 +83,15 @@ exports.getHealth = async (req, res, next) => {
         const completedBounties = bounties.filter(b => b.bountyCompleted === true || b.status === 'Winner').length;
         const totalSubmissions = bounties.reduce((acc, b) => acc + (b.submissionsCount || 0), 0);
         
+        // Compute actual retention from contributor activity
+        const oneMonthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const activeContributors = contributors.filter(c => c.lastActive && new Date(c.lastActive) > oneMonthAgo).length;
+        const retention = contributors.length > 0 ? (activeContributors / contributors.length) * 100 : 0;
+
         const metrics = {
             velocity: Math.min(100, (totalBounties / 20) * 100), // Normalized to 20 per cycle
             completionRate: totalBounties > 0 ? (completedBounties / totalBounties) * 100 : 0,
-            retention: contributors.length > 0 ? 65 : 0, // Base line for active contributors
+            retention: Math.round(retention),
             reputationGrowth: contributors.reduce((acc, c) => acc + (c.reputationScore || 0), 0) / (contributors.length || 1),
             diversity: totalSubmissions > 0 ? Math.min(100, (totalSubmissions / totalBounties) * 10) : 0
         };

@@ -6,77 +6,63 @@
         <p class="text-soft" style="margin-top: 1rem;">Deep historical analysis and qualitative intelligence generated from live telemetry.</p>
     </section>
 
-    <!-- AI INSIGHTS -->
-    <div class="responsive-grid responsive-grid-3" style="margin-bottom: 4rem;">
-        <div class="feature-card" style="border-color: var(--status-warning);">
-            <div class="text-warning mono" style="font-size: 0.7rem; margin-bottom: 1rem;">[BURNOUT_WARNING]</div>
-            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Activity Spike</h3>
-            <p class="text-soft" style="font-size: 0.85rem;">High activity streaks detected. Monitor for burnout and consider mandatory rest periods.</p>
-        </div>
-        <div class="feature-card">
-            <div class="text-cyan mono" style="font-size: 0.7rem; margin-bottom: 1rem;">[SKILL_GAP_ALERT]</div>
-            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Demand vs Supply</h3>
-            <p class="text-soft" style="font-size: 0.85rem;">Cross-reference open bounties with skills to identify underrepresented categories.</p>
-        </div>
-        <div class="feature-card" style="border-color: var(--accent-green);">
-            <div class="text-healthy mono" style="font-size: 0.7rem; margin-bottom: 1rem;">[MOMENTUM_SIGNAL]</div>
-            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Contributor Growth</h3>
-            <p class="text-soft" style="font-size: 0.85rem;">Track reputation patterns to identify rising stars ready for core roles.</p>
-        </div>
+    <% 
+    // Check if user has any tracked DAOs - fetch stats from followed DAOs or show empty state
+    const hasTrackedDaos = followedDaos && followedDaos.length > 0;
+    %>
+
+    <% if (!hasTrackedDaos) { %>
+    <!-- EMPTY STATE - No DAOs tracked -->
+    <div class="glass-panel" style="padding: 4rem 2rem; text-align: center; margin-bottom: 4rem;">
+        <div class="text-warning mono" style="font-size: 0.7rem; margin-bottom: 1rem;">[NO_DAOS_TRACKED]</div>
+        <p class="text-soft" style="font-size: 0.9rem; margin-bottom: 2rem;">Track some DAOs to see real-time intelligence and insights.</p>
+        <a href="/command-center" class="btn btn-primary" style="display: inline-block;">INITIALIZE_TRACKING</a>
+    </div>
+    <% } else { %>
+    <!-- REAL DATA FROM TRACKED DAOs -->
+    <!-- Show tracked DAO selector -->
+    <div style="margin-bottom: 2rem;">
+        <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">SELECT_DAO:</div>
+        <select onchange="window.location.href='/intelligence/' + this.value" style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--accent-cyan); padding: 0.5rem 1rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.7rem; outline: none; cursor: pointer;">
+            <% followedDaos.forEach(dao => { %>
+                <option value="<%= dao.daoId %>"><%= dao.name %></option>
+            <% }) %>
+        </select>
     </div>
 
-    <!-- NETWORK STATS -->
+    <!-- AI INSIGHTS - Only available via API call per specific DAO -->
+    <div class="glass-panel" style="padding: 2rem; margin-bottom: 4rem;">
+        <div class="section-label" style="margin-bottom: 1.5rem;">AI Intelligence</div>
+        <p class="text-muted mono" style="font-size: 0.7rem;">
+            [INTEL_REQUIRES_SELECTION] Select a DAO above to generate AI-powered insights via Groq.
+        </p>
+    </div>
+    <% } %>
+
+    <!-- NETWORK STATS FROM LOCAL SNAPSHOTS (if any exist) -->
+    <% if (typeof snapshotCount !== 'undefined' && snapshotCount > 0) { %>
     <section class="glass-panel" style="margin-bottom: 4rem; padding: 2rem;">
-        <span class="section-label" style="margin-bottom: 2rem;">Network Pulse</span>
+        <span class="section-label" style="margin-bottom: 2rem;">Local Telemetry</span>
         <div class="responsive-grid responsive-grid-4">
             <div style="text-align: center;">
                 <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">SNAPSHOTS</div>
-                <div class="text-cyan mono" style="font-size: 1.5rem; font-weight: 700;">28.4K</div>
+                <div class="text-cyan mono" style="font-size: 1.5rem; font-weight: 700;"><%= snapshotCount %></div>
             </div>
             <div style="text-align: center;">
                 <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">NODES</div>
-                <div class="text-cyan mono" style="font-size: 1.5rem; font-weight: 700;">1,247</div>
+                <div class="text-cyan mono" style="font-size: 1.5rem; font-weight: 700;"><%= uniqueDaos || 0 %></div>
             </div>
             <div style="text-align: center;">
                 <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">AVG_HEALTH</div>
-                <div class="text-healthy mono" style="font-size: 1.5rem; font-weight: 700;">73.4</div>
+                <div class="text-healthy mono" style="font-size: 1.5rem; font-weight: 700;"><%= avgHealth || '—' %></div>
             </div>
             <div style="text-align: center;">
                 <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">STATUS</div>
-                <div class="text-white mono" style="font-size: 1.5rem; font-weight: 700;">LIVE</div>
+                <div class="text-cyan mono" style="font-size: 1.5rem; font-weight: 700;">READY</div>
             </div>
         </div>
     </section>
-
-    <!-- LOGS TERMINAL -->
-    <section class="glass-panel" style="padding: 0; overflow: hidden; margin-bottom: 4rem;">
-        <div class="table-wrapper">
-            <table style="min-width: 600px;">
-                <thead>
-                    <tr style="border-bottom: 1px solid var(--glass-border);">
-                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">EVENT_ID</th>
-                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TYPE</th>
-                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">SEVERITY</th>
-                        <th class="mono" style="padding: 1rem; text-align: left; font-size: 0.6rem; color: var(--text-muted);">TIMESTAMP</th>
-                    </tr>
-                </thead>
-                <tbody class="mono" style="font-size: 0.7rem;">
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                        <td style="padding: 1rem; color: var(--text-muted);">#INT-942</td>
-                        <td style="padding: 1rem; color: var(--accent-cyan);">BURNOUT_RISK</td>
-                        <td style="padding: 1rem;"><span class="text-warning">MEDIUM</span></td>
-                        <td style="padding: 1rem; color: var(--text-muted);">2026-05-16 14:02</td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                        <td style="padding: 1rem; color: var(--text-muted);">#INT-941</td>
-                        <td style="padding: 1rem; color: var(--accent-cyan);">SKILL_GAP</td>
-                        <td style="padding: 1rem;"><span class="text-white">LOW</span></td>
-                        <td style="padding: 1rem; color: var(--text-muted);">2026-05-16 11:45</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+    <% } %>
 
     <!-- FOOTER BADGE -->
     <div style="text-align: center; padding-bottom: 4rem; opacity: 0.5;">

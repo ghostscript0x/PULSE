@@ -19,22 +19,6 @@
     <!-- NOISE OVERLAY -->
     <div class="noise-overlay" aria-hidden="true"></div>
 
-    <!-- STATUS BAR -->
-    <div class="top-status-bar" role="status" aria-label="System status">
-        <div class="container-full">
-            <div class="status-content">
-                <div class="status-left">
-                    <span class="pulse-dot" aria-hidden="true"></span>
-                    <span class="mono">ALL SYSTEMS OPERATIONAL</span>
-                </div>
-                <div class="status-center mono" aria-hidden="true">
-                    ZA API: <span class="text-cyan">CONNECTED</span> | NODES: <span class="text-cyan">1,247</span>
-                </div>
-                <div class="status-right mono" id="typewriter-status" aria-live="polite"></div>
-            </div>
-        </div>
-    </div>
-
     <!-- STICKY NAV -->
     <header class="sticky-nav" role="navigation" aria-label="Main navigation">
         <div class="container">
@@ -70,12 +54,11 @@
                         <% } %>
                         <a href="/auth/logout" class="btn btn-sm btn-secondary desktop-only">Logout</a>
                     <% } else { %>
-                        <a href="/auth/login" class="nav-link desktop-only" style="margin-right: 1.5rem; text-decoration: none; color: white; font-size: 0.85rem;">Sign In</a>
                         <a href="/auth/register" class="btn btn-sm btn-primary desktop-only">Get Started</a>
                     <% } %>
 
                     <!-- MOBILE TOGGLE -->
-                    <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-menu">
+                    <button class="mobile-toggle mobile-only" id="mobile-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-menu">
                         <span></span>
                         <span></span>
                         <span></span>
@@ -95,6 +78,11 @@
         </div>
         <nav class="mobile-nav-links" aria-label="Mobile navigation">
             <% if (user) { %>
+                <% if (user.walletAddress) { %>
+                    <div class="mobile-wallet-display" style="padding: 0.75rem 1rem; background: var(--bg-card); border: 1px solid var(--accent-cyan); border-radius: var(--radius-md); margin: 0.5rem 1rem;">
+                        <span class="mono text-cyan" style="font-size: 0.7rem;"><%= user.walletAddress.substring(0, 6) %>...<%= user.walletAddress.substring(user.walletAddress.length - 4) %></span>
+                    </div>
+                <% } %>
                 <a href="/dashboard" class="mobile-nav-item">Dashboard</a>
                 <a href="/intelligence" class="mobile-nav-item">Intelligence</a>
                 <a href="/bounties" class="mobile-nav-item">Bounties</a>
@@ -103,7 +91,7 @@
                 <a href="/command-center" class="mobile-nav-item">Command Center</a>
                 <a href="/docs" class="mobile-nav-item">Docs</a>
                 <div class="nav-divider"></div>
-                <a href="/auth/logout" class="mobile-nav-item" style="color: var(--accent-critical);">Logout</a>
+                <a href="/auth/logout" class="mobile-nav-item" style="color: var(--accent-critical);">Disconnect</a>
             <% } else { %>
                 <a href="/" class="mobile-nav-item">Home</a>
                 <a href="/about" class="mobile-nav-item">Protocol</a>

@@ -8,9 +8,9 @@ function generateChallenge() {
     return crypto.randomBytes(32).toString('hex');
 }
 
-// Stacks authentication message template
-function createAuthMessage(address, challenge, domain) {
-    return `PULSE Authentication\n\nWallet: ${address}\nChallenge: ${challenge}\n\nSign this message to authenticate with PULSE.\n\nDomain: ${domain}`;
+// EVM wallet authentication message template
+function createAuthMessage(challenge, domain) {
+    return `PULSE Authentication\n\nChallenge: ${challenge}\n\nSign this message to authenticate with PULSE.\n\nDomain: ${domain}\nNonce: ${challenge}`;
 }
 
 exports.getLogin = (req, res) => res.render('login', { title: 'PULSE | Login' });
@@ -22,16 +22,19 @@ exports.walletAuthChallenge = async (req, res) => {
         const challenge = generateChallenge();
         const domain = req.get('origin') || `http://localhost:${process.env.PORT || 3000}`;
 
-        // Store challenge in session for verification later
+        // Store the full message in session for verification
+        const authMessage = createAuthMessage(challenge, domain);
+        
         req.session.walletChallenge = {
             challenge,
+            message: authMessage,
             createdAt: Date.now()
         };
 
         res.json({
             success: true,
             challenge,
-            message: 'PULSE Authentication\n\nSign this message to authenticate with PULSE.',
+            message: authMessage,
             domain
         });
     } catch (error) {
@@ -43,7 +46,7 @@ exports.walletAuthChallenge = async (req, res) => {
 // Verify wallet signature and authenticate
 exports.walletAuthVerify = async (req, res) => {
     try {
-        const { walletAddress, walletType, signature, publicKey } = req.body;
+        const { walletAddress, walletType, signature } = req.body;
 
         if (!walletAddress || !signature) {
             return res.status(400).json({
@@ -52,12 +55,12 @@ exports.walletAuthVerify = async (req, res) => {
             });
         }
 
-        // Validate Stacks address format (SP or SM prefix for mainnet, TP or TM for testnet)
-        const stacksAddressRegex = /^(SP|SM|TP|TM)[A-HJ-NP-Z0-9]{38}$/;
-        if (!stacksAddressRegex.test(walletAddress)) {
+        // Validate EVM address format (0x... followed by 40 hex chars)
+        const evmAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+        if (!evmAddressRegex.test(walletAddress)) {
             return res.status(400).json({
                 success: false,
-                error: 'INVALID_STACKS_ADDRESS_FORMAT'
+                error: 'INVALID_EVM_ADDRESS_FORMAT'
             });
         }
 
@@ -69,24 +72,40 @@ exports.walletAuthVerify = async (req, res) => {
             });
         }
 
-        const { challenge } = req.session.walletChallenge;
+        const { challenge, message: storedMessage } = req.session.walletChallenge;
 
-        // In production, you would verify the signature using Stacks.js
-        // For now, we trust the wallet has validated the signature
-        // and we create/update the user based on wallet address
+        // Use ethers.js to verify the signature against the stored message
+        const { ethers } = require('ethers');
+        
+        // Recover the address from the signature
+        let recoveredAddress;
+        try {
+            // Verify using the exact message that was signed
+            recoveredAddress = ethers.verifyMessage(storedMessage, signature);
+        } catch (verifyError) {
+            console.error('Signature verification error:', verifyError);
+            return res.status(400).json({
+                success: false,
+                error: 'SIGNATURE_VERIFICATION_FAILED'
+            });
+        }
+
+        // Verify the signature matches the claimed address
+        if (recoveredAddress.toLowerCase() !== walletAddress.toLowerCase()) {
+            return res.status(400).json({
+                success: false,
+                error: 'SIGNATURE_VERIFICATION_FAILED'
+            });
+        }
 
         // Find or create user by wallet address
-        let user = await User.findOne({ walletAddress: walletAddress.toUpperCase() });
+        let user = await User.findOne({ walletAddress: walletAddress.toLowerCase() });
 
         if (!user) {
-            // Create new user with wallet auth
+            // Create new user with wallet auth - walletAddress is primary identifier
             user = new User({
-                walletAddress: walletAddress.toUpperCase(),
-                walletType: walletType || 'generic',
-                isWalletAuth: true,
-                profile: {
-                    name: `User_${walletAddress.substring(0, 8)}`
-                }
+                walletAddress: walletAddress.toLowerCase(),
+                walletType: walletType || 'metamask'
             });
             await user.save();
         }
@@ -110,8 +129,8 @@ exports.walletAuthVerify = async (req, res) => {
                 redirect: '/command-center',
                 user: {
                     id: user.id,
-                    username: user.username,
                     walletAddress: user.walletAddress,
+                    profile: user.profile,
                     isWalletAuth: user.isWalletAuth
                 }
             });
@@ -128,25 +147,25 @@ exports.getSupportedWallets = (req, res) => {
         success: true,
         wallets: [
             {
-                id: 'hiro',
-                name: 'Hiro Wallet',
-                icon: '/assets/wallets/hiro.png',
+                id: 'metamask',
+                name: 'MetaMask',
+                icon: '/assets/wallets/metamask.png',
                 supported: true
             },
             {
-                id: 'leather',
-                name: 'Leather Wallet',
-                icon: '/assets/wallets/leather.png',
+                id: 'trustwallet',
+                name: 'Trust Wallet',
+                icon: '/assets/wallets/trustwallet.png',
                 supported: true
             },
             {
-                id: 'xverse',
-                name: 'Xverse Wallet',
-                icon: '/assets/wallets/xverse.png',
+                id: 'coinbase',
+                name: 'Coinbase Wallet',
+                icon: '/assets/wallets/coinbase.png',
                 supported: true
             }
         ],
-        message: 'Supported Stacks-compatible wallets'
+        message: 'Supported EVM-compatible wallets'
     });
 };
 

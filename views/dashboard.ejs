@@ -21,9 +21,17 @@
             <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">ECOSYSTEM_HEALTH</div>
             <div style="display: flex; align-items: baseline; gap: 0.5rem;">
                 <div class="text-healthy" style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display);"><%= stats.healthScore %></div>
-                <div class="text-healthy mono" style="font-size: 0.65rem;">↑ +2.1</div>
+                <% if (stats.healthScore >= 70) { %>
+                    <div class="text-healthy mono" style="font-size: 0.65rem;">↑ STABLE</div>
+                <% } else if (stats.healthScore >= 40) { %>
+                    <div class="text-warning mono" style="font-size: 0.65rem;">↓ CAUTION</div>
+                <% } else { %>
+                    <div class="text-critical mono" style="font-size: 0.65rem;">↓ CRITICAL</div>
+                <% } %>
             </div>
-            <div class="text-muted mono" style="font-size: 0.55rem; margin-top: 0.5rem;">VITALITY_INDEX_STABLE</div>
+            <div class="text-muted mono" style="font-size: 0.55rem; margin-top: 0.5rem;">
+                <%= stats.healthScore >= 70 ? 'VITALITY_INDEX_STABLE' : (stats.healthScore >= 40 ? 'VITALITY_INDEX_DEGRADED' : 'VITALITY_INDEX_CRITICAL') %>
+            </div>
         </div>
         
         <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-cyan); padding: 1.5rem;">
@@ -68,7 +76,9 @@
                         <div class="mono text-soft" style="font-size: 0.6rem; margin-top: 0.5rem; letter-spacing: 2px;">INDEX</div>
                     </div>
                 </div>
-                <div class="mono text-healthy" style="font-size: 0.65rem; margin-top: 2.5rem; letter-spacing: 3px;">STATUS_THRIVING</div>
+                <div class="mono <%= stats.healthScore >= 70 ? 'text-healthy' : (stats.healthScore >= 40 ? 'text-warning' : 'text-critical') %>" style="font-size: 0.65rem; margin-top: 2.5rem; letter-spacing: 3px;">
+                <%= stats.healthScore >= 70 ? 'STATUS_THRIVING' : (stats.healthScore >= 40 ? 'STATUS_DEGRADED' : 'STATUS_CRITICAL') %>
+            </div>
             </section>
 
             <a href="/intelligence" class="btn-glow" style="padding: 1.25rem; text-align: center; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 1px;">
@@ -83,47 +93,60 @@
                     <span class="section-label" style="margin: 0;">Ecosystem Synthesis</span>
                     <span class="mono text-cyan" style="font-size: 0.55rem; opacity: 0.6;">LLAMA_3.3_INFERENCE</span>
                 </div>
+                <% 
+                    const health = stats.healthScore || 0;
+                    const statusText = health >= 70 ? 'Optimal Performance' : (health >= 40 ? 'Moderate Activity' : 'Degraded State');
+                    const riskLevel = health >= 70 ? 'LOW_RISK' : (health >= 40 ? 'MODERATE_RISK' : 'HIGH_RISK');
+                %>
                 <p class="text-soft" style="font-size: 0.9rem; line-height: 1.8;">
-                    The network core is exhibiting <span class="text-white">High Momentum</span>. Contributor retention has stabilized at optimal levels while production velocity across the Stacks ecosystem has increased by 12% in this cycle.
+                    Network core is currently exhibiting <span class="text-white"><%= statusText %></span>. 
+                    <% if (stats.activeContributors) { %>
+                        Active contributor count: <%= stats.activeContributors %>.
+                    <% } else { %>
+                        Telemetry data pending synchronization.
+                    <% } %>
                 </p>
                 <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                    <span class="feature-tag" style="background: rgba(0,255,136,0.1); color: var(--accent-green);">NO_RISK_DETECTED</span>
-                    <span class="feature-tag" style="background: rgba(0,245,255,0.1); color: var(--accent-cyan);">GROWTH_OPTIMIZED</span>
+                    <span class="feature-tag" style="background: <%= riskLevel === 'LOW_RISK' ? 'rgba(0,255,136,0.1)' : (riskLevel === 'MODERATE_RISK' ? 'rgba(255,170,0,0.1)' : 'rgba(255,68,68,0.1)') %>; color: <%= riskLevel === 'LOW_RISK' ? 'var(--accent-green)' : (riskLevel === 'MODERATE_RISK' ? 'var(--status-warning)' : 'var(--accent-critical)') %>;"><%= riskLevel %></span>
+                    <% if (stats.completionRate >= 60) { %>
+                        <span class="feature-tag" style="background: rgba(0,245,255,0.1); color: var(--accent-cyan);">VELOCITY_NORMAL</span>
+                    <% } %>
                 </div>
             </section>
 
             <section class="glass-panel premium-card" style="padding: 0; overflow: hidden;">
                 <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01);">
-                    <span class="section-label" style="margin: 0;">Global Activity</span>
+                    <span class="section-label" style="margin: 0;">Recent Telemetry</span>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span class="pulse-dot" style="width: 4px; height: 4px;"></span>
-                        <span class="text-healthy mono" style="font-size: 0.55rem;">LIVE_FEED</span>
+                        <% if (recentActivity && recentActivity.length > 0) { %>
+                            <span class="pulse-dot" style="width: 4px; height: 4px;"></span>
+                            <span class="text-healthy mono" style="font-size: 0.55rem;">LIVE_FEED</span>
+                        <% } else { %>
+                            <span class="text-muted mono" style="font-size: 0.55rem;">PENDING</span>
+                        <% } %>
                     </div>
                 </div>
+                <% if (recentActivity && recentActivity.length > 0) { %>
                 <div class="table-wrapper">
                     <table style="min-width: 400px;">
                         <tbody class="mono" style="font-size: 0.7rem;">
+                            <% recentActivity.slice(0, 5).forEach(activity => { %>
                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                <td style="padding: 1rem; color: var(--text-muted);">[09:42:01]</td>
-                                <td style="padding: 1rem;">NETWORK_SYNC</td>
-                                <td style="padding: 1rem;" class="text-cyan">MAINNET_CORE</td>
-                                <td style="padding: 1rem;" class="text-healthy">VERIFIED</td>
+                                <td style="padding: 1rem; color: var(--text-muted);">[<%= new Date(activity.timestamp).toLocaleTimeString('en-US', {hour12: false}) %>]</td>
+                                <td style="padding: 1rem;">HEALTH_SYNC</td>
+                                <td style="padding: 1rem;" class="text-cyan"><%= activity.daoId.substring(0, 8) %>...</td>
+                                <td style="padding: 1rem;" class="text-healthy"><%= activity.healthScore %></td>
                             </tr>
-                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                <td style="padding: 1rem; color: var(--text-muted);">[09:41:45]</td>
-                                <td style="padding: 1rem;">BOUNTY_MINT</td>
-                                <td style="padding: 1rem;" class="text-cyan">DAO_NODE_73A</td>
-                                <td style="padding: 1rem;" class="text-healthy">BROADCAST</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 1rem; color: var(--text-muted);">[09:41:22]</td>
-                                <td style="padding: 1rem;">REPUTATION_UP</td>
-                                <td style="padding: 1rem;" class="text-cyan">CONTRIB_0x2...</td>
-                                <td style="padding: 1rem;" class="text-healthy">SIGNED</td>
-                            </tr>
+                            <% }) %>
                         </tbody>
                     </table>
                 </div>
+                <% } else { %>
+                <div style="padding: 3rem 1.5rem; text-align: center;">
+                    <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">[NO_TELEMETRY]</div>
+                    <p class="text-soft" style="font-size: 0.8rem;">No recent snapshots recorded. Initialize a DAO to start tracking.</p>
+                </div>
+                <% } %>
             </section>
         </div>
     </div>

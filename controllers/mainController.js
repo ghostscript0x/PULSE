@@ -20,6 +20,9 @@ exports.getDashboard = async (req, res) => {
         const stats = await apiService.getNetworkVitals();
         const user = await User.findById(req.user.id);
         
+        // Fetch recent activity (snapshots) for the activity feed
+        const recentActivity = await Snapshot.find().sort({ timestamp: -1 }).limit(10);
+        
         if (!stats) {
             throw new Error('NO_LIVE_STATS_RETURNED_FROM_API');
         }
@@ -27,7 +30,8 @@ exports.getDashboard = async (req, res) => {
         res.render('dashboard', { 
             title: 'PULSE | Ecosystem Dashboard',
             stats,
-            followedDaos: user.followedDaos || []
+            followedDaos: user.followedDaos || [],
+            recentActivity: recentActivity || []
         });
     } catch (err) {
         console.error(err);
@@ -164,6 +168,55 @@ exports.getBounties = async (req, res) => {
         res.render('bounties', { 
             title: 'PULSE | Bounty Lifecycle',
             bounties,
+            followedDaos,
+            activeDao: daoId
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+};
+
+exports.getBountyDetail = async (req, res) => {
+    try {
+        const bountyId = req.params.bountyId.replace(/[^a-zA-Z0-9_-]/g, '');
+        const user = await User.findById(req.user.id);
+        const followedDaos = user.followedDaos || [];
+
+        let bounty = null;
+        let daoId = null;
+
+        // Search through all followed DAOs for this bounty
+        for (const dao of followedDaos) {
+            const latest = await Snapshot.findOne({ daoId: dao.daoId }).sort({ timestamp: -1 });
+            if (latest && latest.rawLiveData && latest.rawLiveData.bounties) {
+                const found = latest.rawLiveData.bounties.find(b => b.id === bountyId || b.id === `bounty_${bountyId}`);
+                if (found) {
+                    bounty = found;
+                    daoId = dao.daoId;
+                    break;
+                }
+            }
+        }
+
+        if (!bounty) {
+            // Try fetching from API directly
+            const allBounties = [];
+            for (const dao of followedDaos) {
+                try {
+                    const apiBounties = await apiService.getBounties(dao.daoId);
+                    if (apiBounties && apiBounties.length > 0) {
+                        allBounties.push(...apiBounties);
+                    }
+                } catch (e) {}
+            }
+            bounty = allBounties.find(b => b.id === bountyId || b.id === `bounty_${bountyId}`);
+        }
+
+        res.render('bounty-detail', { 
+            title: 'PULSE | Bounty Details',
+            bounty,
+            bountyId,
             followedDaos,
             activeDao: daoId
         });

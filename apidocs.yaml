@@ -1,0 +1,3442 @@
+openapi: 3.0.3
+info:
+  title: Zero Authority Platform API
+  description: |
+    The Zero Authority Platform API provides endpoints for managing bounties, gigs, and users in a decentralized marketplace.
+    This API supports filtering, pagination, and caching for optimal performance.
+  version: 1.0.0
+  contact:
+    name: Zero Authority Team
+    url: https://zeroauthority.dao
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: /api
+    description: Current origin (same domain as this page – use for testnet or mainnet)
+  - url: https://zeroauthoritydao.com/api
+    description: Production (mainnet)
+  - url: http://localhost:3000/api
+    description: Local development
+
+tags:
+  - name: bounties
+    description: Bounty management operations
+  - name: gigs
+    description: Gig marketplace operations
+  - name: grants
+    description: Grant management and tracking operations
+  - name: users
+    description: User profile and management operations
+  - name: categories
+    description: Bounty categories
+  - name: organizations
+    description: Organization management
+  - name: services
+    description: Service offerings
+  - name: quests
+    description: Quest operations
+  - name: events
+    description: Event discovery, creation, editing, and RSVP operations
+  - name: stxgov
+    description: Stacks SIP listing, SIP detail, and CAB (Consideration Advisory Board) voting aggregates
+  - name: platform
+    description: Platform-wide aggregate statistics
+
+paths:
+  /sips:
+    get:
+      tags:
+        - stxgov
+      summary: List SIPs
+      operationId: get_sips
+      description: |
+        Returns SIPs merged from ratified data and the database, with optional filters.
+        Use the same SIP identifier forms as the platform (e.g. `sip-032`, idea keys).
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Paginated or list payload (implementation-defined)
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /sips/{id}:
+    get:
+      tags:
+        - stxgov
+      summary: Get SIP by id
+      operationId: get_sip_by_id
+      description: Single SIP record with effective CAB voting status when applicable.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: SIP key or id (e.g. sip-032, UUID, or normalized idea id)
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /sips/{id}/cab-votes:
+    get:
+      tags:
+        - stxgov
+      summary: CAB voting state for a SIP
+      operationId: get_sip_cab_votes
+      description: |
+        Aggregate yes/no/abstain counts per CAB voting instance, optional GitHub SIP fields,
+        and per-session currentUser fields when authenticated. Full roll-call is not included
+        in the default response.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: SIP key used when opening CAB voting (must match CabVotingInstance.sipKey)
+        - name: include
+          in: query
+          schema:
+            type: string
+            enum: [votes]
+          description: Set to `votes` with an authenticated CAB member (or manager) to include per-voter roll-call
+        - name: detail
+          in: query
+          schema:
+            type: string
+            enum: [full]
+          description: Alias for roll-call inclusion (same as include=votes)
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /sips/stats:
+    get:
+      tags:
+        - stxgov
+      summary: SIP and CAB aggregate stats
+      operationId: get_sip_stats
+      responses:
+        "200":
+          description: Counts for GitHub SIP rows, CAB groups, open/closed voting instances
+          content:
+            application/json:
+              schema:
+                type: object
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /stats:
+    get:
+      tags:
+        - platform
+      summary: Platform aggregate stats
+      operationId: get_platform_stats
+      description: Returns total counts across gigs, bounties, quests, events, DeGrants, tokens, SIP IDs, and TVE (total value exchanged in USD).
+      responses:
+        "200":
+          description: Aggregate platform counters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      gigs:
+                        type: integer
+                      bounties:
+                        type: integer
+                      quests:
+                        type: integer
+                      events:
+                        type: integer
+                      degrants:
+                        type: integer
+                      tokens:
+                        type: integer
+                      sipIds:
+                        type: integer
+                      tveUsd:
+                        type: number
+                        description: TVE (total value exchanged) in USD, computed from all token-priced bounty and milestone value ever transacted.
+                  meta:
+                    type: object
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /sips/{id}/cab-votes/open:
+    post:
+      tags:
+        - stxgov
+      summary: Open CAB voting for a SIP
+      operationId: post_sip_cab_votes_open
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cabGroupId]
+              properties:
+                cabGroupId:
+                  type: string
+                  format: uuid
+      responses:
+        "200":
+          description: Created voting instance
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /sips/{sipId}/cab/{cabGroupId}:
+    get:
+      tags:
+        - stxgov
+      summary: CAB voting for one group on a SIP
+      operationId: get_sip_cab_by_group
+      parameters:
+        - name: sipId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cabGroupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Filtered instances for this SIP and CAB group
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /sips/{sipId}/cab/{cabGroupId}/members:
+    get:
+      tags:
+        - stxgov
+      summary: CAB group members (SIP-scoped)
+      operationId: get_sip_cab_members
+      parameters:
+        - name: sipId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cabGroupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: fields
+          in: query
+          schema:
+            type: string
+            enum: [full]
+          description: Use `full` to include email when permitted
+      responses:
+        "200":
+          description: Member roster
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /sips/{sipId}/cab/{cabGroupId}/votes:
+    get:
+      tags:
+        - stxgov
+      summary: Roll-call for latest instance (this SIP + group)
+      operationId: get_sip_cab_votes_latest_rollcall
+      responses:
+        "200":
+          description: Vote list
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /sips/{sipId}/cab/{cabGroupId}/instances/{instanceId}/votes:
+    get:
+      tags:
+        - stxgov
+      summary: Roll-call for a specific voting instance
+      operationId: get_sip_cab_instance_votes
+      responses:
+        "200":
+          description: Vote list
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /cab-groups:
+    get:
+      tags:
+        - stxgov
+      summary: List CAB groups
+      operationId: get_cab_groups
+      responses:
+        "200":
+          description: Success
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags:
+        - stxgov
+      summary: Create CAB group
+      operationId: post_cab_groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        "200":
+          description: Created
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /cab-groups/{groupId}:
+    get:
+      tags:
+        - stxgov
+      summary: Get CAB group
+      operationId: get_cab_group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags:
+        - stxgov
+      summary: Update CAB group
+      operationId: patch_cab_group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Updated
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    delete:
+      tags:
+        - stxgov
+      summary: Delete CAB group
+      operationId: delete_cab_group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /cab-groups/{groupId}/voting-overview:
+    get:
+      tags:
+        - stxgov
+      summary: CAB voting overview for a group (open and closed sessions)
+      operationId: get_cab_group_voting_overview
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /cab-groups/{groupId}/members:
+    get:
+      tags:
+        - stxgov
+      summary: List members (admin API)
+      operationId: get_cab_group_members
+      responses:
+        "200":
+          description: Success
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags:
+        - stxgov
+      summary: Add CAB member
+      operationId: post_cab_group_members
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId]
+              properties:
+                userId:
+                  type: string
+                  format: uuid
+                role:
+                  type: string
+                  enum: [Admin, Member]
+                email:
+                  type: string
+      responses:
+        "200":
+          description: Created or updated
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /cab-groups/{groupId}/members/{userId}:
+    patch:
+      tags:
+        - stxgov
+      summary: Update member role
+      operationId: patch_cab_group_member
+      responses:
+        "200":
+          description: Updated
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    delete:
+      tags:
+        - stxgov
+      summary: Remove member
+      operationId: delete_cab_group_member
+      responses:
+        "200":
+          description: Removed
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /cab-voting-instances/{instanceId}/close:
+    post:
+      tags:
+        - stxgov
+      summary: Close CAB voting
+      operationId: post_cab_voting_instance_close
+      responses:
+        "200":
+          description: Closed with tallies
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /cab-voting-instances/{instanceId}/votes:
+    post:
+      tags:
+        - stxgov
+      summary: Cast or update CAB vote
+      operationId: post_cab_voting_instance_vote
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [choice]
+              properties:
+                choice:
+                  type: string
+                  enum: [Yes, No, Abstain]
+      responses:
+        "200":
+          description: Vote recorded
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /cab-voting-instances/{instanceId}/export:
+    get:
+      tags:
+        - stxgov
+      summary: Export CAB vote record
+      operationId: get_cab_voting_instance_export
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, markdown, csv]
+          description: Defaults to json with markdown+csv in payload; use markdown or csv for file download
+      responses:
+        "200":
+          description: JSON, markdown, or CSV body
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /bounties:
+    get:
+      tags:
+        - bounties
+      summary: List bounties
+      description: |
+        Retrieve a paginated list of bounties with optional filtering and sorting.
+        Supports filtering by status, type, category, organization, creator, winner, token, and more.
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of bounties per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search in bounty name and details
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filter by bounty status (comma-separated)
+          schema:
+            type: string
+            enum: [Open, Closed, Winner]
+        - name: type
+          in: query
+          description: Filter by bounty type (comma-separated)
+          schema:
+            type: string
+            enum: [SingleWinner, CommunityDriven, MultiWinner, Top3Bidder]
+        - name: category
+          in: query
+          description: Filter by category name
+          schema:
+            type: string
+        - name: organization
+          in: query
+          description: Filter by organization name
+          schema:
+            type: string
+        - name: creator
+          in: query
+          description: Filter by creator STX address
+          schema:
+            type: string
+        - name: winner
+          in: query
+          description: Filter by winner STX address
+          schema:
+            type: string
+        - name: token
+          in: query
+          description: Filter by token address, symbol, or name
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, startDate, endDate, name, totalPayment, status, type, submissionsCount]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: startDate
+          in: query
+          description: Filter bounties created after this date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: Filter bounties created before this date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: minValue
+          in: query
+          description: Minimum total payment value (in smallest token unit)
+          schema:
+            type: string
+        - name: maxValue
+          in: query
+          description: Maximum total payment value (in smallest token unit)
+          schema:
+            type: string
+        - name: hasSubmissions
+          in: query
+          description: Filter by submission presence
+          schema:
+            type: boolean
+        - name: isCompleted
+          in: query
+          description: Filter by completion status
+          schema:
+            type: boolean
+        - name: includeExpired
+          in: query
+          description: Include expired bounties
+          schema:
+            type: boolean
+            default: true
+        - name: stats
+          in: query
+          description: Return statistics instead of bounty list
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BountyListResponse'
+                  - $ref: '#/components/schemas/BountyStatsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /bounties/{id}:
+    get:
+      tags:
+        - bounties
+      summary: Get bounty by ID
+      description: Retrieve detailed information about a specific bounty
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Bounty ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BountyDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /bounties/categories:
+    get:
+      tags:
+        - categories
+      summary: List bounty categories
+      description: Retrieve all bounty categories with bounty counts
+      parameters:
+        - name: includeEmpty
+          in: query
+          description: Include categories with no bounties
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /bounties/organizations:
+    get:
+      tags:
+        - organizations
+      summary: List organizations
+      description: Retrieve organizations that have created bounties with statistics
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /gigs:
+    get:
+      tags:
+        - gigs
+      summary: List gigs
+      description: |
+        Retrieve a paginated list of gigs with optional filtering and sorting.
+        Gigs represent work agreements between clients and workers.
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of gigs per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search in gig title and description
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filter by gig status
+          schema:
+            type: string
+            enum: [requested, in-progress, in-review, completed, rejected, disputed, mixed]
+        - name: service
+          in: query
+          description: Filter by service name
+          schema:
+            type: string
+        - name: client
+          in: query
+          description: Filter by client STX address
+          schema:
+            type: string
+        - name: worker
+          in: query
+          description: Filter by worker STX address
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, startDate, endDate, title, service]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: startDate
+          in: query
+          description: Filter gigs created after this date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: Filter gigs created before this date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: minValue
+          in: query
+          description: Minimum total value (in smallest token unit)
+          schema:
+            type: string
+        - name: maxValue
+          in: query
+          description: Maximum total value (in smallest token unit)
+          schema:
+            type: string
+        - name: tokenAddress
+          in: query
+          description: Filter by token address
+          schema:
+            type: string
+        - name: includeDisputed
+          in: query
+          description: Include disputed gigs
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GigListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /gigs/{id}:
+    get:
+      tags:
+        - gigs
+      summary: Get gig by ID
+      description: Retrieve detailed information about a specific gig
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Gig ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GigDetailResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /gigs/stats:
+    get:
+      tags:
+        - gigs
+      summary: Get gig statistics
+      description: Retrieve platform-wide gig statistics
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GigStatsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /quest/all:
+    get:
+      tags:
+        - quests
+      summary: List all quests
+      description: |
+        Retrieve a paginated list of quests (only those with a mined create transaction).
+        Supports filtering by search, status, and sorting.
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of quests per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search in title, description, and organization name
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filter by status
+          schema:
+            type: string
+            enum: [all, active, completed, expired]
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [newest, oldest, most-participants, highest-reward, ending-soon]
+            default: newest
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /quests:
+    get:
+      tags:
+        - quests
+      summary: List quests (Next.js API)
+      description: |
+        Retrieve a paginated list of quests using the Next.js `/api/quests` route.
+        This endpoint returns the same Quest objects used in the app, including extended creator
+        fields and submissions metadata.
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of quests per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search in title, description, and organization name
+          schema:
+            type: string
+        - name: tab
+          in: query
+          description: Tab filter (expiring-soon, expired, etc.)
+          schema:
+            type: string
+            enum: [all, expiring-soon, expired, my-quests, in-progress, completed, canceled]
+        - name: status
+          in: query
+          description: Filter by computed quest status
+          schema:
+            type: string
+            enum: [all, active, completed, expired, draft]
+        - name: category
+          in: query
+          description: Category filter (currently applied client-side)
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [newest, oldest, most-participants, highest-reward, ending-soon, most-progress]
+            default: newest
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /quest/{id}:
+    get:
+      tags:
+        - quests
+      summary: Get quest by ID or slug
+      description: Retrieve a single quest by database UUID or by slug (questId)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Quest UUID or slug (questId)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /quest/stats:
+    get:
+      tags:
+        - quests
+      summary: Get quest statistics
+      description: Retrieve platform-wide quest statistics
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestStatsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /users:
+    get:
+      tags:
+        - users
+      summary: List users
+      description: |
+        Retrieve a paginated list of users with optional filtering and sorting.
+        Supports filtering by profile completeness, activity, and other criteria.
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of users per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search in username, bio, and social profiles
+          schema:
+            type: string
+        - name: hasUsername
+          in: query
+          description: Filter by username presence
+          schema:
+            type: boolean
+        - name: hasAvatar
+          in: query
+          description: Filter by avatar presence
+          schema:
+            type: boolean
+        - name: hasTwitter
+          in: query
+          description: Filter by Twitter profile presence
+          schema:
+            type: boolean
+        - name: hasDiscord
+          in: query
+          description: Filter by Discord profile presence
+          schema:
+            type: boolean
+        - name: hasWebsite
+          in: query
+          description: Filter by website presence
+          schema:
+            type: boolean
+        - name: hasGithub
+          in: query
+          description: Filter by GitHub profile presence
+          schema:
+            type: boolean
+        - name: hasLinkedin
+          in: query
+          description: Filter by LinkedIn profile presence
+          schema:
+            type: boolean
+        - name: hasBio
+          in: query
+          description: Filter by bio presence
+          schema:
+            type: boolean
+        - name: hasPortfolio
+          in: query
+          description: Filter by portfolio presence
+          schema:
+            type: boolean
+        - name: hasServices
+          in: query
+          description: Filter by service offerings
+          schema:
+            type: boolean
+        - name: hasCreatedBounties
+          in: query
+          description: Filter by bounty creation activity
+          schema:
+            type: boolean
+        - name: hasWonBounties
+          in: query
+          description: Filter by bounty winning activity
+          schema:
+            type: boolean
+        - name: hasCreatedGigs
+          in: query
+          description: Filter by gig creation activity
+          schema:
+            type: boolean
+        - name: hasTakenGigs
+          in: query
+          description: Filter by gig participation activity
+          schema:
+            type: boolean
+        - name: hasEndorsements
+          in: query
+          description: Filter by endorsement presence
+          schema:
+            type: boolean
+        - name: isOrganizationAdmin
+          in: query
+          description: Filter by organization admin status
+          schema:
+            type: boolean
+        - name: services
+          in: query
+          description: Filter by specific services (comma-separated)
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          description: Filter by organization membership
+          schema:
+            type: string
+            format: uuid
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, username, bountyCount, winnerCount, gigCount, endorsementCount]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: createdAfter
+          in: query
+          description: Filter users created after this date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: createdBefore
+          in: query
+          description: Filter users created before this date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+        - name: includeStats
+          in: query
+          description: Include user statistics in response
+          schema:
+            type: boolean
+            default: false
+        - name: includeRecentActivity
+          in: query
+          description: Include recent activity in response
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/{stxAddress}:
+    get:
+      tags:
+        - users
+      summary: Get user by STX address
+      description: Retrieve detailed information about a specific user
+      parameters:
+        - name: stxAddress
+          in: path
+          required: true
+          description: User's STX address
+          schema:
+            type: string
+        - name: includeStats
+          in: query
+          description: Include user statistics
+          schema:
+            type: boolean
+            default: false
+        - name: includeActivity
+          in: query
+          description: Include recent activity
+          schema:
+            type: boolean
+            default: false
+        - name: includeEndorsements
+          in: query
+          description: Include endorsements
+          schema:
+            type: boolean
+            default: false
+        - name: includePortfolio
+          in: query
+          description: Include portfolio items
+          schema:
+            type: boolean
+            default: false
+        - name: includeServices
+          in: query
+          description: Include service offerings
+          schema:
+            type: boolean
+            default: false
+        - name: includeOrganizations
+          in: query
+          description: Include organization memberships
+          schema:
+            type: boolean
+            default: false
+        - name: includeSettings
+          in: query
+          description: Include user settings (for authenticated user only)
+          schema:
+            type: boolean
+            default: false
+        - name: activityLimit
+          in: query
+          description: Limit number of activity items
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+        - name: endorsementLimit
+          in: query
+          description: Limit number of endorsements
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+        - name: portfolioLimit
+          in: query
+          description: Limit number of portfolio items
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/search:
+    get:
+      tags:
+        - users
+      summary: Search users
+      description: Advanced user search with flexible criteria
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Search type
+          schema:
+            type: string
+            enum: [username, address, skill, service]
+            default: username
+        - name: limit
+          in: query
+          description: Maximum number of results
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /users/stats:
+    get:
+      tags:
+        - users
+      summary: Get user statistics
+      description: Retrieve platform-wide user statistics
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /services:
+    get:
+      tags:
+        - services
+      summary: List services
+      description: Retrieve all available services
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /grants:
+    get:
+      tags:
+        - grants
+      summary: List grants
+      description: |
+        Retrieve a paginated list of grants with optional filtering and sorting.
+        Supports filtering by category, status, grantee, steward, cohort, and amount range.
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of grants per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search in project name, description, and team lead
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Filter by grant category
+          schema:
+            type: string
+            enum: [DeGrants, BlueSky, Community, SocialFi]
+        - name: subcategory
+          in: query
+          description: Filter by grant subcategory (DeGrants only)
+          schema:
+            type: string
+            enum: [Infrastructure, DeFi, NFTs, Community, Education, DeveloperTools, Governance, Analytics, LiveEvents, Creator]
+        - name: status
+          in: query
+          description: Filter by grant status
+          schema:
+            type: string
+            enum: [InProgress, Completed]
+        - name: grantee
+          in: query
+          description: Filter by grantee STX address
+          schema:
+            type: string
+        - name: steward
+          in: query
+          description: Filter by steward STX address
+          schema:
+            type: string
+        - name: cohortNumber
+          in: query
+          description: Filter by cohort number (DeGrants only)
+          schema:
+            type: integer
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, projectName, requestedAmount, awardedAmount, submittedDate, awardedDate, status]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: minAmount
+          in: query
+          description: Minimum awarded amount
+          schema:
+            type: number
+        - name: maxAmount
+          in: query
+          description: Maximum awarded amount
+          schema:
+            type: number
+        - name: includeStats
+          in: query
+          description: Return statistics instead of grant list
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GrantListResponse'
+                  - $ref: '#/components/schemas/GrantStatsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /grants/Survey:
+    get:
+      tags:
+        - grants
+      summary: DeGrants 360° Survey – questions and report
+      description: |
+        **Get question sets (no auth):**
+        - No query params → returns all question sets by respondent type.
+        - `respondentType=Grantee|Steward|FoundationEndowment|ProgramFeedback` → returns the question set for that type.
+        **Get summary report (auth, DeGrants admin):**
+        - `report=1` → returns 360° summary report. Optional `cohortNumber`, `includeRawResponses=1`.
+      parameters:
+        - name: respondentType
+          in: query
+          description: Respondent type to get questions for
+          schema:
+            type: string
+            enum: [Grantee, Steward, FoundationEndowment, ProgramFeedback]
+        - name: report
+          in: query
+          description: If "1", return summary report (requires auth, DeGrants admin)
+          schema:
+            type: string
+            enum: ["1"]
+        - name: cohortNumber
+          in: query
+          description: Filter report by cohort (optional, when report=1)
+          schema:
+            type: integer
+        - name: includeRawResponses
+          in: query
+          description: If "1", include raw responses in report (optional, when report=1)
+          schema:
+            type: string
+            enum: ["1"]
+      responses:
+        '200':
+          description: Question set(s) or report
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    description: Either question sets, a single { respondentType, questions }, or the summary report
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /grants/{id}:
+    get:
+      tags:
+        - grants
+      summary: Get grant by ID
+      description: Retrieve detailed information about a specific grant including milestones, grantee, steward, and payment tracking
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Grant ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrantDetailResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /events:
+    get:
+      tags:
+        - events
+      summary: List events
+      operationId: get_events
+      description: |
+        Retrieve events with tab, type, sort and search filters.
+        Tabs `my-events` and `attending` require authentication.
+      parameters:
+        - name: tab
+          in: query
+          description: Event tab filter
+          schema:
+            type: string
+            enum: [upcoming, my-events, attending, past]
+            default: upcoming
+        - name: type
+          in: query
+          description: Event type filter
+          schema:
+            type: string
+            enum: [all, virtual, irl]
+            default: all
+        - name: sortBy
+          in: query
+          description: Sorting option
+          schema:
+            type: string
+            enum: [newest, oldest, most-attending, soonest]
+            default: newest
+        - name: search
+          in: query
+          description: Search in title and description
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - events
+      summary: Create event
+      operationId: create_event
+      description: |
+        Create a new event. Accepts multipart form-data to support cover image
+        and badge image uploads.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventUpsertFormData'
+      responses:
+        '201':
+          description: Event created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventCreatedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /events/{id}:
+    get:
+      tags:
+        - events
+      summary: Get event by ID
+      operationId: get_event_by_id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event id (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - events
+      summary: Update event
+      operationId: update_event
+      description: |
+        Update editable fields for an event owned by the authenticated creator.
+        Past events cannot be edited.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event id (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventUpsertFormData'
+      responses:
+        '200':
+          description: Event updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /events/{id}/rsvp:
+    post:
+      tags:
+        - events
+      summary: RSVP (or stake) to event
+      operationId: rsvp_event
+      description: |
+        RSVP to an event. For token-stake events, backend records `STAKED`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event id (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRsvpRequest'
+      responses:
+        '201':
+          description: RSVP successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Already RSVPed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - events
+      summary: Cancel RSVP
+      operationId: cancel_event_rsvp
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Event id (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCancelRsvpRequest'
+      responses:
+        '200':
+          description: RSVP cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    # Base Types
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        stxAddress:
+          type: string
+        username:
+          type: string
+          nullable: true
+        avatarUrl:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        twitter:
+          type: string
+          nullable: true
+        discord:
+          type: string
+          nullable: true
+        telegram:
+          type: string
+          nullable: true
+        isXProfileVerified:
+          type: boolean
+          description: User has connected X (Twitter) via OAuth
+        isDiscordProfileVerified:
+          type: boolean
+          description: User has connected Discord via OAuth
+        isTelegramProfileVerified:
+          type: boolean
+          description: User has connected Telegram via OAuth
+        website:
+          type: string
+          nullable: true
+        githubUrl:
+          type: string
+          nullable: true
+        linkedin:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserProfile:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            profileCompleteness:
+              type: integer
+              minimum: 0
+              maximum: 100
+            activityScore:
+              type: integer
+              minimum: 0
+
+    Token:
+      type: object
+      properties:
+        address:
+          type: string
+        identifier:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+        decimals:
+          type: integer
+        imageURI:
+          type: string
+          nullable: true
+        type:
+          type: string
+          enum: [Fungible, NonFungible, SemiFungible]
+
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        bio:
+          type: string
+          nullable: true
+        logo:
+          type: string
+          nullable: true
+        website:
+          type: string
+          nullable: true
+        twitter:
+          type: string
+          nullable: true
+        telegram:
+          type: string
+          nullable: true
+        instagram:
+          type: string
+          nullable: true
+        adminStxAddress:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Service:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # Grant Types
+    GrantMilestone:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        milestoneNumber:
+          type: integer
+          minimum: 1
+          maximum: 4
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        amount:
+          type: number
+          description: Payment amount for this milestone
+        isCompleted:
+          type: boolean
+        completedDate:
+          type: string
+          format: date-time
+          nullable: true
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        transactionUrl:
+          type: string
+          nullable: true
+          description: STX transaction URL for proof of payment
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Grant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectName:
+          type: string
+        projectDescription:
+          type: string
+          nullable: true
+        teamLead:
+          type: string
+        category:
+          type: string
+          enum: [DeGrants, BlueSky, Community, SocialFi]
+        subcategory:
+          type: string
+          nullable: true
+          enum: [Infrastructure, DeFi, NFTs, Community, Education, DeveloperTools, Governance, Analytics, LiveEvents, Creator]
+        cohortNumber:
+          type: integer
+          nullable: true
+          description: Cohort number for DeGrants
+        status:
+          type: string
+          enum: [InProgress, Completed]
+        requestedAmount:
+          type: number
+          description: Amount originally requested
+        awardedAmount:
+          type: number
+          nullable: true
+          description: Total amount awarded
+        grantee:
+          $ref: '#/components/schemas/User'
+        steward:
+          allOf:
+            - $ref: '#/components/schemas/User'
+            - nullable: true
+        submittedDate:
+          type: string
+          format: date-time
+        awardedDate:
+          type: string
+          format: date-time
+          nullable: true
+        githubUrl:
+          type: string
+          nullable: true
+          description: GitHub repository URL for the project
+        network:
+          type: string
+          enum: [Stacks, Ethereum, Base]
+        milestones:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrantMilestone'
+        projectUpdates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectUpdate'
+        completedMilestones:
+          type: integer
+          description: Number of completed milestones
+        totalMilestones:
+          type: integer
+          description: Total number of milestones
+        completionPercentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Percentage of milestones completed
+        totalMilestoneAmount:
+          type: number
+          description: Sum of all milestone amounts
+        paidAmount:
+          type: number
+          description: Total amount paid out through completed milestones
+        remainingAmount:
+          type: number
+          description: Amount remaining to be paid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    GrantDetail:
+      allOf:
+        - $ref: '#/components/schemas/Grant'
+        - type: object
+          properties:
+            nextMilestone:
+              type: object
+              nullable: true
+              properties:
+                milestoneNumber:
+                  type: integer
+                name:
+                  type: string
+                amount:
+                  type: number
+                dueDate:
+                  type: string
+                  format: date-time
+                  nullable: true
+                daysUntilDue:
+                  type: integer
+                  nullable: true
+            milestoneHistory:
+              type: array
+              items:
+                type: object
+                properties:
+                  milestoneNumber:
+                    type: integer
+                  name:
+                    type: string
+                  amount:
+                    type: number
+                  completedDate:
+                    type: string
+                    format: date-time
+                  transactionUrl:
+                    type: string
+                    nullable: true
+            progressByMilestone:
+              type: array
+              items:
+                type: object
+                properties:
+                  milestoneNumber:
+                    type: integer
+                  name:
+                    type: string
+                  amount:
+                    type: number
+                  isCompleted:
+                    type: boolean
+                  completedDate:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  dueDate:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  daysUntilDue:
+                    type: integer
+                    nullable: true
+                  isOverdue:
+                    type: boolean
+
+    ProjectUpdateType:
+      type: string
+      enum: [ProgressUpdate, ImpactUpdate, LearningUpdate, RiskBlockerUpdate, NextStepsUpdate]
+
+    ImpactType:
+      type: string
+      enum: [Users, TVL, Downloads, DAU, MAU, Transactions, Volume, Visits, Engagement, Learning]
+
+    ProjectUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        grantId:
+          type: string
+          format: uuid
+        grant:
+          $ref: '#/components/schemas/Grant'
+        submittedById:
+          type: string
+          format: uuid
+        submittedBy:
+          $ref: '#/components/schemas/User'
+        updateType:
+          $ref: '#/components/schemas/ProjectUpdateType'
+        impactType:
+          $ref: '#/components/schemas/ImpactType'
+          nullable: true
+        description:
+          type: string
+
+    # Bounty Types
+    BountySubmission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        submitterAddress:
+          type: string
+        summary:
+          type: string
+          nullable: true
+        submissionUrl:
+          type: string
+          nullable: true
+        submitter:
+          $ref: '#/components/schemas/User'
+
+    Bounty:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        details:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [Open, Closed, Winner]
+        type:
+          type: string
+          enum: [SingleWinner, CommunityDriven, MultiWinner, Top3Bidder]
+        bountyCompleted:
+          type: boolean
+        startDate:
+          type: string
+          format: date-time
+          nullable: true
+        endDate:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        txId:
+          type: string
+          nullable: true
+        winnerTxId:
+          type: string
+          nullable: true
+        finalReview:
+          type: string
+          nullable: true
+        totalPayment:
+          type: number
+          description: Payment amount in token units (after decimal conversion)
+        creator:
+          $ref: '#/components/schemas/User'
+        winners:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        token:
+          $ref: '#/components/schemas/Token'
+        category:
+          $ref: '#/components/schemas/Category'
+        submissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BountySubmission'
+        submissionsCount:
+          type: integer
+        winnersCount:
+          type: integer
+        isExpired:
+          type: boolean
+        hasActiveSubmissions:
+          type: boolean
+        daysRemaining:
+          type: integer
+          nullable: true
+
+    BountyDetail:
+      allOf:
+        - $ref: '#/components/schemas/Bounty'
+        - type: object
+          properties:
+            submissionsByUser:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BountySubmission'
+            transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+
+    # Gig Types
+    Milestone:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        scope:
+          type: string
+        status:
+          type: string
+          enum: [Requested, Rejected, InProgress, UnderReview, Completed, Disputed]
+        totalPayment:
+          type: string
+          description: Payment amount in smallest token unit
+        rating:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 5
+        token:
+          $ref: '#/components/schemas/Token'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Gig:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        client:
+          $ref: '#/components/schemas/User'
+        worker:
+          $ref: '#/components/schemas/User'
+        service:
+          $ref: '#/components/schemas/Service'
+        milestones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Milestone'
+        totalValue:
+          type: number
+          description: Total value across all milestones
+        status:
+          type: string
+          enum: [requested, in-progress, in-review, completed, rejected, disputed, mixed, unknown]
+        averageRating:
+          type: number
+          nullable: true
+          minimum: 1
+          maximum: 5
+        milestonesCount:
+          type: integer
+        commentsCount:
+          type: integer
+
+    GigDetail:
+      allOf:
+        - $ref: '#/components/schemas/Gig'
+        - type: object
+          properties:
+            completionPercentage:
+              type: number
+              minimum: 0
+              maximum: 100
+            hasDisputes:
+              type: boolean
+            hasActiveDisputes:
+              type: boolean
+            completedMilestonesCount:
+              type: integer
+            comments:
+              type: array
+              items:
+                $ref: '#/components/schemas/Comment'
+            transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+
+    # Additional Types
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/User'
+        milestoneId:
+          type: string
+          format: uuid
+          nullable: true
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        txId:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, MINED, FAILED]
+        type:
+          type: string
+          enum: [UNKNOWN, CREATE_BOUNTY, SUBMIT_ENTRY, SELECT_WINNER, CREATE_GIG, ACCEPT_GIG, REJECT_GIG, CREATE_MILESTONE, ACCEPT_MILESTONE, REJECT_MILESTONE, COMPLETE_MILESTONE, CANCEL_MILESTONE, MILESTONE_PAST_PERIOD_DISPUTE, MILESTONE_CLIENT_RATED, WORKER_REJECTED_CLIENT_RATING, WORKER_ACCEPTED_CLIENT_RATING, DAO_SETTLE_DISPUTE]
+        sender:
+          $ref: '#/components/schemas/User'
+
+    UserStats:
+      type: object
+      properties:
+        createdBounties:
+          type: integer
+        wonBounties:
+          type: integer
+        createdGigs:
+          type: integer
+        takenGigs:
+          type: integer
+        receivedEndorsements:
+          type: integer
+        sentEndorsements:
+          type: integer
+        bountySubmissions:
+          type: integer
+        reactions:
+          type: integer
+        batchEndorsements:
+          type: integer
+        comments:
+          type: integer
+        portfolio:
+          type: integer
+
+    PortfolioItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectTitle:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+          nullable: true
+        websiteUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserSettings:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+        isEmailVerified:
+          type: boolean
+        isNotificationsEnabled:
+          type: boolean
+        isNewsletterEnabled:
+          type: boolean
+
+    # Response Types
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+        hasNext:
+          type: boolean
+        hasPrev:
+          type: boolean
+
+    BountyListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bounty'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+        filters:
+          type: object
+        sort:
+          type: object
+          properties:
+            sortBy:
+              type: string
+            sortOrder:
+              type: string
+
+    BountyStatsResponse:
+      type: object
+      properties:
+        totalBounties:
+          type: integer
+        openBounties:
+          type: integer
+        completedBounties:
+          type: integer
+        totalPayouts:
+          type: string
+          description: Total payouts in smallest unit
+        activeOrganizations:
+          type: integer
+        totalSubmissions:
+          type: integer
+        completionRate:
+          type: number
+          description: Completion rate as percentage
+
+    CategoryListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Category'
+              - type: object
+                properties:
+                  bountiesCount:
+                    type: integer
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+            includeEmpty:
+              type: boolean
+
+    OrganizationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Organization'
+              - type: object
+                properties:
+                  admin:
+                    $ref: '#/components/schemas/User'
+                  totalBounties:
+                    type: integer
+                  completedBounties:
+                    type: integer
+                  openBounties:
+                    type: integer
+                  totalPayout:
+                    type: number
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+
+    GigListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Gig'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+        filters:
+          type: object
+        sort:
+          type: object
+          properties:
+            sortBy:
+              type: string
+            sortOrder:
+              type: string
+
+    GigDetailResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GigDetail'
+        meta:
+          type: object
+          properties:
+            cached:
+              type: boolean
+            lastUpdated:
+              type: string
+              format: date-time
+
+    GigStatsResponse:
+      type: object
+      properties:
+        totalGigs:
+          type: integer
+        activeGigs:
+          type: integer
+        completedGigs:
+          type: integer
+        disputedGigs:
+          type: integer
+        totalValue:
+          type: string
+        averageRating:
+          type: number
+
+    Quest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+          description: Quest slug (questId)
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [draft, published, not-published, active, completed, expired]
+        endDate:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        imageUrl:
+          type: string
+          nullable: true
+        creator:
+          $ref: '#/components/schemas/QuestCreator'
+        campaign:
+          $ref: '#/components/schemas/QuestCampaign'
+        participants:
+          type: integer
+          description: Number of participants
+        totalRep:
+          type: number
+          description: Total REP from activities
+        nftReward:
+          type: boolean
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestActivity'
+        completedActivities:
+          type: integer
+          nullable: true
+          description: For authenticated user, number of completed activities
+        submissions:
+          type: array
+          description: Content submissions associated with this quest
+          items:
+            $ref: '#/components/schemas/QuestSubmission'
+
+    QuestCreator:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+        address:
+          type: string
+        stxAddress:
+          type: string
+          description: Same as address (STX address)
+        bio:
+          type: string
+          nullable: true
+        twitter:
+          type: string
+          nullable: true
+        discord:
+          type: string
+          nullable: true
+        telegram:
+          type: string
+          nullable: true
+        isXProfileVerified:
+          type: boolean
+        isDiscordProfileVerified:
+          type: boolean
+        isTelegramProfileVerified:
+          type: boolean
+        website:
+          type: string
+          nullable: true
+        githubUrl:
+          type: string
+          nullable: true
+        linkedin:
+          type: string
+          nullable: true
+        instagram:
+          type: string
+          nullable: true
+        nostrPubKey:
+          type: string
+          nullable: true
+        consoleDao:
+          type: string
+          nullable: true
+        sigle:
+          type: string
+          nullable: true
+        schedule:
+          type: string
+          nullable: true
+        newsLetterUrl:
+          type: string
+          nullable: true
+        youtubeUrl:
+          type: string
+          nullable: true
+        btcAddress:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    QuestCampaign:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+
+    QuestActivity:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        repLevel:
+          type: string
+          enum: [Low REP, Medium REP, High REP]
+        repAmount:
+          type: number
+        icon:
+          type: string
+        isRequired:
+          type: boolean
+        ctaButtonLabel:
+          type: string
+          nullable: true
+        config:
+          type: object
+          nullable: true
+
+    QuestSubmission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        submitterAddress:
+          type: string
+        summary:
+          type: string
+          nullable: true
+        submissionUrl:
+          type: string
+        submitter:
+          $ref: '#/components/schemas/QuestCreator'
+
+    QuestListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Quest'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    QuestDetailResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Quest'
+
+    QuestStatsResponse:
+      type: object
+      properties:
+        totalQuests:
+          type: integer
+        activeQuests:
+          type: integer
+        completedQuests:
+          type: integer
+        expiredQuests:
+          type: integer
+        totalParticipants:
+          type: integer
+
+    UserListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/UserProfile'
+              - type: object
+                properties:
+                  services:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Service'
+                  organizations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Organization'
+                  portfolio:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PortfolioItem'
+                  _count:
+                    $ref: '#/components/schemas/UserStats'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+        filters:
+          type: object
+        sort:
+          type: object
+          properties:
+            sortBy:
+              type: string
+            sortOrder:
+              type: string
+
+    UserDetailResponse:
+      type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/UserProfile'
+            - type: object
+              properties:
+                services:
+                  type: array
+                  items:
+                    allOf:
+                      - $ref: '#/components/schemas/Service'
+                      - type: object
+                        properties:
+                          _count:
+                            type: object
+                            properties:
+                              users:
+                                type: integer
+                              gigs:
+                                type: integer
+                organizations:
+                  type: array
+                  items:
+                    allOf:
+                      - $ref: '#/components/schemas/Organization'
+                      - type: object
+                        properties:
+                          _count:
+                            type: object
+                            properties:
+                              bounties:
+                                type: integer
+                portfolio:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PortfolioItem'
+                settings:
+                  $ref: '#/components/schemas/UserSettings'
+                _count:
+                  $ref: '#/components/schemas/UserStats'
+                recentActivity:
+                  type: object
+                  properties:
+                    createdBounties:
+                      type: array
+                      items:
+                        type: object
+                    wonBounties:
+                      type: array
+                      items:
+                        type: object
+                    createdGigs:
+                      type: array
+                      items:
+                        type: object
+                    receivedEndorsements:
+                      type: array
+                      items:
+                        type: object
+        meta:
+          type: object
+          properties:
+            cached:
+              type: boolean
+            lastUpdated:
+              type: string
+              format: date-time
+
+    UserSearchResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        meta:
+          type: object
+          properties:
+            query:
+              type: string
+            type:
+              type: string
+            limit:
+              type: integer
+            total:
+              type: integer
+
+    UserStatsResponse:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        activeUsers:
+          type: integer
+        usersWithProfiles:
+          type: integer
+        usersWithServices:
+          type: integer
+        organizationAdmins:
+          type: integer
+        averageProfileCompleteness:
+          type: number
+
+    ServiceListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Service'
+              - type: object
+                properties:
+                  userCount:
+                    type: integer
+                  gigCount:
+                    type: integer
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+
+    GrantListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Grant'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+        filters:
+          type: object
+          properties:
+            search:
+              type: string
+            category:
+              type: string
+            subcategory:
+              type: string
+            status:
+              type: string
+            grantee:
+              type: string
+            steward:
+              type: string
+            cohortNumber:
+              type: integer
+            minAmount:
+              type: number
+            maxAmount:
+              type: number
+        sort:
+          type: object
+          properties:
+            sortBy:
+              type: string
+            sortOrder:
+              type: string
+
+    GrantDetailResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GrantDetail'
+        meta:
+          type: object
+          properties:
+            grantId:
+              type: string
+              format: uuid
+            cacheTimestamp:
+              type: string
+              format: date-time
+
+    GrantStatsResponse:
+      type: object
+      properties:
+        stats:
+          type: object
+          properties:
+            totalGrants:
+              type: integer
+            inProgressGrants:
+              type: integer
+            completedGrants:
+              type: integer
+            totalRequested:
+              type: string
+              description: Total amount requested across all grants
+            totalAwarded:
+              type: string
+              description: Total amount awarded across all grants
+            totalMilestones:
+              type: integer
+            completedMilestones:
+              type: integer
+            milestoneCompletionRate:
+              type: integer
+              description: Percentage of milestones completed
+            grantsByCategory:
+              type: array
+              items:
+                type: object
+                properties:
+                  category:
+                    type: string
+                  count:
+                    type: integer
+                  totalAwarded:
+                    type: string
+            grantsByCohort:
+              type: array
+              items:
+                type: object
+                properties:
+                  cohortNumber:
+                    type: integer
+                  count:
+                    type: integer
+                  totalAwarded:
+                    type: string
+        meta:
+          type: object
+          properties:
+            cacheTimestamp:
+              type: string
+              format: date-time
+
+    EventLocation:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        state:
+          type: string
+          nullable: true
+        zip:
+          type: string
+          nullable: true
+        mapsUrl:
+          type: string
+          nullable: true
+
+    EventHost:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+
+    EventReputationBadge:
+      type: object
+      nullable: true
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+          nullable: true
+        contractAddress:
+          type: string
+          nullable: true
+        contractTxId:
+          type: string
+          nullable: true
+        isOnchain:
+          type: boolean
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        fullDescription:
+          type: string
+          nullable: true
+        date:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+          nullable: true
+        location:
+          $ref: '#/components/schemas/EventLocation'
+        isVirtual:
+          type: boolean
+        meetingLink:
+          type: string
+          nullable: true
+        imageUrl:
+          type: string
+          nullable: true
+        badgeImageUrl:
+          type: string
+          nullable: true
+        tokensToRsvp:
+          type: number
+        attendeeCount:
+          type: integer
+        host:
+          $ref: '#/components/schemas/EventHost'
+        status:
+          type: string
+          enum: [upcoming, in-progress, completed, cancelled]
+        tokensStaked:
+          type: number
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        reputationBadge:
+          $ref: '#/components/schemas/EventReputationBadge'
+        viewerRsvped:
+          type: boolean
+        viewerAuthenticated:
+          type: boolean
+        viewerAttendanceStatus:
+          type: string
+          enum: [PENDING, ATTENDED, NO_SHOW]
+          nullable: true
+        viewerIsCreator:
+          type: boolean
+        hasMintedBadge:
+          type: boolean
+
+    EventListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+
+    EventDetailResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Event'
+
+    EventCreatedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+
+    EventRsvpRequest:
+      type: object
+      properties:
+        network:
+          type: string
+          enum: [Stacks, Base]
+          default: Stacks
+        txId:
+          type: string
+          description: On-chain tx id for stake flows (optional)
+
+    EventCancelRsvpRequest:
+      type: object
+      properties:
+        network:
+          type: string
+          enum: [Stacks, Base]
+          default: Stacks
+
+    EventUpsertFormData:
+      type: object
+      required:
+        - eventName
+        - description
+        - campaignId
+        - eventType
+        - date
+        - startTime
+        - endTime
+      properties:
+        eventId:
+          type: string
+          format: uuid
+          description: Required for update, optional for create
+        eventName:
+          type: string
+        description:
+          type: string
+        campaignId:
+          type: string
+          format: uuid
+        eventType:
+          type: string
+          enum: [virtual, irl]
+        venueName:
+          type: string
+        streetAddress:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        meetingLink:
+          type: string
+        timezone:
+          type: string
+        date:
+          type: string
+          format: date-time
+        startTime:
+          type: string
+          example: "10:00 AM"
+        endTime:
+          type: string
+          example: "12:30 PM"
+        entryRequirement:
+          type: string
+          enum: [free, token-stake]
+        tokenAmount:
+          type: string
+        tokenAddress:
+          type: string
+        badgeName:
+          type: string
+        badgeDescription:
+          type: string
+        nftRewardEnabled:
+          type: string
+          enum: ["true", "false"]
+        coverImage:
+          type: string
+          format: binary
+        coverImageUrl:
+          type: string
+        badgeImage:
+          type: string
+          format: binary
+        badgeImageUrl:
+          type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+    # Error Types
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized (e.g. login required)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Forbidden (e.g. admin required)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authenticated requests
+
+# Apply authentication to all endpoints that might need it
+security:
+  - bearerAuth: []
+  - {} # Allow unauthenticated access as well

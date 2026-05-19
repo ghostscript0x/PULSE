@@ -50,7 +50,7 @@ const syncDaoData = async (daoId) => {
             const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
             return lastActive && lastActive > monthAgo;
         }).length;
-        const retentionVal = contributors.length > 0 ? (activeCount / contributors.length) * 100 : 0;
+        const retentionVal = contributors.length > 0 ? Math.round((activeCount / contributors.length) * 100) : 0;
 
         const metrics = {
             velocity: Math.min(100, (totalBounties / 50) * 100), // Normalized to 50 for higher sensitivity

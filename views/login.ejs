@@ -3,7 +3,7 @@
     <div style="width: 100%; max-width: 420px; position: relative; z-index: 1;">
         <section class="glass-panel premium-card card-accent-top" style="padding: 2rem 1.5rem;" data-aos="fade-in-up">
             <div class="section-label" style="text-align: center; margin-bottom: 1.5rem;">Authentication</div>
-            <h2 style="font-family: var(--font-display); font-size: clamp(1.5rem, 5vw, 2rem); text-align: center; margin-bottom: 2rem; line-height: 1.1;">INITIALIZE SESSION<span class="text-gradient">.</span></h2>
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.5rem, 5vw, 2rem); text-align: center; margin-bottom: 2rem; line-height: 1.1;">CONNECT WALLET<span class="text-gradient">.</span></h2>
 
             <% if(error != '') { %>
                 <div class="alert-error" style="margin-bottom: 1.5rem;" role="alert">
@@ -12,107 +12,72 @@
             <% } %>
 
             <!-- Wallet Connection -->
-            <div id="wallet-connect-section" style="margin-bottom: 1.5rem;">
-                <button type="button" id="connect-wallet-btn" class="btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/>
-                        <circle cx="12" cy="12" r="4" fill="currentColor"/>
+            <div id="wallet-connect-section">
+                <button type="button" id="connect-wallet-btn" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="currentColor"/>
                     </svg>
-                    CONNECT_STACKS_WALLET
+                    CONNECT WALLET
                 </button>
-                <div id="wallet-status" style="margin-top: 0.75rem; text-align: center; display: none;">
-                    <div class="text-muted mono" style="font-size: 0.7rem;"></div>
+                <div id="wallet-status" style="margin-top: 1rem; text-align: center; display: none;">
+                    <div class="text-muted mono" style="font-size: 0.75rem;"></div>
                 </div>
             </div>
-
-            <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0;">
-                <div style="flex: 1; height: 1px; background: var(--glass-border);"></div>
-                <span class="mono text-muted" style="font-size: 0.65rem;">OR</span>
-                <div style="flex: 1; height: 1px; background: var(--glass-border);"></div>
-            </div>
-
-            <form action="/auth/login" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;" novalidate>
-                <div class="form-group">
-                    <label for="username" class="form-label">USERNAME</label>
-                    <input type="text" id="username" name="username" class="form-input" placeholder="Enter your username" autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label for="password" class="form-label">ACCESS_KEY</label>
-                    <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" autocomplete="current-password">
-                </div>
-                <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">AUTHENTICATE_NODE</button>
-            </form>
 
             <div style="margin-top: 2rem; text-align: center;">
-                <a href="/auth/register" class="btn-link" style="font-size: 0.875rem;">CREATE_NEW_ACCESS_NODE →</a>
+                <a href="/auth/register" class="btn-link" style="font-size: 0.875rem;">NEW? CONNECT WALLET TO REGISTER →</a>
             </div>
         </section>
     </div>
 </div>
 
+<!-- Ethers.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.0/ethers.umd.min.js"></script>
+
 <script>
-    // Stacks Wallet Authentication
     (function() {
         const connectBtn = document.getElementById('connect-wallet-btn');
         const walletStatus = document.getElementById('wallet-status');
 
-        // Detect available Stacks wallets
-        function getStacksProvider() {
-            // Check for Hiro Wallet (window.HiroWallet)
-            if (window.HiroWallet && typeof window.HiroWallet === 'object') {
-                return { type: 'hiro', provider: window.HiroWallet };
-            }
-            // Check for Leather Wallet (window.leather)
-            if (window.leather && typeof window.leather === 'object') {
-                return { type: 'leather', provider: window.leather };
-            }
-            // Check for Xverse Wallet (window.xverse)
-            if (window.xverse && typeof window.xverse === 'object') {
-                return { type: 'xverse', provider: window.xverse };
+        function getEthereumProvider() {
+            if (window.ethereum) {
+                return window.ethereum;
             }
             return null;
         }
 
-        // Sign message with wallet
-        async function signMessage(providerObj, message, walletType) {
-            const provider = providerObj;
-
-            // All Stacks wallets support signMessage
-            if (provider.signMessage) {
-                return await provider.signMessage(message);
-            }
-            throw new Error('Wallet does not support message signing');
-        }
-
-        // Get address from wallet
-        async function getWalletAddress(providerObj, walletType) {
-            const provider = providerObj;
-
-            try {
-                if (provider.getAddresses) {
-                    const addresses = await provider.getAddresses();
-                    return addresses.stx;
-                }
-            } catch (e) {
-                console.error('Error getting wallet address:', e);
-            }
-            return null;
+        function detectWalletType(provider) {
+            const ua = navigator.userAgent || '';
+            if (ua.includes('MetaMask')) return 'metamask';
+            if (ua.includes('Trust') || provider.isTrust) return 'trustwallet';
+            if (ua.includes('Coinbase') || provider.isCoinbaseWallet) return 'coinbase';
+            if (ua.includes('Brave') || provider.isBraveWallet) return 'brave';
+            return 'generic';
         }
 
         connectBtn.addEventListener('click', async function() {
-            const providerObj = getStacksProvider();
+            const provider = getEthereumProvider();
 
-            if (!providerObj) {
+            if (!provider) {
                 walletStatus.style.display = 'block';
-                walletStatus.querySelector('div').innerHTML = '<span class="text-critical">[ERROR] No Stacks wallet detected. Please install Hiro, Leather, or Xverse wallet.</span>';
+                walletStatus.querySelector('div').innerHTML = '<span class="text-critical">[ERROR] No wallet detected. Please install MetaMask, Trust Wallet, or another EVM wallet.</span>';
                 return;
             }
 
             try {
                 connectBtn.disabled = true;
-                connectBtn.innerHTML = '<span class="loading-spinner" style="width: 16px; height: 16px; border: 2px solid var(--text-muted); border-top-color: var(--accent-cyan); border-radius: 50%;"></span> CONNECTING...';
+                connectBtn.innerHTML = '<span class="loading-spinner" style="width: 20px; height: 20px; border: 2px solid var(--text-muted); border-top-color: var(--accent-cyan); border-radius: 50%;"></span> CONNECTING...';
 
-                // Get authentication challenge from server
+                const ethersProvider = new ethers.BrowserProvider(provider);
+                await provider.request({ method: 'eth_requestAccounts' });
+                const signer = await ethersProvider.getSigner();
+                const walletAddress = await signer.getAddress();
+
+                const evmAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+                if (!evmAddressRegex.test(walletAddress)) {
+                    throw new Error('Invalid wallet address format');
+                }
+
                 const challengeRes = await fetch('/auth/wallet/challenge');
                 const challengeData = await challengeRes.json();
 
@@ -121,30 +86,13 @@
                 }
 
                 const { challenge, message, domain } = challengeData;
-                const { provider, type: walletType } = providerObj;
+                const signature = await signer.signMessage(message);
+                const walletType = detectWalletType(provider);
 
-                // Request wallet signature
-                const signatureResult = await signMessage(provider, message, walletType);
-
-                // Get address from provider
-                let walletAddress = await getWalletAddress(provider, walletType);
-
-                if (!walletAddress) {
-                    throw new Error('Could not get wallet address');
-                }
-
-                // Verify signature with server
                 const verifyRes = await fetch('/auth/wallet/verify', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        walletAddress,
-                        walletType,
-                        signature: signatureResult.signature || signatureResult,
-                        publicKey: signatureResult.publicKey || null
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ walletAddress, walletType, signature })
                 });
 
                 const verifyData = await verifyRes.json();
@@ -152,7 +100,6 @@
                 if (verifyData.success) {
                     walletStatus.style.display = 'block';
                     walletStatus.querySelector('div').innerHTML = '<span class="text-healthy">[SUCCESS] Wallet authenticated! Redirecting...</span>';
-                    // Redirect to command center
                     window.location.href = verifyData.redirect || '/command-center';
                 } else {
                     throw new Error(verifyData.error || 'Verification failed');
@@ -163,7 +110,7 @@
                 walletStatus.style.display = 'block';
                 walletStatus.querySelector('div').innerHTML = '<span class="text-critical">[ERROR] ' + (error.message || 'Connection failed') + '</span>';
                 connectBtn.disabled = false;
-                connectBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg> CONNECT_STACKS_WALLET';
+                connectBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="currentColor"/></svg> CONNECT WALLET';
             }
         });
     })();

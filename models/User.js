@@ -1,13 +1,11 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    username: { type: String, unique: true, sparse: true },
-    password: { type: String },
-    // Stacks Wallet Authentication
-    walletAddress: { type: String, unique: true, sparse: true },
-    walletType: { type: String, enum: ['hiro', 'leather', 'xverse', 'generic'], default: 'generic' },
-    isWalletAuth: { type: Boolean, default: false },
-    // Profile from wallet
+    // Wallet address is the primary identifier
+    walletAddress: { type: String, required: true, unique: true },
+    walletType: { type: String, enum: ['metamask', 'trustwallet', 'coinbase', 'brave', 'generic'], default: 'generic' },
+    isWalletAuth: { type: Boolean, default: true },
+    // Profile - using wallet address as display name by default
     profile: {
         name: String,
         avatar: String
@@ -20,15 +18,10 @@ const userSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-// Ensure either username/password or walletAddress is present
+// Auto-generate name from wallet address if not provided
 userSchema.pre('save', function(next) {
-    if (!this.username && !this.walletAddress) {
-        const err = new Error('Either username or wallet address is required');
-        return next(err);
-    }
-    if (this.username && !this.password && !this.isWalletAuth) {
-        const err = new Error('Password is required for username authentication');
-        return next(err);
+    if (this.isWalletAuth && this.walletAddress && !this.profile.name) {
+        this.profile.name = `0x${this.walletAddress.substring(2, 10)}`;
     }
     next();
 });

@@ -40,10 +40,23 @@
             </div>
             <div class="vital-delta text-healthy mono">VERIFIED_TRUTH</div>
         </div>
+        <% 
+            // Compute real average reward from actual data
+            const rewards = bounties.filter(b => b.reward).map(b => b.reward);
+            const avgReward = rewards.length > 0 
+                ? Math.round(rewards.reduce((a, b) => a + b, 0) / rewards.length) 
+                : null;
+        %>
         <div class="vital-panel" style="background: var(--bg-card); border: 1px solid var(--glass-border); padding: 1.5rem;" data-aos="fade-up" data-aos-delay="400">
             <div class="vital-label">Avg Reward</div>
-            <div class="vital-value">450 <span style="font-size: 0.8rem; color: var(--text-muted);">USDC</span></div>
-            <div class="vital-delta text-muted mono">NET_VALUE</div>
+            <div class="vital-value">
+                <% if (avgReward !== null) { %>
+                    <%= avgReward %> <span style="font-size: 0.8rem; color: var(--text-muted);">USDC</span>
+                <% } else { %>
+                    <span class="text-warning">N/A</span>
+                <% } %>
+            </div>
+            <div class="vital-delta text-muted mono"><%= rewards.length %> SAMPLED</div>
         </div>
     </div>
 
@@ -78,9 +91,9 @@
                                     statusColor = 'var(--accent-green)'; statusLabel = 'COMPLETED';
                                 }
                             %>
-                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.02); cursor: pointer;" onclick="window.location.href='/bounty/<%= b.id %>'">
                                 <td style="padding: 1rem;">
-                                    <div class="text-white" style="font-weight: 700; margin-bottom: 0.2rem;"><%= b.name %></div>
+                                    <a href="/bounty/<%= b.id %>" class="text-white" style="font-weight: 700; margin-bottom: 0.2rem; display: block; text-decoration: none;"><%= b.name %></a>
                                     <div class="text-muted" style="font-size: 0.55rem;"><%= b.id.substring(0,12) %>...</div>
                                 </td>
                                 <td>
@@ -88,7 +101,7 @@
                                         <%= statusLabel.toUpperCase() %>
                                     </span>
                                 </td>
-                                <td class="text-cyan" style="font-weight: 700;"><%= b.reward || '350' %> USDC</td>
+                                <td class="text-cyan" style="font-weight: 700;"><%= b.reward ? b.reward + ' USDC' : '—' %></td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 0.75rem;">
                                         <div style="width: 60px; height: 2px; background: rgba(255,255,255,0.05);">
@@ -105,14 +118,23 @@
         <% } %>
     </section>
 
-    <!-- CATEGORIES -->
+    <!-- CATEGORIES (derived from actual bounty data or explicit empty state) -->
+    <% 
+        // Derive categories from actual bounty data if category/type field exists
+        // Otherwise show explicit empty state per operational rules
+        const categoryMap = {};
+        bounties.forEach(b => {
+            const cat = b.category || b.type || 'Uncategorized';
+            categoryMap[cat] = (categoryMap[cat] || 0) + 1;
+        });
+        const cats = Object.entries(categoryMap).map(([name, count]) => ({
+            name: name,
+            icon: '◆',
+            count: count
+        }));
+    %>
+    <% if (cats.length > 0) { %>
     <div class="responsive-grid responsive-grid-2" style="margin-bottom: 4rem;">
-        <% const cats = [
-            { name: 'Development', icon: '◈', count: 12 },
-            { name: 'Design', icon: '◇', count: 5 },
-            { name: 'Docs', icon: '▣', count: 3 },
-            { name: 'Marketing', icon: '◎', count: 4 }
-        ] %>
         <% cats.forEach(cat => { %>
             <div class="feature-card" style="text-align: center; padding: 2rem;">
                 <div style="font-size: 1.5rem; color: var(--accent-cyan); margin-bottom: 1rem;"><%= cat.icon %></div>
@@ -121,4 +143,10 @@
             </div>
         <% }) %>
     </div>
+    <% } else { %>
+    <div style="text-align: center; padding: 2rem; margin-bottom: 4rem; opacity: 0.5;">
+        <div class="text-muted mono" style="font-size: 0.7rem;">[CATEGORIES_UNAVAILABLE]</div>
+        <p class="text-soft" style="font-size: 0.8rem; margin-top: 0.5rem;">No category data available from API</p>
+    </div>
+    <% } %>
 </div>

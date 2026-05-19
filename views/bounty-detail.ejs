@@ -1,0 +1,204 @@
+<div class="container" style="padding-top: 4rem;">
+    <!-- BACK LINK -->
+    <a href="/bounties/<%= activeDao %>" class="btn-link" style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; font-size: 0.8rem;">
+        ← RETURN_TO_REGISTRY
+    </a>
+
+    <% if (!bounty) { %>
+        <div class="glass-panel" style="padding: 3rem; text-align: center;">
+            <div class="text-warning mono" style="font-size: 0.8rem; margin-bottom: 1rem;">[BOUNTY_NOT_FOUND]</div>
+            <p class="text-soft">The requested bounty could not be found in the registry.</p>
+            <a href="/bounties/<%= activeDao %>" class="btn btn-secondary" style="margin-top: 1.5rem;">RETURN_TO_REGISTRY</a>
+        </div>
+    <% } else { %>
+        <!-- HEADER -->
+        <div style="margin-bottom: 3rem;">
+            <div class="section-label" data-aos="fade-right">Bounty Details</div>
+            <h1 style="font-family: var(--font-display); font-size: 2.5rem; line-height: 1.1; margin-top: 0.5rem;">
+                <%= bounty.name || bounty.title || 'Untitled Bounty' %><span class="text-cyan">.</span>
+            </h1>
+            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                <span style="color: var(--accent-cyan); border: 1px solid var(--accent-cyan); padding: 0.3rem 0.75rem; border-radius: 4px; font-size: 0.7rem; font-family: var(--font-mono);">
+                    <%= (bounty.status || 'OPEN').toUpperCase() %>
+                </span>
+                <span class="mono text-muted" style="font-size: 0.7rem;">
+                    <%= bounty.id ? bounty.id.substring(0, 12) + '...' : bountyId.substring(0, 12) + '...' %>
+                </span>
+                <span class="mono text-soft" style="font-size: 0.7rem;">ID: <%= bounty.id || bountyId %></span>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT GRID -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+            <!-- LEFT COLUMN -->
+            <div>
+                <!-- REWARD CARD -->
+                <div class="glass-panel" style="margin-bottom: 1.5rem; border-left: 3px solid var(--accent-cyan);">
+                    <div class="section-label" style="margin-bottom: 1rem;">Total Reward Pool</div>
+                    <% if (bounty.reward || bounty.rewardAmount) { %>
+                    <div style="font-family: var(--font-display); font-size: 2.5rem; color: var(--accent-cyan); margin-bottom: 0.5rem;">
+                        <%= bounty.reward || bounty.rewardAmount %> <span style="font-size: 1rem; color: var(--text-muted);">STX</span>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.8rem;">
+                        <%= bounty.usdValue || bounty.rewardUSD || 'N/A' %> USD
+                    </div>
+                    <% if (bounty.winners && bounty.winners > 1) { %>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+                            <span class="mono text-soft" style="font-size: 0.7rem;">Multiple Winners (<%= bounty.winners %>)</span>
+                        </div>
+                    <% } %>
+                    <% } else { %>
+                    <div style="font-family: var(--font-display); font-size: 2rem; color: var(--text-warning); margin-bottom: 0.5rem;">
+                        — <span style="font-size: 1rem; color: var(--text-muted);">STX</span>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.8rem;">
+                        Reward data unavailable
+                    </div>
+                    <% } %>
+                </div>
+
+                <!-- DESCRIPTION / SCOPE OF WORK -->
+                <div class="glass-panel" style="margin-bottom: 1.5rem;">
+                    <div class="section-label" style="margin-bottom: 1.5rem;">Scope of Work</div>
+                    <% if (bounty.description) { %>
+                        <div style="white-space: pre-wrap; line-height: 1.7; color: var(--text-soft);"><%= bounty.description %></div>
+                    <% } else if (bounty.details) { %>
+                        <div style="white-space: pre-wrap; line-height: 1.7; color: var(--text-soft);"><%= bounty.details %></div>
+                    <% } else if (bounty.content) { %>
+                        <div style="white-space: pre-wrap; line-height: 1.7; color: var(--text-soft);"><%= bounty.content %></div>
+                    <% } else { %>
+                        <div style="white-space: pre-wrap; line-height: 1.7; color: var(--text-muted);">
+                            [SCOPE_UNAVAILABLE]
+                        </div>
+                    <% } %>
+
+                    <!-- REQUIREMENTS -->
+                    <% if (bounty.requirements && bounty.requirements.length > 0) { %>
+                        <div style="margin-top: 2rem;">
+                            <div class="section-label" style="margin-bottom: 1rem;">Requirements</div>
+                            <ul style="list-style: none; padding: 0;">
+                                <% bounty.requirements.forEach(req => { %>
+                                    <li style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                        <span style="color: var(--accent-cyan);">▸</span>
+                                        <span class="text-soft"><%= req %></span>
+                                    </li>
+                                <% }) %>
+                            </ul>
+                        </div>
+                    <% } %>
+
+                    <!-- HOW TO SUBMIT -->
+                    <% if (bounty.submissionLink || bounty.submissionUrl) { %>
+                        <div style="margin-top: 2rem;">
+                            <a href="<%= bounty.submissionLink || bounty.submissionUrl %>" target="_blank" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                ADD SUBMISSION →
+                            </a>
+                        </div>
+                    <% } else { %>
+                        <div style="margin-top: 2rem;">
+                            <button class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                ADD SUBMISSION →
+                            </button>
+                        </div>
+                    <% } %>
+                </div>
+
+                <!-- ENGAGEMENT CRITERIA -->
+                <div class="glass-panel">
+                    <div class="section-label" style="margin-bottom: 1rem;">Engagement Criteria</div>
+                    <% if (bounty.likesWeight || bounty.repostsWeight || bounty.commentsWeight) { %>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                            <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">LIKES</div>
+                            <div class="text-cyan" style="font-size: 1.25rem; font-weight: 700;"><%= bounty.likesWeight || 0 %>%</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                            <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">REPOSTS</div>
+                            <div class="text-cyan" style="font-size: 1.25rem; font-weight: 700;"><%= bounty.repostsWeight || 0 %>%</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                            <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">COMMENTS</div>
+                            <div class="text-cyan" style="font-size: 1.25rem; font-weight: 700;"><%= bounty.commentsWeight || 0 %>%</div>
+                        </div>
+                    </div>
+                    <% } else { %>
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                        <span class="mono text-muted" style="font-size: 0.7rem;">[ENGAGEMENT_CRITERIA_UNAVAILABLE]</span>
+                    </div>
+                    <% } %>
+                    <% if (bounty.submissionsCount !== undefined) { %>
+                        <div style="margin-top: 1rem; text-align: center; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+                            <span class="mono text-soft" style="font-size: 0.7rem;">SUBMISSIONS: <span class="text-cyan"><%= bounty.submissionsCount %></span></span>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div>
+                <!-- TIMELINE -->
+                <div class="glass-panel" style="margin-bottom: 1.5rem;">
+                    <div class="section-label" style="margin-bottom: 1rem;">Timeline</div>
+                    
+                    <div style="margin-bottom: 1.25rem;">
+                        <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.25rem;">START DATE</div>
+                        <div class="text-white" style="font-size: 0.9rem;"><%= bounty.startDate || bounty.start_date || '—' %></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.25rem;">
+                        <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.25rem;">DEADLINE</div>
+                        <div class="text-warning" style="font-size: 0.9rem; font-weight: 600;"><%= bounty.deadline || bounty.end_date || '—' %></div>
+                    </div>
+                    
+                    <div>
+                        <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.25rem;">DAYS REMAINING</div>
+                        <div class="text-cyan" style="font-size: 1.5rem; font-weight: 700;"><%= bounty.daysRemaining || bounty.days_left || '—' %></div>
+                    </div>
+                </div>
+
+                <!-- DETAILS -->
+                <div class="glass-panel" style="margin-bottom: 1.5rem;">
+                    <div class="section-label" style="margin-bottom: 1rem;">Details</div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.25rem;">TYPE OF SERVICE</div>
+                        <div class="text-white" style="font-size: 0.85rem;"><%= bounty.category || bounty.type || '—' %></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.25rem;">TRANSACTION</div>
+                        <% if (bounty.transactionId || bounty.txId) { %>
+                        <div class="mono text-cyan" style="font-size: 0.7rem; word-break: break-all;"><%= (bounty.transactionId || bounty.txId).substring(0, 8) + '...' + (bounty.transactionId || bounty.txId).substring((bounty.transactionId || bounty.txId).length - 4) %></div>
+                        <% } else if (bounty.id) { %>
+                        <div class="mono text-cyan" style="font-size: 0.7rem; word-break: break-all;"><%= bounty.id.substring(0, 8) + '...' + bounty.id.substring(bounty.id.length - 4) %></div>
+                        <% } else { %>
+                        <div class="mono text-muted" style="font-size: 0.7rem;">—</div>
+                        <% } %>
+                    </div>
+                    
+                    <% if (bounty.daoName || bounty.organization) { %>
+                    <div>
+                        <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.25rem;">ORGANIZATION</div>
+                        <div class="text-white" style="font-size: 0.85rem;"><%= bounty.daoName || bounty.organization %></div>
+                    </div>
+                    <% } %>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="glass-panel">
+                    <div class="section-label" style="margin-bottom: 1rem;">Actions</div>
+                    <a href="#" class="btn btn-primary" style="width: 100%; margin-bottom: 0.75rem; display: block; text-align: center;">SUBMIT WORK</a>
+                    <button class="btn btn-secondary" style="width: 100%; display: block; text-align: center;">SHARE BOUNTY</button>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<style>
+@media (max-width: 900px) {
+    .container > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>

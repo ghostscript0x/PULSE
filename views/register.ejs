@@ -3,7 +3,7 @@
     <div style="width: 100%; max-width: 420px; position: relative; z-index: 1;">
         <section class="glass-panel premium-card card-accent-top" style="padding: 2rem 1.5rem;" data-aos="fade-in-up">
             <div class="section-label" style="text-align: center; margin-bottom: 1.5rem;">Registry Access</div>
-            <h2 style="font-family: var(--font-display); font-size: clamp(1.5rem, 5vw, 2rem); text-align: center; margin-bottom: 2rem; line-height: 1.1;">REGISTER NODE<span class="text-gradient">.</span></h2>
+            <h2 style="font-family: var(--font-display); font-size: clamp(1.5rem, 5vw, 2rem); text-align: center; margin-bottom: 2rem; line-height: 1.1;">CONNECT WALLET<span class="text-gradient">.</span></h2>
 
             <% if(typeof errors != 'undefined') { %>
                 <% errors.forEach(function(error) { %>
@@ -13,24 +13,18 @@
                 <% }); %>
             <% } %>
 
-            <form action="/auth/register" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;" novalidate>
-                <div class="form-group">
-                    <label for="username" class="form-label">USERNAME</label>
-                    <input type="text" id="username" name="username" value="<%= typeof username != 'undefined' ? username : '' %>" required
-                        class="form-input" placeholder="Choose your username" autocomplete="username">
+            <!-- Wallet Connection -->
+            <div id="wallet-connect-section">
+                <button type="button" id="connect-wallet-btn" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="currentColor"/>
+                    </svg>
+                    CONNECT WALLET TO REGISTER
+                </button>
+                <div id="wallet-status" style="margin-top: 1rem; text-align: center; display: none;">
+                    <div class="text-muted mono" style="font-size: 0.75rem;"></div>
                 </div>
-                <div class="form-group">
-                    <label for="password" class="form-label">ACCESS_KEY</label>
-                    <input type="password" id="password" name="password" required
-                        class="form-input" placeholder="Create a password" autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <label for="confirmPassword" class="form-label">CONFIRM_KEY</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required
-                        class="form-input" placeholder="Confirm your password" autocomplete="new-password">
-                </div>
-                <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">INITIALIZE_NODE</button>
-            </form>
+            </div>
 
             <div style="margin-top: 2rem; text-align: center;">
                 <a href="/auth/login" class="btn-link" style="font-size: 0.875rem;">ALREADY REGISTERED? →</a>
@@ -38,3 +32,88 @@
         </section>
     </div>
 </div>
+
+<!-- Ethers.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.0/ethers.umd.min.js"></script>
+
+<script>
+    (function() {
+        const connectBtn = document.getElementById('connect-wallet-btn');
+        const walletStatus = document.getElementById('wallet-status');
+
+        function getEthereumProvider() {
+            if (window.ethereum) {
+                return window.ethereum;
+            }
+            return null;
+        }
+
+        function detectWalletType(provider) {
+            const ua = navigator.userAgent || '';
+            if (ua.includes('MetaMask')) return 'metamask';
+            if (ua.includes('Trust') || provider.isTrust) return 'trustwallet';
+            if (ua.includes('Coinbase') || provider.isCoinbaseWallet) return 'coinbase';
+            if (ua.includes('Brave') || provider.isBraveWallet) return 'brave';
+            return 'generic';
+        }
+
+        connectBtn.addEventListener('click', async function() {
+            const provider = getEthereumProvider();
+
+            if (!provider) {
+                walletStatus.style.display = 'block';
+                walletStatus.querySelector('div').innerHTML = '<span class="text-critical">[ERROR] No wallet detected. Please install MetaMask, Trust Wallet, or another EVM wallet.</span>';
+                return;
+            }
+
+            try {
+                connectBtn.disabled = true;
+                connectBtn.innerHTML = '<span class="loading-spinner" style="width: 20px; height: 20px; border: 2px solid var(--text-muted); border-top-color: var(--accent-cyan); border-radius: 50%;"></span> CONNECTING...';
+
+                const ethersProvider = new ethers.BrowserProvider(provider);
+                await provider.request({ method: 'eth_requestAccounts' });
+                const signer = await ethersProvider.getSigner();
+                const walletAddress = await signer.getAddress();
+
+                const evmAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+                if (!evmAddressRegex.test(walletAddress)) {
+                    throw new Error('Invalid wallet address format');
+                }
+
+                const challengeRes = await fetch('/auth/wallet/challenge');
+                const challengeData = await challengeRes.json();
+
+                if (!challengeData.success) {
+                    throw new Error('Failed to get authentication challenge');
+                }
+
+                const { challenge, message, domain } = challengeData;
+                const signature = await signer.signMessage(message);
+                const walletType = detectWalletType(provider);
+
+                const verifyRes = await fetch('/auth/wallet/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ walletAddress, walletType, signature })
+                });
+
+                const verifyData = await verifyRes.json();
+
+                if (verifyData.success) {
+                    walletStatus.style.display = 'block';
+                    walletStatus.querySelector('div').innerHTML = '<span class="text-healthy">[SUCCESS] Wallet registered! Redirecting...</span>';
+                    window.location.href = verifyData.redirect || '/command-center';
+                } else {
+                    throw new Error(verifyData.error || 'Verification failed');
+                }
+
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                walletStatus.style.display = 'block';
+                walletStatus.querySelector('div').innerHTML = '<span class="text-critical">[ERROR] ' + (error.message || 'Connection failed') + '</span>';
+                connectBtn.disabled = false;
+                connectBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" fill="currentColor"/></svg> CONNECT WALLET TO REGISTER';
+            }
+        });
+    })();
+</script>
