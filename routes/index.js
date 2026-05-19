@@ -33,8 +33,27 @@ router.get('/bounty/:bountyId', ensureAuth, getBountyDetail);
 router.get('/insights', ensureAuth, async (req, res) => {
     const User = require('../models/User');
     const Snapshot = require('../models/Snapshot');
+    const { syncDaoData } = require('../services/healthService');
     try {
         const user = await User.findById(req.user.id);
+        const followedDaos = user.followedDaos || [];
+        
+        // Get selected DAO from query param, default to first
+        let selectedDao = req.query.dao || (followedDaos.length > 0 ? followedDaos[0].daoId : null);
+        
+        // JIT SYNC: Ensure snapshot exists for selected DAO before rendering
+        if (selectedDao) {
+            const existingSnapshot = await Snapshot.findOne({ daoId: selectedDao }).sort({ timestamp: -1 });
+            if (!existingSnapshot) {
+                console.log(`[INSIGHTS_JIT] No snapshot for ${selectedDao}, triggering sync...`);
+                try {
+                    await syncDaoData(selectedDao);
+                } catch (syncErr) {
+                    console.warn(`[INSIGHTS_JIT] Sync failed for ${selectedDao}:`, syncErr.message);
+                }
+            }
+        }
+        
         // Fetch local snapshot stats
         const snapshotCount = await Snapshot.countDocuments();
         const uniqueDaos = await Snapshot.distinct('daoId');
@@ -46,7 +65,8 @@ router.get('/insights', ensureAuth, async (req, res) => {
         
         res.render('insights', { 
             title: 'PULSE | Data Intelligence',
-            followedDaos: user.followedDaos || [],
+            followedDaos,
+            selectedDao,
             snapshotCount,
             uniqueDaos: uniqueDaos.length,
             avgHealth
@@ -56,6 +76,7 @@ router.get('/insights', ensureAuth, async (req, res) => {
         res.render('insights', { 
             title: 'PULSE | Data Intelligence',
             followedDaos: [],
+            selectedDao: null,
             snapshotCount: 0,
             uniqueDaos: 0,
             avgHealth: null

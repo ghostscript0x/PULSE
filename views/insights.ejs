@@ -7,8 +7,8 @@
     </section>
 
     <% 
-    // Check if user has any tracked DAOs - fetch stats from followed DAOs or show empty state
     const hasTrackedDaos = followedDaos && followedDaos.length > 0;
+    const activeDao = typeof selectedDao !== 'undefined' ? selectedDao : (hasTrackedDaos ? followedDaos[0].daoId : null);
     %>
 
     <% if (!hasTrackedDaos) { %>
@@ -19,27 +19,160 @@
         <a href="/command-center" class="btn btn-primary" style="display: inline-block;">INITIALIZE_TRACKING</a>
     </div>
     <% } else { %>
-    <!-- REAL DATA FROM TRACKED DAOs -->
-    <!-- Show tracked DAO selector -->
+    <!-- DAO SELECTOR -->
     <div style="margin-bottom: 2rem;">
         <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">SELECT_DAO:</div>
-        <select onchange="window.location.href='/intelligence/' + this.value" style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--accent-cyan); padding: 0.5rem 1rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.7rem; outline: none; cursor: pointer;">
+        <select id="daoSelector" onchange="window.location.href='/insights?dao=' + this.value" style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--accent-cyan); padding: 0.5rem 1rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.7rem; outline: none; cursor: pointer;">
             <% followedDaos.forEach(dao => { %>
-                <option value="<%= dao.daoId %>"><%= dao.name %></option>
+                <option value="<%= dao.daoId %>" <%= activeDao === dao.daoId ? 'selected' : '' %>><%= dao.name %></option>
             <% }) %>
         </select>
     </div>
 
-    <!-- AI INSIGHTS - Only available via API call per specific DAO -->
-    <div class="glass-panel" style="padding: 2rem; margin-bottom: 4rem;">
+    <!-- AI INSIGHTS SECTION -->
+    <div id="insightsSection" class="glass-panel" style="padding: 2rem; margin-bottom: 4rem;">
         <div class="section-label" style="margin-bottom: 1.5rem;">AI Intelligence</div>
-        <p class="text-muted mono" style="font-size: 0.7rem;">
-            [INTEL_REQUIRES_SELECTION] Select a DAO above to generate AI-powered insights via Groq.
-        </p>
+        
+        <div id="insightsLoading" style="text-align: center; padding: 2rem;">
+            <div class="mono text-cyan" style="font-size: 0.7rem;">[FETCHING_INTEL]</div>
+        </div>
+        
+        <div id="insightsContent" style="display: none;">
+            <div id="insightsSummary" style="margin-bottom: 1.5rem;">
+                <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">EXECUTIVE_SUMMARY</div>
+                <p class="text-soft" style="font-size: 0.9rem; line-height: 1.7;"></p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div>
+                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.75rem;">RISKS</div>
+                    <ul id="insightsRisks" class="mono text-warning" style="font-size: 0.75rem; padding-left: 1rem;"></ul>
+                </div>
+                <div>
+                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.75rem;">OPPORTUNITIES</div>
+                    <ul id="insightsOpportunities" class="mono text-healthy" style="font-size: 0.75rem; padding-left: 1rem;"></ul>
+                </div>
+                <div>
+                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.75rem;">ALERTS</div>
+                    <ul id="insightsAlerts" class="mono text-critical" style="font-size: 0.75rem; padding-left: 1rem;"></ul>
+                </div>
+            </div>
+        </div>
+        
+        <div id="insightsError" style="display: none; text-align: center; padding: 2rem;">
+            <div class="mono text-warning" style="font-size: 0.7rem; margin-bottom: 0.5rem;">[INTEL_UNAVAILABLE]</div>
+            <p class="text-soft" style="font-size: 0.8rem;"></p>
+        </div>
     </div>
+    
+    <script>
+        function loadInsights(daoId) {
+            if (!daoId) {
+                console.log('[FRONTEND] No daoId provided');
+                return;
+            }
+            
+            console.log('[FRONTEND] Loading insights for:', daoId);
+            
+            const loading = document.getElementById('insightsLoading');
+            const content = document.getElementById('insightsContent');
+            const error = document.getElementById('insightsError');
+            
+            loading.style.display = 'block';
+            content.style.display = 'none';
+            error.style.display = 'none';
+            
+            fetch('/api/insights/' + daoId)
+                .then(res => {
+                    console.log('[FRONTEND] Response status:', res.status);
+                    if (!res.ok) {
+                        return res.json().then(err => {
+                            throw new Error(err.message || `HTTP ${res.status}`);
+                        });
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('[FRONTEND] Response data:', data);
+                    loading.style.display = 'none';
+                    
+                    if (data.status === 'success' && data.data) {
+                        content.style.display = 'block';
+                        
+                        // Summary
+                        document.querySelector('#insightsSummary p').textContent = data.data.summary || 'No summary available';
+                        
+                        // Risks
+                        const risksList = document.getElementById('insightsRisks');
+                        risksList.innerHTML = '';
+                        (data.data.risks || []).forEach(risk => {
+                            const li = document.createElement('li');
+                            li.textContent = risk;
+                            li.style.marginBottom = '0.5rem';
+                            risksList.appendChild(li);
+                        });
+                        if (data.data.risks && data.data.risks.length === 0) {
+                            risksList.innerHTML = '<li class="text-muted">No risks detected</li>';
+                        }
+                        
+                        // Opportunities
+                        const oppList = document.getElementById('insightsOpportunities');
+                        oppList.innerHTML = '';
+                        (data.data.opportunities || []).forEach(opp => {
+                            const li = document.createElement('li');
+                            li.textContent = opp;
+                            li.style.marginBottom = '0.5rem';
+                            oppList.appendChild(li);
+                        });
+                        if (data.data.opportunities && data.data.opportunities.length === 0) {
+                            oppList.innerHTML = '<li class="text-muted">No opportunities identified</li>';
+                        }
+                        
+                        // Alerts
+                        const alertsList = document.getElementById('insightsAlerts');
+                        alertsList.innerHTML = '';
+                        (data.data.alerts || []).forEach(alert => {
+                            const li = document.createElement('li');
+                            li.textContent = alert;
+                            li.style.marginBottom = '0.5rem';
+                            alertsList.appendChild(li);
+                        });
+                        if (data.data.alerts && data.data.alerts.length === 0) {
+                            alertsList.innerHTML = '<li class="text-muted">No alerts</li>';
+                        }
+                        
+                        console.log('[FRONTEND] Insights displayed successfully');
+                    } else {
+                        console.error('[FRONTEND] Error in response:', data);
+                        error.style.display = 'block';
+                        const errorMsg = data.code === 'INSUFFICIENT_DATA' 
+                            ? 'No telemetry data available. Visit the Intelligence page to sync data first.'
+                            : (data.message || data.data?.message || 'Failed to load insights');
+                        error.querySelector('p').textContent = errorMsg;
+                    }
+                })
+                .catch(err => {
+                    console.error('[FRONTEND] Fetch error:', err);
+                    loading.style.display = 'none';
+                    error.style.display = 'block';
+                    error.querySelector('p').textContent = 'Error: ' + err.message;
+                });
+        }
+        
+        // Auto-load on page load if DAO is selected
+        document.addEventListener('DOMContentLoaded', function() {
+            const selector = document.getElementById('daoSelector');
+            if (selector && selector.value) {
+                console.log('[FRONTEND] Auto-loading insights for:', selector.value);
+                loadInsights(selector.value);
+            } else {
+                console.log('[FRONTEND] No DAO selected in selector');
+            }
+        });
+    </script>
     <% } %>
 
-    <!-- NETWORK STATS FROM LOCAL SNAPSHOTS (if any exist) -->
+    <!-- NETWORK STATS FROM LOCAL SNAPSHOTS -->
     <% if (typeof snapshotCount !== 'undefined' && snapshotCount > 0) { %>
     <section class="glass-panel" style="margin-bottom: 4rem; padding: 2rem;">
         <span class="section-label" style="margin-bottom: 2rem;">Local Telemetry</span>
@@ -64,7 +197,6 @@
     </section>
     <% } %>
 
-    <!-- FOOTER BADGE -->
     <div style="text-align: center; padding-bottom: 4rem; opacity: 0.5;">
         <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px;">NEURAL_SYNTHESIS_ENGINE_ACTIVE</div>
     </div>

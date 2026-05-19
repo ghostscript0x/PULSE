@@ -170,10 +170,14 @@ exports.getInsights = async (req, res, next) => {
             const insights = await aiService.generateInsights(latest.metrics);
             res.json({ status: 'success', data: insights });
         } catch (err) {
+            console.error('[INSIGHTS ERROR]', err.message);
             if (err.message === 'GROQ_API_KEY_MISSING') {
                 return res.json({ status: 'success', message: 'AI_DISABLED', code: 'AI_DISABLED' });
             }
-            throw err;
+            if (err.message === 'AI_PARSING_ERROR') {
+                return res.status(500).json({ status: 'error', message: 'AI_RESPONSE_INVALID', code: 'INFERENCE_FAILED' });
+            }
+            return res.status(500).json({ status: 'error', message: err.message, code: 'INFERENCE_FAILED' });
         }
     } catch (err) {
         next(err);

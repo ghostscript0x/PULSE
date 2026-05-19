@@ -200,39 +200,246 @@
                     <div class="text-soft mono shimmer" style="font-size: 0.75rem; padding: 1rem;">INITIALIZING_NEURAL_LAYERS...</div>
                 </section>
 
+                <%
+                    // REAL DATA - Process contributor data BEFORE rendering HTML
+                    const contributors = latest.rawLiveData?.contributors || [];
+                    const bounties = latest.rawLiveData?.bounties || [];
+                    
+                    const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+                    const timeBlocks = ['12AM-6AM', '6AM-12PM', '12PM-6PM', '6PM-12AM'];
+                    
+                    // Build REAL heatmap from contributor lastActive timestamps
+                    const heatmapData = Array(4).fill(null).map(() => Array(7).fill(0));
+                    
+                    contributors.forEach(c => {
+                        if (c.lastActive) {
+                            try {
+                                const date = new Date(c.lastActive);
+                                if (!isNaN(date.getTime())) {
+                                    const dayOfWeek = date.getDay(); // 0 = Sunday
+                                    const hour = date.getHours();
+                                    let blockIdx = 0;
+                                    if (hour >= 6 && hour < 12) blockIdx = 1;
+                                    else if (hour >= 12 && hour < 18) blockIdx = 2;
+                                    else if (hour >= 18) blockIdx = 3;
+                                    // Convert Sunday=0 to MON=0 format
+                                    const dayIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                                    heatmapData[blockIdx][dayIdx]++;
+                                }
+                            } catch (e) {}
+                        }
+                    });
+                    
+                    // Normalize to 0-100 scale
+                    const maxActivity = Math.max(...heatmapData.flat(), 1);
+                    const realHeatmap = heatmapData.map(row => row.map(val => Math.round((val / maxActivity) * 100)));
+                    
+                    // REAL SKILL DATA - Try to extract from contributor data
+                    const skillCounts = { 'Smart Contracts': 0, 'Frontend': 0, 'Design': 0, 'Research': 0, 'Community': 0 };
+                    
+                    contributors.forEach(c => {
+                        const role = (c.role || c.roles || c.title || c.type || '').toLowerCase();
+                        const skillsArr = (c.skills || c.tags || c.categories || []);
+                        const allText = role + ' ' + skillsArr.join(' ');
+                        
+                        if (allText.includes('solidity') || allText.includes('rust') || allText.includes('contract') || allText.includes('smart') || allText.includes('backend')) {
+                            skillCounts['Smart Contracts']++;
+                        } else if (allText.includes('frontend') || allText.includes('ui') || allText.includes('react') || allText.includes('web')) {
+                            skillCounts['Frontend']++;
+                        } else if (allText.includes('design') || allText.includes('ux') || allText.includes('graphic')) {
+                            skillCounts['Design']++;
+                        } else if (allText.includes('research') || allText.includes('analyst') || allText.includes('writer') || allText.includes('content')) {
+                            skillCounts['Research']++;
+                        } else if (allText.includes('community') || allText.includes('mod') || allText.includes('support') || allText.includes('social')) {
+                            skillCounts['Community']++;
+                        } else {
+                            skillCounts['Smart Contracts']++;
+                        }
+                    });
+                    
+                    const totalContributors = contributors.length || 1;
+                    const skills = Object.entries(skillCounts).map(([name, count]) => ({
+                        name,
+                        percent: Math.round((count / totalContributors) * 100),
+                        count
+                    }));
+                    
+                    const hasRealSkillData = contributors.some(c => c.role || c.roles || c.skills || c.tags);
+                    const dataStatus = hasRealSkillData ? 'LIVE_DATA' : 'INFERRED';
+                    %>
+
+                <!-- CONTRIBUTOR INTELLIGENCE MATRIX -->
                 <section class="glass-panel premium-card" style="padding: 0; overflow: hidden;">
                     <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
-                        <span class="section-label" style="margin: 0;">Activity Feed</span>
-                        <span class="mono text-muted" style="font-size: 0.55rem;">NODE_0x73...</span>
+                        <span class="section-label" style="margin: 0;">CONTRIBUTOR INTELLIGENCE MATRIX</span>
+                        <span class="mono <%= contributors.length > 0 ? 'text-healthy' : 'text-warning' %>" style="font-size: 0.55rem;"><%= contributors.length > 0 ? 'LIVE_DATA ' + contributors.length + ' nodes' : 'NO_DATA' %></span>
                     </div>
-                    <div class="table-wrapper">
-                        <table style="min-width: 450px;">
-                            <tbody class="mono" style="font-size: 0.75rem;">
-                                <% if (latest.rawLiveData?.bounties && latest.rawLiveData.bounties.length > 0) { %>
-                                    <% latest.rawLiveData.bounties.slice(0, 5).forEach(b => { %>
-                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                            <td style="padding: 1rem; color: var(--text-muted);">EVENT_SYNC</td>
-                                            <td style="padding: 1rem;" class="text-cyan"><%= b.id.substring(0, 12) %>...</td>
-                                            <td style="padding: 1rem;" class="text-healthy">VERIFIED</td>
-                                        </tr>
-                                    <% }) %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="3" style="text-align: center; padding: 4rem; color: var(--text-muted);">AWAITING_ACTIVITY_PACKETS...</td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 320px; gap: 0;">
+                        <!-- LEFT: Activity Heatmap (REAL DATA from lastActive) -->
+                        <div style="padding: 1.5rem; border-right: 1px solid var(--glass-border);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 1px;">ACTIVITY_INTENSITY_MAP</div>
+                                <div class="mono <%= contributors.length > 0 ? 'text-healthy' : 'text-warning' %>" style="font-size: 0.5rem;"><%= contributors.length %> contributors</div>
+                            </div>
+                            
+                            <!-- Day labels -->
+                            <div style="display: flex; margin-left: 50px; margin-bottom: 0.5rem;">
+                                <% days.forEach(day => { %>
+                                    <div style="flex: 1; text-align: center; font-size: 0.55rem; color: var(--text-muted);"><%= day %></div>
+                                <% }); %>
+                            </div>
+                            
+                            <!-- REAL HEATMAP GRID -->
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <% timeBlocks.forEach((block, blockIdx) => { %>
+                                <div style="display: flex; align-items: center; gap: 0;">
+                                    <div class="mono text-muted" style="font-size: 0.5rem; width: 45px; text-align: right; padding-right: 8px;"><%= block %></div>
+                                    <div style="display: flex; gap: 4px; flex: 1;">
+                                        <% days.forEach((day, dayIdx) => { 
+                                            const intensity = realHeatmap[blockIdx][dayIdx];
+                                            const rawCount = heatmapData[blockIdx][dayIdx];
+                                            let bgColor, glow;
+                                            if (intensity > 80) { 
+                                                bgColor = 'rgba(34, 197, 94, 0.8)'; 
+                                                glow = 'box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);';
+                                            } else if (intensity > 60) { 
+                                                bgColor = 'rgba(6, 182, 212, 0.7)'; 
+                                                glow = 'box-shadow: 0 0 6px rgba(6, 182, 212, 0.5);';
+                                            } else if (intensity > 40) { 
+                                                bgColor = 'rgba(6, 182, 212, 0.4)'; 
+                                                glow = '';
+                                            } else if (intensity > 20) { 
+                                                bgColor = 'rgba(107, 114, 128, 0.4)'; 
+                                                glow = '';
+                                            } else { 
+                                                bgColor = 'rgba(55, 65, 81, 0.5)'; 
+                                                glow = '';
+                                            }
+                                        %>
+                                        <div style="flex: 1; height: 28px; background: <%= bgColor %>; border-radius: 3px; <%= glow %>" title="<%= day %> <%= block %>: <%= rawCount %> activities"></div>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                                <% }); %>
+                            </div>
+                            
+                            <!-- Legend -->
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem; justify-content: center;">
+                                <span class="mono text-muted" style="font-size: 0.5rem;">LESS</span>
+                                <div style="display: flex; gap: 3px;">
+                                    <div style="width: 16px; height: 16px; background: rgba(55, 65, 81, 0.5); border-radius: 2px;"></div>
+                                    <div style="width: 16px; height: 16px; background: rgba(107, 114, 128, 0.4); border-radius: 2px;"></div>
+                                    <div style="width: 16px; height: 16px; background: rgba(6, 182, 212, 0.4); border-radius: 2px;"></div>
+                                    <div style="width: 16px; height: 16px; background: rgba(6, 182, 212, 0.7); border-radius: 2px; box-shadow: 0 0 4px rgba(6, 182, 212, 0.5);"></div>
+                                    <div style="width: 16px; height: 16px; background: rgba(34, 197, 94, 0.8); border-radius: 2px; box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);"></div>
+                                </div>
+                                <span class="mono text-muted" style="font-size: 0.5rem;">MORE</span>
+                            </div>
+                        </div>
+                        
+                        <!-- RIGHT: Skill Distribution (REAL DATA) & AI Insights -->
+                        <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
+                            <!-- REAL Skill Distribution -->
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 1px;">SKILL_DISTRIBUTION</div>
+                                    <div class="mono <%= hasRealSkillData ? 'text-healthy' : 'text-warning' %>" style="font-size: 0.5rem;"><%= dataStatus %></div>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                    <% skills.forEach(skill => { %>
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                            <span class="mono text-soft" style="font-size: 0.65rem;"><%= skill.name %></span>
+                                            <span class="mono text-cyan" style="font-size: 0.65rem;"><%= skill.percent %>% <span class="text-muted">(<%= skill.count %>)</span></span>
+                                        </div>
+                                        <div style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
+                                            <div style="width: <%= skill.percent %>%; height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green)); border-radius: 3px;"></div>
+                                        </div>
+                                    </div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                            
+                            <!-- AI Insight Box -->
+                            <div id="contributor-insight-box" style="background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 6px; padding: 1rem;">
+                                <div class="mono text-cyan" style="font-size: 0.55rem; margin-bottom: 0.75rem; letter-spacing: 1px;">// INTELLIGENCE</div>
+                                <div class="mono text-soft" style="font-size: 0.7rem; line-height: 1.6;">
+                                    <span class="text-warning">ANALYZING...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
+                
+                <script>
+                    // Fetch AI insights for contributor intelligence
+                    const contribInsightBox = document.getElementById('contributor-insight-box');
+                    if (contribInsightBox) {
+                        fetch(`/api/insights/<%= latest.daoId %>`)
+                            .then(res => res.json())
+                            .then(res => {
+                                if (res.status === 'success' && res.data) {
+                                    const d = res.data;
+                                    // Extract key insight for contributor matrix
+                                    let insightText = '';
+                                    if (d.alerts && d.alerts.length > 0) {
+                                        insightText = d.alerts[0];
+                                    } else if (d.risks && d.risks.length > 0) {
+                                        insightText = d.risks[0];
+                                    } else if (d.opportunities && d.opportunities.length > 0) {
+                                        insightText = d.opportunities[0];
+                                    } else {
+                                        insightText = 'Ecosystem activity nominal.';
+                                    }
+                                    contribInsightBox.innerHTML = `
+                                        <div class="mono text-cyan" style="font-size: 0.55rem; margin-bottom: 0.75rem; letter-spacing: 1px;">// INTELLIGENCE</div>
+                                        <div class="mono text-soft" style="font-size: 0.7rem; line-height: 1.6;">${escapeHtml(insightText)}</div>
+                                    `;
+                                } else {
+                                    contribInsightBox.innerHTML = `
+                                        <div class="mono text-cyan" style="font-size: 0.55rem; margin-bottom: 0.75rem; letter-spacing: 1px;">// INTELLIGENCE</div>
+                                        <div class="mono text-soft" style="font-size: 0.7rem; line-height: 1.6;">Insufficient telemetry data. Sync required.</div>
+                                    `;
+                                }
+                            })
+                            .catch(() => {
+                                contribInsightBox.innerHTML = `
+                                    <div class="mono text-cyan" style="font-size: 0.55rem; margin-bottom: 0.75rem; letter-spacing: 1px;">// INTELLIGENCE</div>
+                                    <div class="mono text-soft" style="font-size: 0.7rem; line-height: 1.6;">Connection error.</div>
+                                `;
+                            });
+                    }
+                </script>
             </div>
         </div>
 
         <script>
+            // HTML escape function to prevent XSS
+            function escapeHtml(text) {
+                if (!text) return '';
+                return text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
             const daoId = "<%= latest.daoId %>";
+            console.log('[INTELLIGENCE] Loading AI insights for:', daoId);
             fetch(`/api/insights/${daoId}`)
-                .then(res => res.json())
                 .then(res => {
+                    console.log('[INTELLIGENCE] Insights response status:', res.status);
+                    if (!res.ok) {
+                        return res.json().then(err => {
+                            throw new Error(err.message || `HTTP ${res.status}`);
+                        });
+                    }
+                    return res.json();
+                })
+                .then(res => {
+                    console.log('[INTELLIGENCE] Insights response:', res);
                     const panel = document.getElementById('ai-insights-panel');
                     if (res.status === 'success' && res.data) {
                         const d = res.data;
@@ -258,12 +465,18 @@
                                 </div>
                             </div>
                         `;
+                        console.log('[INTELLIGENCE] AI insights displayed');
                     } else {
-                        panel.innerHTML = '<div class="text-muted mono" style="font-size: 0.8rem;">[AI_OFFLINE] CONFIGURE_API_KEY</div>';
+                        console.error('[INTELLIGENCE] Error loading insights:', res);
+                        const errorMsg = res.code === 'INSUFFICIENT_DATA' 
+                            ? '[SYNC_REQUIRED] Visit this page to initialize telemetry'
+                            : (res.message || 'AI analysis unavailable');
+                        panel.innerHTML = `<div class="text-muted mono" style="font-size: 0.8rem;">${errorMsg}</div>`;
                     }
                 })
-                .catch(() => {
-                    document.getElementById('ai-insights-panel').innerHTML = '<div class="text-muted mono" style="font-size: 0.8rem;">[ERROR] INFERENCE_FAILED</div>';
+                .catch(err => {
+                    console.error('[INTELLIGENCE] Fetch error:', err);
+                    document.getElementById('ai-insights-panel').innerHTML = `<div class="text-muted mono" style="font-size: 0.8rem;">[ERROR] ${err.message}</div>`;
                 });
         </script>
     <% } %>
