@@ -1,194 +1,285 @@
-<div class="container" style="padding-top: 4rem;">
+<div class="container" style="padding-top: 1.5rem; padding-left: 1rem; padding-right: 1rem;">
     <!-- HEADER -->
-    <section class="page-header" style="text-align: left; margin-bottom: 3rem;">
-        <div class="section-label">Zero Authority Network</div>
-        <h1 style="font-family: var(--font-display); font-size: 2.5rem; line-height: 1.1;">DAO<span class="text-cyan">SCANNER</span></h1>
-        <p class="text-soft" style="margin-top: 1rem;">Query any DAO by UUID to retrieve live telemetry data from Zero Authority.</p>
+    <section class="page-header" style="text-align: left; margin-bottom: 2rem;">
+        <div class="section-label" style="font-size: 0.7rem; margin-bottom: 0.5rem;">Zero Authority Network</div>
+        <h1 style="font-family: var(--font-display); font-size: clamp(1.5rem, 6vw, 2.5rem); line-height: 1.1;">DAO<span class="text-cyan">SCANNER</span></h1>
+        <p class="text-soft" style="margin-top: 0.5rem; font-size: 0.85rem;">Query any DAO by UUID to retrieve live telemetry data from Zero Authority.</p>
     </section>
 
     <!-- SEARCH FORM -->
-    <div class="glass-panel" style="padding: 2rem; margin-bottom: 3rem;">
-        <form method="POST" action="/scanner" style="display: flex; gap: 1rem; align-items: flex-end;">
-            <div style="flex: 1;">
+    <div class="glass-panel" style="padding: 1.25rem; margin-bottom: 2rem;">
+        <form method="POST" action="/scanner" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="width: 100%;">
                 <label class="mono text-muted" style="font-size: 0.6rem; display: block; margin-bottom: 0.5rem; letter-spacing: 1px;">DAO_UUID_INPUT</label>
                 <input 
                     type="text" 
                     name="daoId" 
                     placeholder="Enter DAO UUID (e.g., f8b4fb46-4b3c-...)" 
-                    style="width: 100%; padding: 1rem; background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.9rem; border-radius: 4px; outline: none;"
+                    style="width: 100%; padding: 0.75rem; background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.85rem; border-radius: 4px; outline: none; box-sizing: border-box;"
                     value="<%= typeof daoData !== 'undefined' && daoData ? daoData.id : '' %>"
                 >
             </div>
-            <button type="submit" class="btn btn-primary" style="padding: 1rem 2rem;">INITIATE_SCAN</button>
+            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem; width: 100%;">INITIATE_SCAN</button>
         </form>
         
         <% if (error) { %>
-            <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 59, 59, 0.1); border: 1px solid rgba(255, 59, 59, 0.3); border-radius: 4px;">
-                <span class="mono text-critical" style="font-size: 0.75rem;"><%= error %></span>
+            <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(255, 59, 59, 0.1); border: 1px solid rgba(255, 59, 59, 0.3); border-radius: 4px;">
+                <span class="mono text-critical" style="font-size: 0.7rem;"><%= error %></span>
             </div>
         <% } %>
     </div>
+    <style>
+        @media (min-width: 768px) {
+            .glass-panel form {
+                flex-direction: row !important;
+                align-items: flex-end !important;
+                gap: 1rem !important;
+            }
+            .glass-panel form > div:first-child {
+                flex: 1 !important;
+            }
+            .glass-panel form button {
+                width: auto !important;
+                padding: 1rem 2rem !important;
+            }
+            .glass-panel {
+                padding: 2rem !important;
+            }
+        }
+    </style>
 
     <% if (daoData) { %>
     <!-- SCAN RESULTS -->
-    <div style="display: flex; flex-direction: column; gap: 2rem;">
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
         
         <!-- DAO HEADER -->
-        <div class="glass-panel premium-card" style="padding: 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div class="glass-panel premium-card" style="padding: 1.25rem;">
+            <div style="display: flex; flex-direction: column; gap: 1rem; align-items: flex-start;">
                 <div>
-                    <div class="section-label" style="margin-bottom: 0.5rem;">TARGET_NODE</div>
-                    <h2 class="text-white" style="font-family: var(--font-display); font-size: 1.8rem;"><%= daoData.name %></h2>
-                    <p class="mono text-muted" style="font-size: 0.7rem; margin-top: 0.5rem; word-break: break-all;"><%= daoData.id %></p>
+                    <div class="section-label" style="margin-bottom: 0.5rem; font-size: 0.65rem;">TARGET_NODE</div>
+                    <h2 class="text-white" style="font-family: var(--font-display); font-size: 1.4rem;"><%= daoData.name %></h2>
+                    <p class="mono text-muted" style="font-size: 0.6rem; margin-top: 0.5rem; word-break: break-all;"><%= daoData.id %></p>
                 </div>
                 <% if (daoData.health) { %>
-                <div style="text-align: right;">
-                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">HEALTH_SCORE</div>
-                    <div class="<%= daoData.health.score > 70 ? 'text-healthy' : 'text-warning' %>" style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display);"><%= daoData.health.score %></div>
-                    <div class="mono <%= daoData.health.score > 70 ? 'text-healthy' : 'text-warning' %>" style="font-size: 0.6rem;"><%= daoData.health.score > 70 ? 'THRIVING' : 'AT_RISK' %></div>
+                <div style="text-align: left; width: 100%; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+                    <div class="mono text-muted" style="font-size: 0.55rem; margin-bottom: 0.25rem;">HEALTH_SCORE</div>
+                    <div class="<%= daoData.health.score > 70 ? 'text-healthy' : 'text-warning' %>" style="font-size: 2rem; font-weight: 800; font-family: var(--font-display);"><%= daoData.health.score %></div>
+                    <div class="mono <%= daoData.health.score > 70 ? 'text-healthy' : 'text-warning' %>" style="font-size: 0.55rem;"><%= daoData.health.score > 70 ? 'THRIVING' : 'AT_RISK' %></div>
                 </div>
                 <% } %>
             </div>
             
             <% if (daoData.health && daoData.health.lastSync) { %>
-            <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
-                <span class="mono text-muted" style="font-size: 0.6rem;">LAST_SYNC: <%= new Date(daoData.health.lastSync).toLocaleString() %></span>
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+                <span class="mono text-muted" style="font-size: 0.55rem;">LAST_SYNC: <%= new Date(daoData.health.lastSync).toLocaleString() %></span>
             </div>
             <% } %>
         </div>
+        <style>
+            @media (min-width: 768px) {
+                .glass-panel.premium-card > div:first-child {
+                    flex-direction: row !important;
+                    justify-content: space-between !important;
+                    align-items: flex-start !important;
+                }
+                .glass-panel.premium-card > div:first-child > div:last-child {
+                    text-align: right !important;
+                    width: auto !important;
+                    padding-top: 0 !important;
+                    border-top: none !important;
+                }
+                .glass-panel.premium-card h2 {
+                    font-size: 1.8rem !important;
+                }
+            }
+        </style>
 
         <!-- VITAL METRICS -->
-        <div class="responsive-grid responsive-grid-4">
-            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-cyan); padding: 1.5rem; text-align: center;">
-                <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 1rem;">CONTRIBUTORS</div>
-                <div class="text-cyan" style="font-size: 2rem; font-weight: 800; font-family: var(--font-display);"><%= daoData.contributors.length %></div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-cyan); padding: 1rem; text-align: center;">
+                <div class="mono text-muted" style="font-size: 0.5rem; margin-bottom: 0.5rem;">CONTRIBUTORS</div>
+                <div class="text-cyan" style="font-size: 1.5rem; font-weight: 800; font-family: var(--font-display);"><%= daoData.contributors.length %></div>
             </div>
-            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1.5rem; text-align: center;">
-                <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 1rem;">BOUNTIES</div>
-                <div class="text-healthy" style="font-size: 2rem; font-weight: 800; font-family: var(--font-display);"><%= daoData.bounties.length %></div>
+            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1rem; text-align: center;">
+                <div class="mono text-muted" style="font-size: 0.5rem; margin-bottom: 0.5rem;">BOUNTIES</div>
+                <div class="text-healthy" style="font-size: 1.5rem; font-weight: 800; font-family: var(--font-display);"><%= daoData.bounties.length %></div>
             </div>
-            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-cyan); padding: 1.5rem; text-align: center;">
-                <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 1rem;">COMPLETED</div>
-                <div class="text-cyan" style="font-size: 2rem; font-weight: 800; font-family: var(--font-display);"><%= daoData.bounties.filter(b => b.bountyCompleted || b.status === 'Winner').length %></div>
+            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-cyan); padding: 1rem; text-align: center;">
+                <div class="mono text-muted" style="font-size: 0.5rem; margin-bottom: 0.5rem;">COMPLETED</div>
+                <div class="text-cyan" style="font-size: 1.5rem; font-weight: 800; font-family: var(--font-display);"><%= daoData.bounties.filter(b => b.bountyCompleted || b.status === 'Winner').length %></div>
             </div>
-            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1.5rem; text-align: center;">
-                <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 1rem;">OPEN</div>
-                <div class="text-healthy" style="font-size: 2rem; font-weight: 800; font-family: var(--font-display);"><%= daoData.bounties.filter(b => !b.bountyCompleted && b.status !== 'Winner').length %></div>
+            <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1rem; text-align: center;">
+                <div class="mono text-muted" style="font-size: 0.5rem; margin-bottom: 0.5rem;">OPEN</div>
+                <div class="text-healthy" style="font-size: 1.5rem; font-weight: 800; font-family: var(--font-display);"><%= daoData.bounties.filter(b => !b.bountyCompleted && b.status !== 'Winner').length %></div>
             </div>
         </div>
+        <style>
+            @media (min-width: 768px) {
+                .scanner-metrics {
+                    grid-template-columns: repeat(4, 1fr) !important;
+                    gap: 1.5rem !important;
+                }
+                .scanner-metrics .glass-panel {
+                    padding: 1.5rem !important;
+                }
+                .scanner-metrics .mono.text-muted {
+                    font-size: 0.6rem !important;
+                    margin-bottom: 1rem !important;
+                }
+                .scanner-metrics .text-cyan,
+                .scanner-metrics .text-healthy {
+                    font-size: 2rem !important;
+                }
+            }
+        </style>
 
         <!-- RAW DATA SECTIONS -->
-        <div class="responsive-grid responsive-grid-2" style="gap: 2rem;">
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
             
             <!-- CONTRIBUTORS RAW DATA -->
             <section class="glass-panel premium-card" style="padding: 0; overflow: hidden;">
-                <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
-                    <span class="section-label" style="margin: 0;">CONTRIBUTORS_RAW</span>
-                    <span class="mono text-cyan" style="font-size: 0.55rem;"><%= daoData.contributors.length %> NODES</span>
+                <div style="padding: 1rem; border-bottom: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 0.5rem; justify-content: space-between; align-items: flex-start;">
+                    <span class="section-label" style="margin: 0; font-size: 0.65rem;">CONTRIBUTORS_RAW</span>
+                    <span class="mono text-cyan" style="font-size: 0.5rem;"><%= daoData.contributors.length %> NODES</span>
                 </div>
                 
                 <% if (daoData.contributors.length > 0) { %>
-                <div style="max-height: 400px; overflow-y: auto;">
-                    <table style="width: 100%; font-size: 0.75rem;" class="mono">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; font-size: 0.7rem; min-width: 400px;" class="mono">
                         <thead>
                             <tr style="border-bottom: 1px solid var(--glass-border);">
-                                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">ID</th>
-                                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">NAME</th>
-                                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">REP</th>
-                                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">LAST_ACTIVE</th>
+                                <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">ID</th>
+                                <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">NAME</th>
+                                <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">REP</th>
+                                <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">LAST_ACTIVE</th>
                             </tr>
                         </thead>
                         <tbody>
                             <% daoData.contributors.slice(0, 50).forEach(c => { %>
                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                <td style="padding: 0.75rem; color: var(--accent-cyan);"><%= c.id ? c.id.substring(0, 12) + '...' : 'N/A' %></td>
-                                <td style="padding: 0.75rem; color: var(--text-soft);"><%= c.name || c.username || 'Unknown' %></td>
-                                <td style="padding: 0.75rem; color: var(--text-muted);"><%= c.reputationScore || 0 %></td>
-                                <td style="padding: 0.75rem; color: var(--text-muted);"><%= c.lastActive ? new Date(c.lastActive).toLocaleDateString() : 'N/A' %></td>
+                                <td style="padding: 0.5rem; color: var(--accent-cyan);"><%= c.id ? c.id.substring(0, 10) + '...' : 'N/A' %></td>
+                                <td style="padding: 0.5rem; color: var(--text-soft);"><%= c.name || c.username || 'Unknown' %></td>
+                                <td style="padding: 0.5rem; color: var(--text-muted);"><%= c.reputationScore || 0 %></td>
+                                <td style="padding: 0.5rem; color: var(--text-muted);"><%= c.lastActive ? new Date(c.lastActive).toLocaleDateString() : 'N/A' %></td>
                             </tr>
                             <% }) %>
                         </tbody>
                     </table>
                 </div>
                 <% if (daoData.contributors.length > 50) { %>
-                <div style="padding: 1rem; text-align: center; border-top: 1px solid var(--glass-border);">
-                    <span class="mono text-muted" style="font-size: 0.7rem;">...and <%= daoData.contributors.length - 50 %> more</span>
+                <div style="padding: 0.75rem; text-align: center; border-top: 1px solid var(--glass-border);">
+                    <span class="mono text-muted" style="font-size: 0.65rem;">...and <%= daoData.contributors.length - 50 %> more</span>
                 </div>
                 <% } %>
                 <% } else { %>
-                <div style="padding: 4rem; text-align: center; color: var(--text-muted);">NO_CONTRIBUTORS_FOUND</div>
+                <div style="padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.8rem;">NO_CONTRIBUTORS_FOUND</div>
                 <% } %>
             </section>
 
             <!-- BOUNTIES RAW DATA -->
             <section class="glass-panel premium-card" style="padding: 0; overflow: hidden;">
-                <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
-                    <span class="section-label" style="margin: 0;">BOUNTIES_RAW</span>
-                    <span class="mono text-cyan" style="font-size: 0.55rem;"><%= daoData.bounties.length %> CONTRACTS</span>
+                <div style="padding: 1rem; border-bottom: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 0.5rem; justify-content: space-between; align-items: flex-start;">
+                    <span class="section-label" style="margin: 0; font-size: 0.65rem;">BOUNTIES_RAW</span>
+                    <span class="mono text-cyan" style="font-size: 0.5rem;"><%= daoData.bounties.length %> CONTRACTS</span>
                 </div>
                 
                 <% if (daoData.bounties.length > 0) { %>
-                <div style="max-height: 400px; overflow-y: auto;">
-                    <table style="width: 100%; font-size: 0.75rem;" class="mono">
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; font-size: 0.7rem; min-width: 400px;" class="mono">
                         <thead>
                             <tr style="border-bottom: 1px solid var(--glass-border);">
-                                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">ID</th>
-                                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">TITLE</th>
-                                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">STATUS</th>
-                                <th style="padding: 1rem; text-align: left; color: var(--text-muted);">REWARD</th>
+                                <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">ID</th>
+                                <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">TITLE</th>
+                                <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">STATUS</th>
+                                <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">REWARD</th>
                             </tr>
                         </thead>
                         <tbody>
                             <% daoData.bounties.slice(0, 50).forEach(b => { %>
                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
-                                <td style="padding: 0.75rem; color: var(--accent-cyan);"><%= b.id ? b.id.substring(0, 12) + '...' : 'N/A' %></td>
-                                <td style="padding: 0.75rem; color: var(--text-soft); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= b.title || b.name || 'Untitled' %></td>
-                                <td style="padding: 0.75rem;"><span class="<%= b.bountyCompleted || b.status === 'Winner' ? 'text-healthy' : 'text-warning' %>" style="font-size: 0.7rem;"><%= b.status || (b.bountyCompleted ? 'Completed' : 'Open') %></span></td>
-                                <td style="padding: 0.75rem; color: var(--text-muted);"><%= b.reward || b.rewardAmount || 'N/A' %></td>
+                                <td style="padding: 0.5rem; color: var(--accent-cyan);"><%= b.id ? b.id.substring(0, 10) + '...' : 'N/A' %></td>
+                                <td style="padding: 0.5rem; color: var(--text-soft); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= b.title || b.name || 'Untitled' %></td>
+                                <td style="padding: 0.5rem;"><span class="<%= b.bountyCompleted || b.status === 'Winner' ? 'text-healthy' : 'text-warning' %>" style="font-size: 0.65rem;"><%= b.status || (b.bountyCompleted ? 'Completed' : 'Open') %></span></td>
+                                <td style="padding: 0.5rem; color: var(--text-muted);"><%= b.reward || b.rewardAmount || 'N/A' %></td>
                             </tr>
                             <% }) %>
                         </tbody>
                     </table>
                 </div>
                 <% if (daoData.bounties.length > 50) { %>
-                <div style="padding: 1rem; text-align: center; border-top: 1px solid var(--glass-border);">
-                    <span class="mono text-muted" style="font-size: 0.7rem;">...and <%= daoData.bounties.length - 50 %> more</span>
+                <div style="padding: 0.75rem; text-align: center; border-top: 1px solid var(--glass-border);">
+                    <span class="mono text-muted" style="font-size: 0.65rem;">...and <%= daoData.bounties.length - 50 %> more</span>
                 </div>
                 <% } %>
                 <% } else { %>
-                <div style="padding: 4rem; text-align: center; color: var(--text-muted);">NO_BOUNTIES_FOUND</div>
+                <div style="padding: 2rem; text-align: center; color: var(--text-muted); font-size: 0.8rem;">NO_BOUNTIES_FOUND</div>
                 <% } %>
             </section>
         </div>
+        <style>
+            @media (min-width: 768px) {
+                .scanner-tables {
+                    display: grid !important;
+                    grid-template-columns: repeat(2, 1fr) !important;
+                    gap: 2rem !important;
+                }
+                .scanner-tables table {
+                    font-size: 0.75rem !important;
+                }
+                .scanner-tables th,
+                .scanner-tables td {
+                    padding: 1rem !important;
+                }
+            }
+        </style>
 
         <!-- HEALTH METRICS -->
         <% if (daoData.health && daoData.health.metrics) { %>
-        <section class="glass-panel premium-card">
-            <span class="section-label" style="margin-bottom: 2rem;">TELEMETRY_METRICS</span>
+        <section class="glass-panel premium-card" style="padding: 1.25rem;">
+            <span class="section-label" style="margin-bottom: 1rem; display: block;">TELEMETRY_METRICS</span>
             
-            <div class="responsive-grid responsive-grid-5" style="gap: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                 <div style="text-align: center;">
-                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">VELOCITY</div>
-                    <div class="text-cyan" style="font-size: 1.5rem; font-weight: 700;"><%= Math.round(daoData.health.metrics.velocity || 0) %></div>
+                    <div class="mono text-muted" style="font-size: 0.5rem; margin-bottom: 0.25rem;">VELOCITY</div>
+                    <div class="text-cyan" style="font-size: 1.25rem; font-weight: 700;"><%= Math.round(daoData.health.metrics.velocity || 0) %></div>
                 </div>
                 <div style="text-align: center;">
-                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">COMPLETION</div>
-                    <div class="text-healthy" style="font-size: 1.5rem; font-weight: 700;"><%= Math.round(daoData.health.metrics.completionRate || 0) %>%</div>
+                    <div class="mono text-muted" style="font-size: 0.5rem; margin-bottom: 0.25rem;">COMPLETION</div>
+                    <div class="text-healthy" style="font-size: 1.25rem; font-weight: 700;"><%= Math.round(daoData.health.metrics.completionRate || 0) %>%</div>
                 </div>
                 <div style="text-align: center;">
-                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">RETENTION</div>
-                    <div class="text-cyan" style="font-size: 1.5rem; font-weight: 700;"><%= Math.round(daoData.health.metrics.retention || 0) %>%</div>
+                    <div class="mono text-muted" style="font-size: 0.5rem; margin-bottom: 0.25rem;">RETENTION</div>
+                    <div class="text-cyan" style="font-size: 1.25rem; font-weight: 700;"><%= Math.round(daoData.health.metrics.retention || 0) %>%</div>
                 </div>
                 <div style="text-align: center;">
-                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">REP_GROWTH</div>
-                    <div class="text-healthy" style="font-size: 1.5rem; font-weight: 700;"><%= Math.round(daoData.health.metrics.reputationGrowth || 0) %></div>
+                    <div class="mono text-muted" style="font-size: 0.5rem; margin-bottom: 0.25rem;">REP_GROWTH</div>
+                    <div class="text-healthy" style="font-size: 1.25rem; font-weight: 700;"><%= Math.round(daoData.health.metrics.reputationGrowth || 0) %></div>
                 </div>
-                <div style="text-align: center;">
-                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">DIVERSITY</div>
-                    <div class="text-cyan" style="font-size: 1.5rem; font-weight: 700;"><%= Math.round(daoData.health.metrics.diversity || 0) %></div>
+                <div style="text-align: center; grid-column: 1 / -1;">
+                    <div class="mono text-muted" style="font-size: 0.5rem; margin-bottom: 0.25rem;">DIVERSITY</div>
+                    <div class="text-cyan" style="font-size: 1.25rem; font-weight: 700;"><%= Math.round(daoData.health.metrics.diversity || 0) %></div>
                 </div>
             </div>
         </section>
+        <style>
+            @media (min-width: 768px) {
+                .glass-panel.premium-card:has(.mono:contains("VELOCITY")) > div {
+                    grid-template-columns: repeat(5, 1fr) !important;
+                    gap: 1.5rem !important;
+                }
+                .glass-panel.premium-card:has(.mono:contains("VELOCITY")) > div > div {
+                    grid-column: auto !important;
+                }
+                .glass-panel.premium-card:has(.mono:contains("VELOCITY")) .mono.text-muted {
+                    font-size: 0.6rem !important;
+                    margin-bottom: 0.5rem !important;
+                }
+                .glass-panel.premium-card:has(.mono:contains("VELOCITY")) .text-cyan,
+                .glass-panel.premium-card:has(.mono:contains("VELOCITY")) .text-healthy {
+                    font-size: 1.5rem !important;
+                }
+            }
+        </style>
         <% } %>
 
         <!-- TRACK THIS DAO BUTTON -->
@@ -196,13 +287,22 @@
             <form action="/follow-dao" method="POST" style="display: inline;">
                 <input type="hidden" name="daoId" value="<%= daoData.id %>">
                 <input type="hidden" name="name" value="<%= daoData.name %>">
-                <button type="submit" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 0.9rem;">TRACK_THIS_DAO</button>
+                <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-size: 0.85rem; width: 100%;">TRACK_THIS_DAO</button>
             </form>
         </div>
+        <style>
+            @media (min-width: 768px) {
+                .glass-panel + div button {
+                    width: auto !important;
+                    padding: 1rem 2rem !important;
+                    font-size: 0.9rem !important;
+                }
+            }
+        </style>
     </div>
     <% } %>
 
-    <div style="text-align: center; padding-bottom: 4rem; opacity: 0.5; margin-top: 3rem;">
-        <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px;">LIVE_ZERO_AUTH_INTEGRATION</div>
+    <div style="text-align: center; padding-bottom: 3rem; opacity: 0.5; margin-top: 2rem;">
+        <div class="mono text-muted" style="font-size: 0.55rem; letter-spacing: 1px;">LIVE_ZERO_AUTH_INTEGRATION</div>
     </div>
 </div>

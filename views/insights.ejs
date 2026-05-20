@@ -1,9 +1,9 @@
-<div class="container" style="padding-top: 2rem;">
+<div class="container" style="padding-top: 1.5rem; padding-left: 1rem; padding-right: 1rem;">
     <!-- HEADER -->
-    <section class="page-header" style="text-align: left; margin-bottom: 3rem;">
-        <div class="section-label">Data Intelligence</div>
-        <h1 style="font-family: var(--font-display); font-size: 2.5rem; line-height: 1.1;">ANALYTICS<span class="text-cyan">.</span></h1>
-        <p class="text-soft" style="margin-top: 1rem;">Deep historical analysis and qualitative intelligence generated from live telemetry.</p>
+    <section class="page-header" style="text-align: left; margin-bottom: 2rem;">
+        <div class="section-label" style="font-size: 0.7rem; margin-bottom: 0.5rem;">Data Intelligence</div>
+        <h1 style="font-family: var(--font-display); font-size: clamp(1.5rem, 6vw, 2.5rem); line-height: 1.1;">ANALYTICS<span class="text-cyan">.</span></h1>
+        <p class="text-soft" style="margin-top: 0.5rem; font-size: 0.85rem;">Deep historical analysis and qualitative intelligence generated from live telemetry.</p>
     </section>
 
     <% 
@@ -13,16 +13,16 @@
 
     <% if (!hasTrackedDaos) { %>
     <!-- EMPTY STATE - No DAOs tracked -->
-    <div class="glass-panel" style="padding: 4rem 2rem; text-align: center; margin-bottom: 4rem;">
-        <div class="text-warning mono" style="font-size: 0.7rem; margin-bottom: 1rem;">[NO_DAOS_TRACKED]</div>
-        <p class="text-soft" style="font-size: 0.9rem; margin-bottom: 2rem;">Track some DAOs to see real-time intelligence and insights.</p>
-        <a href="/command-center" class="btn btn-primary" style="display: inline-block;">INITIALIZE_TRACKING</a>
+    <div class="glass-panel" style="padding: 2rem 1rem; text-align: center; margin-bottom: 3rem;">
+        <div class="text-warning mono" style="font-size: 0.65rem; margin-bottom: 0.75rem;">[NO_DAOS_TRACKED]</div>
+        <p class="text-soft" style="font-size: 0.85rem; margin-bottom: 1.5rem;">Track some DAOs to see real-time intelligence and insights.</p>
+        <a href="/command-center" class="btn btn-primary" style="display: inline-block; padding: 0.75rem 1.5rem;">INITIALIZE_TRACKING</a>
     </div>
     <% } else { %>
     <!-- DAO SELECTOR -->
-    <div style="margin-bottom: 2rem;">
-        <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">SELECT_DAO:</div>
-        <select id="daoSelector" onchange="window.location.href='/insights?dao=' + this.value" style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--accent-cyan); padding: 0.5rem 1rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.7rem; outline: none; cursor: pointer;">
+    <div style="margin-bottom: 1.5rem;">
+        <div class="mono text-muted" style="font-size: 0.55rem; margin-bottom: 0.5rem;">SELECT_DAO:</div>
+        <select id="daoSelector" onchange="window.location.href='/insights?dao=' + this.value" style="background: var(--bg-card); border: 1px solid var(--glass-border); color: var(--accent-cyan); padding: 0.5rem 0.75rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.7rem; outline: none; cursor: pointer; width: 100%; box-sizing: border-box;">
             <% followedDaos.forEach(dao => { %>
                 <option value="<%= dao.daoId %>" <%= activeDao === dao.daoId ? 'selected' : '' %>><%= dao.name %></option>
             <% }) %>
@@ -30,40 +30,75 @@
     </div>
 
     <!-- AI INSIGHTS SECTION -->
-    <div id="insightsSection" class="glass-panel" style="padding: 2rem; margin-bottom: 4rem;">
-        <div class="section-label" style="margin-bottom: 1.5rem;">AI Intelligence</div>
+    <div id="insightsSection" class="glass-panel" style="padding: 1.25rem; margin-bottom: 3rem;">
+        <div class="section-label" style="margin-bottom: 1rem;">AI Intelligence</div>
         
-        <div id="insightsLoading" style="text-align: center; padding: 2rem;">
-            <div class="mono text-cyan" style="font-size: 0.7rem;">[FETCHING_INTEL]</div>
+        <div id="insightsLoading" style="text-align: center; padding: 1.5rem;">
+            <div class="mono text-cyan" style="font-size: 0.65rem;">[FETCHING_INTEL]</div>
         </div>
         
         <div id="insightsContent" style="display: none;">
-            <div id="insightsSummary" style="margin-bottom: 1.5rem;">
-                <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.5rem;">EXECUTIVE_SUMMARY</div>
-                <p class="text-soft" style="font-size: 0.9rem; line-height: 1.7;"></p>
+            <div id="insightsSummary" style="margin-bottom: 1rem;">
+                <div class="mono text-muted" style="font-size: 0.55rem; margin-bottom: 0.25rem;">EXECUTIVE_SUMMARY</div>
+                <p class="text-soft" style="font-size: 0.8rem; line-height: 1.6;"></p>
             </div>
             
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 1.5rem;">
+            <!-- Mobile-first: stacked columns -->
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;">
                 <div>
-                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.75rem;">RISKS</div>
-                    <ul id="insightsRisks" class="mono text-warning" style="font-size: 0.75rem; padding-left: 1rem;"></ul>
+                    <div class="mono text-muted" style="font-size: 0.55rem; margin-bottom: 0.5rem;">RISKS</div>
+                    <ul id="insightsRisks" class="mono text-warning" style="font-size: 0.7rem; padding-left: 1rem;"></ul>
                 </div>
                 <div>
-                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.75rem;">OPPORTUNITIES</div>
-                    <ul id="insightsOpportunities" class="mono text-healthy" style="font-size: 0.75rem; padding-left: 1rem;"></ul>
+                    <div class="mono text-muted" style="font-size: 0.55rem; margin-bottom: 0.5rem;">OPPORTUNITIES</div>
+                    <ul id="insightsOpportunities" class="mono text-healthy" style="font-size: 0.7rem; padding-left: 1rem;"></ul>
                 </div>
                 <div>
-                    <div class="mono text-muted" style="font-size: 0.6rem; margin-bottom: 0.75rem;">ALERTS</div>
-                    <ul id="insightsAlerts" class="mono text-critical" style="font-size: 0.75rem; padding-left: 1rem;"></ul>
+                    <div class="mono text-muted" style="font-size: 0.55rem; margin-bottom: 0.5rem;">ALERTS</div>
+                    <ul id="insightsAlerts" class="mono text-critical" style="font-size: 0.7rem; padding-left: 1rem;"></ul>
                 </div>
             </div>
         </div>
         
-        <div id="insightsError" style="display: none; text-align: center; padding: 2rem;">
-            <div class="mono text-warning" style="font-size: 0.7rem; margin-bottom: 0.5rem;">[INTEL_UNAVAILABLE]</div>
-            <p class="text-soft" style="font-size: 0.8rem;"></p>
+        <div id="insightsError" style="display: none; text-align: center; padding: 1.5rem;">
+            <div class="mono text-warning" style="font-size: 0.65rem; margin-bottom: 0.5rem;">[INTEL_UNAVAILABLE]</div>
+            <p class="text-soft" style="font-size: 0.75rem;"></p>
         </div>
     </div>
+
+    <style>
+        @media (min-width: 768px) {
+            .glass-panel {
+                padding: 2rem !important;
+            }
+            #insightsSection .section-label {
+                margin-bottom: 1.5rem !important;
+            }
+            #insightsSummary {
+                margin-bottom: 1.5rem !important;
+            }
+            #insightsSummary .mono.text-muted {
+                font-size: 0.6rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+            #insightsSummary .text-soft {
+                font-size: 0.9rem !important;
+                line-height: 1.7 !important;
+            }
+            #insightsContent > div:last-child {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 1.5rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            #insightsContent .mono.text-muted {
+                font-size: 0.6rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+            #insightsContent ul {
+                font-size: 0.75rem !important;
+            }
+        }
+    </style>
     
     <script>
         function loadInsights(daoId) {
@@ -174,30 +209,51 @@
 
     <!-- NETWORK STATS FROM LOCAL SNAPSHOTS -->
     <% if (typeof snapshotCount !== 'undefined' && snapshotCount > 0) { %>
-    <section class="glass-panel" style="margin-bottom: 4rem; padding: 2rem;">
-        <span class="section-label" style="margin-bottom: 2rem;">Local Telemetry</span>
-        <div class="responsive-grid responsive-grid-4">
+    <section class="glass-panel" style="margin-bottom: 3rem; padding: 1.25rem;">
+        <span class="section-label" style="margin-bottom: 1rem; display: block;">Local Telemetry</span>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
             <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">SNAPSHOTS</div>
-                <div class="text-cyan mono" style="font-size: 1.5rem; font-weight: 700;"><%= snapshotCount %></div>
+                <div class="text-muted mono" style="font-size: 0.55rem; margin-bottom: 0.25rem;">SNAPSHOTS</div>
+                <div class="text-cyan mono" style="font-size: 1.25rem; font-weight: 700;"><%= snapshotCount %></div>
             </div>
             <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">NODES</div>
-                <div class="text-cyan mono" style="font-size: 1.5rem; font-weight: 700;"><%= uniqueDaos || 0 %></div>
+                <div class="text-muted mono" style="font-size: 0.55rem; margin-bottom: 0.25rem;">NODES</div>
+                <div class="text-cyan mono" style="font-size: 1.25rem; font-weight: 700;"><%= uniqueDaos || 0 %></div>
             </div>
             <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">AVG_HEALTH</div>
-                <div class="text-healthy mono" style="font-size: 1.5rem; font-weight: 700;"><%= avgHealth || '—' %></div>
+                <div class="text-muted mono" style="font-size: 0.55rem; margin-bottom: 0.25rem;">AVG_HEALTH</div>
+                <div class="text-healthy mono" style="font-size: 1.25rem; font-weight: 700;"><%= avgHealth || '—' %></div>
             </div>
             <div style="text-align: center;">
-                <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">STATUS</div>
-                <div class="text-cyan mono" style="font-size: 1.5rem; font-weight: 700;">READY</div>
+                <div class="text-muted mono" style="font-size: 0.55rem; margin-bottom: 0.25rem;">STATUS</div>
+                <div class="text-cyan mono" style="font-size: 1.25rem; font-weight: 700;">READY</div>
             </div>
         </div>
     </section>
+    <style>
+        @media (min-width: 768px) {
+            .glass-panel.premium-card:has(.mono:contains("SNAPSHOTS")) {
+                padding: 2rem !important;
+            }
+            .glass-panel.premium-card:has(.mono:contains("SNAPSHOTS")) .section-label {
+                margin-bottom: 2rem !important;
+            }
+            .glass-panel.premium-card:has(.mono:contains("SNAPSHOTS")) > div {
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+            .glass-panel.premium-card:has(.mono:contains("SNAPSHOTS")) .mono {
+                font-size: 0.6rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+            .glass-panel.premium-card:has(.mono:contains("SNAPSHOTS")) .text-cyan,
+            .glass-panel.premium-card:has(.mono:contains("SNAPSHOTS")) .text-healthy {
+                font-size: 1.5rem !important;
+            }
+        }
+    </style>
     <% } %>
 
-    <div style="text-align: center; padding-bottom: 4rem; opacity: 0.5;">
-        <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px;">NEURAL_SYNTHESIS_ENGINE_ACTIVE</div>
+    <div style="text-align: center; padding-bottom: 3rem; opacity: 0.5;">
+        <div class="mono text-muted" style="font-size: 0.55rem; letter-spacing: 1px;">NEURAL_SYNTHESIS_ENGINE_ACTIVE</div>
     </div>
 </div>

@@ -1,64 +1,65 @@
-<div class="container" style="padding-top: 2rem;">
+<div class="container" style="padding-top: 1.5rem; padding-left: 1rem; padding-right: 1rem;">
     <!-- DASHBOARD HEADER -->
     <div class="hero-aura-enhanced"></div>
     
-    <section class="page-header" style="text-align: left; margin-bottom: 3rem;">
-        <div class="section-label" data-aos="fade-right">Ecosystem Overview</div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+    <section class="page-header" style="text-align: left; margin-bottom: 2rem;">
+        <div class="section-label" data-aos="fade-right" style="font-size: 0.7rem; margin-bottom: 0.75rem;">Ecosystem Overview</div>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
             <div>
-                <h1 style="font-family: var(--font-display); font-size: clamp(2.5rem, 8vw, 3.5rem); line-height: 1; margin: 0;">DASHBOARD<span class="text-gradient">.</span></h1>
-                <p class="text-soft" style="margin-top: 0.5rem; font-size: 0.95rem;">Real-time telemetry across the Zero Authority network.</p>
+                <h1 style="font-family: var(--font-display); font-size: clamp(1.75rem, 8vw, 3.5rem); line-height: 1.1; margin: 0;">DASHBOARD<span class="text-gradient">.</span></h1>
+                <p class="text-soft" style="margin-top: 0.5rem; font-size: 0.85rem;">Real-time telemetry across the Zero Authority network.</p>
             </div>
-            <div class="mono text-cyan gradient-border" style="font-size: 0.65rem; padding: 0.5rem 1rem; border-radius: 4px; background: rgba(0,212,255,0.03); letter-spacing: 1px;">
+            <div class="mono text-cyan gradient-border" style="font-size: 0.6rem; padding: 0.5rem 0.75rem; border-radius: 4px; background: rgba(0,212,255,0.03); letter-spacing: 1px; text-align: center;">
                 STATUS: <span class="text-healthy pulse-ring" style="padding-left: 0.5rem;">● OPERATIONAL</span>
             </div>
         </div>
     </section>
 
-    <!-- GLOBAL METRICS -->
-    <div class="responsive-grid responsive-grid-3" style="margin-bottom: 2.5rem;">
-        <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1.5rem;">
-            <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">ECOSYSTEM_HEALTH</div>
-            <div style="display: flex; align-items: baseline; gap: 0.5rem;">
-                <div class="text-healthy" style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display);"><%= stats.healthScore %></div>
+    <!-- GLOBAL METRICS - Mobile responsive grid -->
+    <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 2rem;">
+        <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1rem;">
+            <div class="mono text-muted" style="font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">ECOSYSTEM_HEALTH</div>
+            <div style="display: flex; align-items: baseline; gap: 0.25rem; flex-wrap: wrap;">
+                <div class="text-healthy" style="font-size: 1.75rem; font-weight: 800; font-family: var(--font-display);"><%= stats.healthScore %></div>
                 <% if (stats.healthScore >= 70) { %>
-                    <div class="text-healthy mono" style="font-size: 0.65rem;">↑ STABLE</div>
+                    <div class="text-healthy mono" style="font-size: 0.55rem;">↑ STABLE</div>
                 <% } else if (stats.healthScore >= 40) { %>
-                    <div class="text-warning mono" style="font-size: 0.65rem;">↓ CAUTION</div>
+                    <div class="text-warning mono" style="font-size: 0.55rem;">↓ CAUTION</div>
                 <% } else { %>
-                    <div class="text-critical mono" style="font-size: 0.65rem;">↓ CRITICAL</div>
+                    <div class="text-critical mono" style="font-size: 0.55rem;">↓ CRITICAL</div>
                 <% } %>
             </div>
-            <div class="text-muted mono" style="font-size: 0.55rem; margin-top: 0.5rem;">
+            <div class="text-muted mono" style="font-size: 0.5rem; margin-top: 0.25rem;">
                 <%= stats.healthScore >= 70 ? 'VITALITY_INDEX_STABLE' : (stats.healthScore >= 40 ? 'VITALITY_INDEX_DEGRADED' : 'VITALITY_INDEX_CRITICAL') %>
             </div>
         </div>
         
-        <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-cyan); padding: 1.5rem;">
-            <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">ACTIVE_NODES</div>
-            <div style="display: flex; align-items: baseline; gap: 0.5rem;">
-                <div class="text-cyan" style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display);"><%= (stats.activeContributors || 0).toLocaleString() %></div>
-                <div class="text-cyan mono" style="font-size: 0.65rem;">LIVE</div>
+        <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-cyan); padding: 1rem;">
+            <div class="mono text-muted" style="font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">ACTIVE_NODES</div>
+            <div style="display: flex; align-items: baseline; gap: 0.25rem;">
+                <div class="text-cyan" style="font-size: 1.75rem; font-weight: 800; font-family: var(--font-display);"><%= (stats.activeContributors || 0).toLocaleString() %></div>
+                <div class="text-cyan mono" style="font-size: 0.55rem;">LIVE</div>
             </div>
-            <div class="text-muted mono" style="font-size: 0.55rem; margin-top: 0.5rem;">CONTRIBUTOR_NETWORK_ACTIVE</div>
+            <div class="text-muted mono" style="font-size: 0.5rem; margin-top: 0.25rem;">CONTRIBUTOR_NETWORK_ACTIVE</div>
         </div>
 
-        <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1.5rem;">
-            <div class="mono text-muted" style="font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 1rem;">COMPLETION_RATE</div>
-            <div style="display: flex; align-items: baseline; gap: 0.5rem;">
-                <div class="text-healthy" style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-display);"><%= stats.completionRate || 0 %>%</div>
-                <div class="text-healthy mono" style="font-size: 0.65rem;">OPTIMIZED</div>
+        <div class="glass-panel premium-card" style="border-top: 3px solid var(--accent-green); padding: 1rem;">
+            <div class="mono text-muted" style="font-size: 0.55rem; letter-spacing: 1px; margin-bottom: 0.5rem;">COMPLETION_RATE</div>
+            <div style="display: flex; align-items: baseline; gap: 0.25rem;">
+                <div class="text-healthy" style="font-size: 1.75rem; font-weight: 800; font-family: var(--font-display);"><%= stats.completionRate || 0 %>%</div>
+                <div class="text-healthy mono" style="font-size: 0.55rem;">OPTIMIZED</div>
             </div>
-            <div class="text-muted mono" style="font-size: 0.55rem; margin-top: 0.5rem;">PRODUCTION_VELOCITY_PEAK</div>
+            <div class="text-muted mono" style="font-size: 0.5rem; margin-top: 0.25rem;">PRODUCTION_VELOCITY_PEAK</div>
         </div>
     </div>
 
-    <div class="responsive-grid responsive-grid-2" style="margin-bottom: 4rem; align-items: start;">
+    <!-- Main grid - stacked on mobile, side-by-side on tablet -->
+    <div class="dashboard-main-grid" style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3rem; align-items: stretch;">
         <!-- LEFT: ECOSYSTEM VITALITY -->
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            <section class="glass-panel premium-card" style="text-align: center; padding: 3rem 2rem; background: radial-gradient(circle at center, rgba(0,245,255,0.05) 0%, transparent 100%);">
-                <span class="section-label" style="margin-bottom: 2.5rem;">Network Vitality</span>
-                <div class="gauge-container pulse-ring" style="max-width: 240px;">
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <section class="glass-panel premium-card" style="text-align: center; padding: 2rem 1rem; background: radial-gradient(circle at center, rgba(0,245,255,0.05) 0%, transparent 100%);">
+                <span class="section-label" style="margin-bottom: 1.5rem; display: block;">Network Vitality</span>
+                <div class="gauge-container pulse-ring" style="max-width: 160px; margin: 0 auto;">
                     <svg class="gauge-svg" viewBox="0 0 100 100">
                         <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="5" />
                         <circle cx="50" cy="50" r="45" fill="none" stroke="url(#dashGrad)" stroke-width="5" 
@@ -72,33 +73,33 @@
                         </defs>
                     </svg>
                     <div class="gauge-center">
-                        <div class="gauge-number text-gradient"><%= stats.healthScore %></div>
-                        <div class="mono text-soft" style="font-size: 0.6rem; margin-top: 0.5rem; letter-spacing: 2px;">INDEX</div>
+                        <div class="gauge-number text-gradient" style="font-size: 1.5rem;"><%= stats.healthScore %></div>
+                        <div class="mono text-soft" style="font-size: 0.5rem; margin-top: 0.25rem; letter-spacing: 1px;">INDEX</div>
                     </div>
                 </div>
-                <div class="mono <%= stats.healthScore >= 70 ? 'text-healthy' : (stats.healthScore >= 40 ? 'text-warning' : 'text-critical') %>" style="font-size: 0.65rem; margin-top: 2.5rem; letter-spacing: 3px;">
+                <div class="mono <%= stats.healthScore >= 70 ? 'text-healthy' : (stats.healthScore >= 40 ? 'text-warning' : 'text-critical') %>" style="font-size: 0.6rem; margin-top: 1.5rem; letter-spacing: 2px;">
                 <%= stats.healthScore >= 70 ? 'STATUS_THRIVING' : (stats.healthScore >= 40 ? 'STATUS_DEGRADED' : 'STATUS_CRITICAL') %>
             </div>
             </section>
 
-            <a href="/intelligence" class="btn-glow" style="padding: 1.25rem; text-align: center; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 1px;">
+            <a href="/intelligence" class="btn-glow" style="padding: 1rem; text-align: center; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 1px;">
                 INITIALIZE_SPECIFIC_TELEMETRY →
             </a>
         </div>
 
         <!-- RIGHT: NEURAL SYNTHESIS & RECENT ACTIVITY -->
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            <section class="glass-panel premium-card" style="border-left: 3px solid var(--accent-cyan);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <section class="glass-panel premium-card" style="border-left: 3px solid var(--accent-cyan); padding: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
                     <span class="section-label" style="margin: 0;">Ecosystem Synthesis</span>
-                    <span class="mono text-cyan" style="font-size: 0.55rem; opacity: 0.6;">LLAMA_3.3_INFERENCE</span>
+                    <span class="mono text-cyan" style="font-size: 0.5rem; opacity: 0.6;">LLAMA_3.3_INFERENCE</span>
                 </div>
                 <% 
                     const health = stats.healthScore || 0;
                     const statusText = health >= 70 ? 'Optimal Performance' : (health >= 40 ? 'Moderate Activity' : 'Degraded State');
                     const riskLevel = health >= 70 ? 'LOW_RISK' : (health >= 40 ? 'MODERATE_RISK' : 'HIGH_RISK');
                 %>
-                <p class="text-soft" style="font-size: 0.9rem; line-height: 1.8;">
+                <p class="text-soft" style="font-size: 0.8rem; line-height: 1.6;">
                     Network core is currently exhibiting <span class="text-white"><%= statusText %></span>. 
                     <% if (stats.activeContributors) { %>
                         Active contributor count: <%= stats.activeContributors %>.
@@ -106,7 +107,7 @@
                         Telemetry data pending synchronization.
                     <% } %>
                 </p>
-                <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                     <span class="feature-tag" style="background: <%= riskLevel === 'LOW_RISK' ? 'rgba(0,255,136,0.1)' : (riskLevel === 'MODERATE_RISK' ? 'rgba(255,170,0,0.1)' : 'rgba(255,68,68,0.1)') %>; color: <%= riskLevel === 'LOW_RISK' ? 'var(--accent-green)' : (riskLevel === 'MODERATE_RISK' ? 'var(--status-warning)' : 'var(--accent-critical)') %>;"><%= riskLevel %></span>
                     <% if (stats.completionRate >= 60) { %>
                         <span class="feature-tag" style="background: rgba(0,245,255,0.1); color: var(--accent-cyan);">VELOCITY_NORMAL</span>
@@ -155,33 +156,33 @@
             %>
             
             <section class="glass-panel premium-card" style="padding: 0; overflow: hidden;">
-                <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
-                    <span class="section-label" style="margin: 0;">ECOSYSTEM ACTIVITY MAP</span>
+                <div style="padding: 1rem; border-bottom: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 0.5rem; justify-content: space-between; align-items: flex-start;">
+                    <span class="section-label" style="margin: 0; font-size: 0.65rem;">ECOSYSTEM ACTIVITY MAP</span>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <% if (allContributors.length > 0) { %>
                             <span class="pulse-dot" style="width: 4px; height: 4px;"></span>
-                            <span class="text-healthy mono" style="font-size: 0.55rem;">LIVE_DATA <%= allContributors.length %> NODES</span>
+                            <span class="text-healthy mono" style="font-size: 0.5rem;">LIVE_DATA <%= allContributors.length %> NODES</span>
                         <% } else { %>
-                            <span class="text-muted mono" style="font-size: 0.55rem;">PENDING</span>
+                            <span class="text-muted mono" style="font-size: 0.5rem;">PENDING</span>
                         <% } %>
                     </div>
                 </div>
                 
-                <div style="padding: 1.5rem;">
+                <div style="padding: 1rem;">
                     <% if (allContributors.length > 0) { %>
                     <!-- Day labels -->
-                    <div style="display: flex; margin-left: 55px; margin-bottom: 0.5rem;">
+                    <div style="display: flex; margin-left: 40px; margin-bottom: 0.5rem; overflow-x: auto;">
                         <% days.forEach(day => { %>
-                            <div style="flex: 1; text-align: center; font-size: 0.55rem; color: var(--text-muted);"><%= day %></div>
+                            <div style="flex: 1; min-width: 25px; text-align: center; font-size: 0.45rem; color: var(--text-muted);"><%= day %></div>
                         <% }); %>
                     </div>
                     
-                    <!-- Heatmap grid -->
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <!-- Heatmap grid - compact on mobile -->
+                    <div style="display: flex; flex-direction: column; gap: 3px;">
                         <% timeBlocks.forEach((block, blockIdx) => { %>
                         <div style="display: flex; align-items: center; gap: 0;">
-                            <div class="mono text-muted" style="font-size: 0.5rem; width: 50px; text-align: right; padding-right: 8px;"><%= block %></div>
-                            <div style="display: flex; gap: 4px; flex: 1;">
+                            <div class="mono text-muted" style="font-size: 0.4rem; width: 38px; text-align: right; padding-right: 4px; white-space: nowrap;"><%= block %></div>
+                            <div style="display: flex; gap: 2px; flex: 1; min-width: 0;">
                                 <% days.forEach((day, dayIdx) => { 
                                     const intensity = realHeatmap[blockIdx][dayIdx];
                                     const rawCount = heatmapData[blockIdx][dayIdx];
@@ -203,7 +204,7 @@
                                         glow = '';
                                     }
                                 %>
-                                <div style="flex: 1; height: 32px; background: <%= bgColor %>; border-radius: 3px; <%= glow %>" title="<%= day %> <%= block %>: <%= rawCount %> activities"></div>
+                                <div style="flex: 1; min-height: 20px; min-width: 0; background: <%= bgColor %>; border-radius: 2px; <%= glow %>" title="<%= day %> <%= block %>: <%= rawCount %> activities"></div>
                                 <% }); %>
                             </div>
                         </div>
@@ -211,21 +212,21 @@
                     </div>
                     
                     <!-- Legend -->
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; justify-content: center;">
-                        <span class="mono text-muted" style="font-size: 0.5rem;">LESS</span>
-                        <div style="display: flex; gap: 3px;">
-                            <div style="width: 16px; height: 16px; background: rgba(55, 65, 81, 0.5); border-radius: 2px;"></div>
-                            <div style="width: 16px; height: 16px; background: rgba(107, 114, 128, 0.4); border-radius: 2px;"></div>
-                            <div style="width: 16px; height: 16px; background: rgba(6, 182, 212, 0.4); border-radius: 2px;"></div>
-                            <div style="width: 16px; height: 16px; background: rgba(6, 182, 212, 0.7); border-radius: 2px; box-shadow: 0 0 4px rgba(6, 182, 212, 0.5);"></div>
-                            <div style="width: 16px; height: 16px; background: rgba(34, 197, 94, 0.8); border-radius: 2px; box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);"></div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                        <span class="mono text-muted" style="font-size: 0.4rem;">LESS</span>
+                        <div style="display: flex; gap: 2px;">
+                            <div style="width: 12px; height: 12px; background: rgba(55, 65, 81, 0.5); border-radius: 2px;"></div>
+                            <div style="width: 12px; height: 12px; background: rgba(107, 114, 128, 0.4); border-radius: 2px;"></div>
+                            <div style="width: 12px; height: 12px; background: rgba(6, 182, 212, 0.4); border-radius: 2px;"></div>
+                            <div style="width: 12px; height: 12px; background: rgba(6, 182, 212, 0.7); border-radius: 2px; box-shadow: 0 0 4px rgba(6, 182, 212, 0.5);"></div>
+                            <div style="width: 12px; height: 12px; background: rgba(34, 197, 94, 0.8); border-radius: 2px; box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);"></div>
                         </div>
-                        <span class="mono text-muted" style="font-size: 0.5rem;">MORE</span>
+                        <span class="mono text-muted" style="font-size: 0.4rem;">MORE</span>
                     </div>
                     <% } else { %>
-                    <div style="text-align: center; padding: 2rem;">
-                        <div class="text-muted mono" style="font-size: 0.6rem; margin-bottom: 0.5rem;">[NO_TELEMETRY]</div>
-                        <p class="text-soft" style="font-size: 0.8rem;">Track DAOs to see ecosystem activity patterns.</p>
+                    <div style="text-align: center; padding: 1.5rem;">
+                        <div class="text-muted mono" style="font-size: 0.55rem; margin-bottom: 0.5rem;">[NO_TELEMETRY]</div>
+                        <p class="text-soft" style="font-size: 0.75rem;">Track DAOs to see ecosystem activity patterns.</p>
                     </div>
                     <% } %>
                 </div>
@@ -233,22 +234,109 @@
         </div>
     </div>
 
+    <!-- Responsive styles for tablet and desktop -->
+    <style>
+        @media (min-width: 480px) {
+            .dashboard-main-grid > div:first-child {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+        }
+        @media (min-width: 768px) {
+            .dashboard-main-grid {
+                flex-direction: row !important;
+                gap: 1.5rem !important;
+            }
+            .dashboard-main-grid > div:first-child {
+                flex: 0 0 320px !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+            .dashboard-main-grid > div:last-child {
+                flex: 1 !important;
+            }
+            .dashboard-main-grid .glass-panel.premium-card:has(.gauge-container) {
+                padding: 3rem 2rem !important;
+            }
+            .dashboard-main-grid .gauge-container {
+                max-width: 240px !important;
+            }
+            .dashboard-main-grid .gauge-number {
+                font-size: 2rem !important;
+            }
+            .dashboard-main-grid .mono.text-soft {
+                font-size: 0.6rem !important;
+                margin-top: 0.5rem !important;
+                letter-spacing: 2px !important;
+            }
+            .dashboard-main-grid .btn-glow {
+                padding: 1.25rem !important;
+                font-size: 0.8rem !important;
+            }
+            .dashboard-main-grid .glass-panel:has(.section-label) {
+                padding: 1.5rem !important;
+            }
+            .dashboard-main-grid .text-soft {
+                font-size: 0.9rem !important;
+                line-height: 1.8 !important;
+            }
+            .dashboard-main-grid .feature-tag {
+                margin-top: 1.5rem !important;
+            }
+            .dashboard-main-grid .glass-panel.premium-card:has(> div:first-child) {
+                border-left: 3px solid var(--accent-cyan) !important;
+            }
+            /* Metrics grid */
+            .dashboard-main-grid + div > .glass-panel {
+                padding: 1.5rem !important;
+            }
+            .dashboard-main-grid + div .mono.text-muted {
+                font-size: 0.6rem !important;
+                letter-spacing: 2px !important;
+                margin-bottom: 1rem !important;
+            }
+            .dashboard-main-grid + div .text-cyan,
+            .dashboard-main-grid + div .text-healthy,
+            .dashboard-main-grid + div .text-warning,
+            .dashboard-main-grid + div .text-critical {
+                font-size: 2.5rem !important;
+            }
+            .dashboard-main-grid + div .mono {
+                font-size: 0.65rem !important;
+            }
+        }
+    </style>
+
     <!-- QUICK ACCESS STRIP -->
     <% if (followedDaos && followedDaos.length > 0) { %>
-        <section style="margin-bottom: 6rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <section style="margin-bottom: 4rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; align-items: flex-start;">
                 <span class="section-label" style="margin: 0;">Your Tracked Nodes</span>
                 <a href="/command-center" class="mono text-soft" style="font-size: 0.6rem; text-decoration: none;">MANAGE_ALL →</a>
             </div>
-            <div class="responsive-grid responsive-grid-4">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;">
                 <% followedDaos.slice(0, 4).forEach(dao => { %>
-                    <a href="/intelligence/<%= dao.daoId %>" class="glass-panel premium-card tracked-node-card" style="padding: 1.25rem;">
+                    <a href="/intelligence/<%= dao.daoId %>" class="glass-panel premium-card tracked-node-card" style="padding: 1rem;">
                         <div class="mono text-cyan pulse-ring" style="font-size: 0.5rem; margin-bottom: 0.5rem; letter-spacing: 1px; display: inline-block;">LINK_ACTIVE</div>
                         <div class="text-white mono node-name"><%= dao.name %></div>
-                        <div class="text-muted mono" style="font-size: 0.5rem; letter-spacing: 1px; margin-top: 0.5rem;">[MONITOR_NODE]</div>
+                        <div class="text-muted mono" style="font-size: 0.5rem; letter-spacing: 1px; margin-top: 0.25rem;">[MONITOR_NODE]</div>
                     </a>
                 <% }) %>
             </div>
         </section>
+        <style>
+            @media (min-width: 480px) {
+                .tracked-node-card ~ div {
+                    grid-template-columns: repeat(2, 1fr) !important;
+                }
+            }
+            @media (min-width: 768px) {
+                .tracked-node-card ~ div {
+                    grid-template-columns: repeat(4, 1fr) !important;
+                    gap: 1.5rem !important;
+                }
+                .tracked-node-card ~ div > * {
+                    padding: 1.25rem !important;
+                }
+            }
+        </style>
     <% } %>
 </div>
